@@ -1,0 +1,35 @@
+export const builders = {
+    name: "",
+    slug: "",
+    starting_price: "",
+    configuration: "",
+    ratings: "",
+    estb_year: "",
+    residential_num: "",
+    commercial_num: "",
+    coming_soon: "",
+    dwarka_page_url: "",
+    seo: {
+        title: "",
+        description: "",
+        footer_title: "",
+        footer_description: "",
+        robots: "",
+        index: false,
+        keywords: "",
+        twitter: {
+          title: "",
+          description: "",
+        },
+        open_graph: {
+          title: "",
+          description: "",
+        },
+      },
+    images: [{
+        image: "",
+        name: "",
+        alt: "",
+        order: 0,
+      }],
+}

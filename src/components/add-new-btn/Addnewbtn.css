@@ -1,0 +1,8 @@
+.addProperty-btn {
+  width: 165px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background-color: #ff385c !important;
+  border: none;
+}

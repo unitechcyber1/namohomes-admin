@@ -1,0 +1,19 @@
+.table_container {
+  display: flex;
+  width: 100%;
+}
+
+.top_table_box1 {
+  width: 60%;
+}
+.top_table_box2 {
+  width: 40%;
+  margin-left: 30px;
+}
+.table_border {
+  margin-top: 30px;
+}
+
+.table_top_header {
+  margin: 40px 0px !important;
+}

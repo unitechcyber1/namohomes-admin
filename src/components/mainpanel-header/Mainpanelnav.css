@@ -1,0 +1,25 @@
+.mainpanel-icon {
+  font-size: 27px;
+  color: #ff385c;
+  cursor: pointer;
+}
+.logoutbtn {
+  width: 160px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: right;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  cursor: pointer;
+  z-index: 99;
+}
+.dropdown-toggle::after {
+  display: none !important;
+}
+.dropdown-item {
+  height: 46px;
+  display: flex !important;
+  justify-content: flex-start;
+  align-items: center;
+}

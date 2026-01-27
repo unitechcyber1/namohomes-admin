@@ -1,0 +1,11 @@
+.form-select {
+  border: none;
+}
+.checkBox_style {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.checkBox_style input {
+  height: 20px;
+}
