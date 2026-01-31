@@ -6,10 +6,10 @@ export const getSeoDataById = async (
 ) => {
   try {
     if (url.includes("dwarkaexpressway")) {
-      const { data } = await axios.get(`${BASE_URL}/api/admin/dwarka/seos/${id}`);
+      const { data } = await axios.get(`${BASE_URL}/api/admin/seos/${id}`);
      return data;
    }else{
-    const { data } = await axios.get(`${BASE_URL}/api/admin/seo/seos/${id}`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/seos/${id}`);
     return data;
    }
   } catch (error) {
@@ -21,13 +21,13 @@ export const getSeoData = async (setLoading, setSeos, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
       setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/admin/dwarka/seos`);
+      const { data } = await axios.get(`${BASE_URL}/api/admin/seos`);
      const newData = data.reverse();
      setSeos(newData);
      setLoading(false);
    }else{
     setLoading(true);
-    const { data } = await axios.get(`${BASE_URL}/api/admin/seo/seos`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/seos`);
     const newData = data.reverse();
     setSeos(newData);
     setLoading(false);

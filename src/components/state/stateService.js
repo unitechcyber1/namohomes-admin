@@ -4,7 +4,7 @@ import BASE_URL from "../../apiConfig";
 export const getState = async (setStates, setLoading) => {
   try {
     setLoading(true);
-    const { data } = await axios.get(`${BASE_URL}/api/admin/state/states`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/states`);
     setLoading(false);
     setStates(data);
   } catch (error) {

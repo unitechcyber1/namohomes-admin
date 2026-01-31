@@ -12,7 +12,7 @@ export const deleteAmenity = async (id) => {
 
 export const getallAmenities = async () => {
     try {
-        const { data } = await axios.get(`${BASE_URL}/api/admin/amenity/amenities`);
+        const { data } = await axios.get(`${BASE_URL}/api/admin/amenity`);
         return data
     } catch (error) {
         console.log(error);
@@ -28,14 +28,14 @@ export const getAmenityById = async (id) => {
 };
 export const saveAmenities = async (data) => {
     try {
-        return await axios.post(`${BASE_URL}/api/admin/amenity/amenities`, data);
+        return await axios.post(`${BASE_URL}/api/admin/amenities`, data);
     } catch (error) {
         console.log(error);
     }
 };
 export const editAmenities = async (id, data) => {
     try {
-        return await axios.put(`${BASE_URL}/api/admin/amenity/amenity-by-id/${id}`, data);
+        return await axios.put(`${BASE_URL}/api/admin/amenity-by-id/${id}`, data);
     } catch (error) {
         console.log(error);
     }

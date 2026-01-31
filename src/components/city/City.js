@@ -78,7 +78,7 @@ function City() {
 
   const handleSaveCity = async () => {
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/city/cities`, {
+      const { data } = await axios.post(`${BASE_URL}/api/admin/cities`, {
         name: cityfield.name,
         description: cityfield.description,
         country: selectedCountry.value,

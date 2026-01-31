@@ -38,7 +38,7 @@ function ResPropertyType() {
   const handleSavePropertyTypes = async () => {
     try {
       const { data } = await axios.post(
-        `${BASE_URL}/api/admin/propertyType/propertyTypes`,
+        `${BASE_URL}/api/admin/propertyTypes`,
         {
           name: name,
         }
@@ -70,7 +70,7 @@ function ResPropertyType() {
       setLoading(true);
 
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/propertyType/propertyTypes`
+        `${BASE_URL}/api/admin/propertyTypes`
       );
       setPropertyTypes(data);
       setLoading(false);

@@ -147,7 +147,7 @@ const EditMicrolocation = ({
   useEffect(() => {
     handleFetchCountry();
     handleFetchStates(microlocations.country._id);
-    handleFetchCity(microlocations.state._id);
+    handleFetchCity(microlocations.state?._id);
   }, []);
   const handleCheckboxChange = (e) => {
     const { checked } = e.target;

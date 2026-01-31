@@ -3,7 +3,7 @@ import BASE_URL from "../../apiConfig";
 
 export const getStateByCountry = async (countryId, setStates) => {
   try {
-    const result = await axios.post(`${BASE_URL}/api/admin/state/statesbycountry`, {
+    const result = await axios.post(`${BASE_URL}/api/admin/statesbycountry`, {
       country_id: countryId,
     });
     setStates(result.data);
@@ -14,7 +14,7 @@ export const getStateByCountry = async (countryId, setStates) => {
 export const getCityByState = async (stateId, setCities) => {
   try {
     await axios
-      .post(`${BASE_URL}/api/admin/city/citybystate`, { state_id: stateId })
+      .post(`${BASE_URL}/api/admin/citybystate`, { state_id: stateId })
       .then((result) => {
         setCities(result.data);
       });
@@ -25,7 +25,7 @@ export const getCityByState = async (stateId, setCities) => {
 
 export const getCountry = async (setCountry) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/allCountry/countries`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/countries`);
 
     setCountry(data.country);
   } catch (error) {
@@ -37,7 +37,7 @@ export const getMicroLocation = async (setMicrolocations, setLoading) => {
   try {
     setLoading(true);
     const { data } = await axios.get(
-      `${BASE_URL}/api/admin/microlocation/microlocations`
+      `${BASE_URL}/api/admin/locations`
     );
     const newData = data.reverse();
 

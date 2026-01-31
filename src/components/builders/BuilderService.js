@@ -4,7 +4,7 @@ import BASE_URL from "../../apiConfig";
 
 export const getbuildersData = async () => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/builder/builders`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/builders`);
     return data
   } catch (error) {
     console.log(error);
@@ -13,7 +13,7 @@ export const getbuildersData = async () => {
 export const getAllbuildersData = async (params, url) => {
   try {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/builder/allbuilders`, {params}
+        `${BASE_URL}/api/admin/allbuilders`, {params}
       );
       return data;
   } catch (error) {
@@ -23,7 +23,7 @@ export const getAllbuildersData = async (params, url) => {
 
 export const getCity = async (setAllCity) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/city/cities`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/cities`);
     setAllCity(data);
   } catch (error) {
     console.log(error);
@@ -32,7 +32,7 @@ export const getCity = async (setAllCity) => {
 
 export const getbuildersDataById = async (id) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/builder/builders/${id}`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/builders/${id}`);
     return data;
   } catch (error) {
     console.log(error);

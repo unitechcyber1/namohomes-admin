@@ -84,7 +84,7 @@ function OurClient() {
     }
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/ourClient/client`, {
+      const { data } = await axios.post(`${BASE_URL}/api/admin/client`, {
         name: ourClientField.name,
         logo_url: images[0],
       });
@@ -117,7 +117,7 @@ function OurClient() {
   const getOurClients = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/admin/ourClient/clients`);
+      const { data } = await axios.get(`${BASE_URL}/api/admin/clients`);
       const newData = data.reverse();
       setOurClient(newData);
       setLoading(false);
@@ -129,7 +129,7 @@ function OurClient() {
   const handleDeleteClient = async (id) => {
     try {
       const { data } = await axios.delete(
-        `${BASE_URL}/api/admin/ourClient/delete/${id}`
+        `${BASE_URL}/api/admin/client/delete/${id}`
       );
       setUpdateTable((prev) => !prev);
       toast({

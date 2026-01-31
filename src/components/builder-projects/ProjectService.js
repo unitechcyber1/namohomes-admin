@@ -3,7 +3,7 @@ import BASE_URL from "../../apiConfig";
 export const getStateByCountry = async (countryId, setStates) => {
   try {
     const result = await axios.get(
-      `${BASE_URL}/api/admin/state/states/priority/${countryId}`,
+      `${BASE_URL}/api/admin/states/priority/${countryId}`,
       {
         country_id: countryId,
       }
@@ -16,7 +16,7 @@ export const getStateByCountry = async (countryId, setStates) => {
 export const getCityByState = async (stateId, setCities) => {
   try {
     await axios
-      .post(`${BASE_URL}/api/admin/city/citybystate`, { state_id: stateId })
+      .post(`${BASE_URL}/api/admin/citybystate`, { state_id: stateId })
       .then((result) => {
         setCities(result.data);
       });
@@ -28,7 +28,7 @@ export const getCityByState = async (stateId, setCities) => {
 export const getMicrolocationByCity = async (cityId, setMicrolocations) => {
   try {
     await axios
-      .get(`${BASE_URL}/api/admin/microlocation/priority-location/${cityId}`)
+      .get(`${BASE_URL}/api/admin/priority-location/${cityId}`)
       .then((result) => {
         setMicrolocations(result.data);
       });
@@ -39,7 +39,7 @@ export const getMicrolocationByCity = async (cityId, setMicrolocations) => {
 
 export const getCountry = async (setCountry) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/allCountry/countries`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/countries`);
 
     setCountry(data.country);
   } catch (error) {
@@ -49,7 +49,7 @@ export const getCountry = async (setCountry) => {
 
 export const getBuilderData = async (setbuilders) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/builder/builders`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/builders`);
     setbuilders(data);
   } catch (error) {
     console.log(error);
@@ -57,7 +57,7 @@ export const getBuilderData = async (setbuilders) => {
 };
 export const getAmenities = async (params) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/amenity/amenities`, {params});
+    const { data } = await axios.get(`${BASE_URL}/api/admin/amenity`, {params});
     return data
   } catch (error) {
     console.log(error);
@@ -66,7 +66,7 @@ export const getAmenities = async (params) => {
 export const getCategory = async (setCategories) => {
   try {
     const { data } = await axios.get(
-      `${BASE_URL}/api/admin/propertyType/propertyTypes`
+      `${BASE_URL}/api/admin/propertyTypes`
     );
 
     setCategories(data);
@@ -87,13 +87,13 @@ export const getProjectData = async (params, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/dwarkaProject/projects-page`, {params}
+        `${BASE_URL}/api/admin/projects-page`, {params}
       );
       return data;
     }
     if (!url.includes("dwarkaexpressway")) {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/project/projects-page`, {params}
+        `${BASE_URL}/api/admin/projects-page`, {params}
       );
       return data;
     }
@@ -103,7 +103,7 @@ export const getProjectData = async (params, url) => {
 };
 export const searchedProjects = async (name, city, microlocation, status, page, limit) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/admin/project/search-projects?name=${name}&city=${city}&microlocation=${microlocation}&status=${status}&page=${page}&limit=${limit}`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/search-projects?name=${name}&city=${city}&microlocation=${microlocation}&status=${status}&page=${page}&limit=${limit}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -117,12 +117,12 @@ export const changeProjectStatus = async (
   try {
     if (url.includes("dwarkaexpressway")) {
       return await axios.put(
-        `${BASE_URL}/api/admin/dwarkaProject/changeStatus/${id}`,
+        `${BASE_URL}/api/admin/changeStatus/${id}`,
         { status: action }
       );
      } else {
        return await axios.put(
-        `${BASE_URL}/api/admin/project/changeStatus/${id}`,
+        `${BASE_URL}/api/admin/changeStatus/${id}`,
         { status: action }
       );
      }
@@ -134,9 +134,9 @@ export const changeProjectStatus = async (
 export const deleteprojects = async (id, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
-     return await axios.delete(`${BASE_URL}/api/admin/dwarkaProject/delete/${id}`);
+     return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
     } else {
-      return await axios.delete(`${BASE_URL}/api/admin/project/delete/${id}`);
+      return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
     }
   } catch (error) {
     console.log(error)
@@ -146,12 +146,12 @@ export const getProjectsById = async (id, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/dwarkaProject/projects/${id}`
+        `${BASE_URL}/api/admin/projects/${id}`
       );
       return data;
     } else {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/project/projects/${id}`
+        `${BASE_URL}/api/admin/projects/${id}`
       );
       return data;
     }
@@ -177,14 +177,14 @@ export const saveDwarkaProjects = async (data) => {
 
 export const updatedProjects = async (id, data) => {
   try {
-    return await axios.put(`${BASE_URL}/api/admin/project/edit-project/${id}`, data)
+    return await axios.put(`${BASE_URL}/api/admin/edit-project/${id}`, data)
   } catch (error) {
     console.log(error);
   }
 }
 export const updatedDwarkaProjects = async (id, data) => {
   try {
-    return await axios.put(`${BASE_URL}/api/admin/dwarkaProject/edit-project/${id}`, data)
+    return await axios.put(`${BASE_URL}/api/admin/edit-project/${id}`, data)
   } catch (error) {
     console.log(error);
   }

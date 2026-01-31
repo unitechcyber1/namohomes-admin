@@ -12,12 +12,12 @@ import { IoLocationOutline } from "react-icons/io5";
 const Sidebar = () => {
   const propularityTabs = [
     { link: "/builder-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "Builder Projects" },
-    { link: "/priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects Priority" },
-    { link: "/priority-india", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects India" },
-    { link: "/top-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "Top Projects" },
-    { link: "/builder-priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Builder Priority" },
-    { link: "/plans-priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Plans Priority" },
-    { link: "/priority-microlocation", icon: <IoLocationOutline className="icon" />, label: "Location Priority" },
+    // { link: "/priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects Priority" },
+    // { link: "/priority-india", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects India" },
+    // { link: "/top-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "Top Projects" },
+    // { link: "/builder-priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Builder Priority" },
+    // { link: "/plans-priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Plans Priority" },
+    // { link: "/priority-microlocation", icon: <IoLocationOutline className="icon" />, label: "Location Priority" },
     { link: "/seo", icon: <MdOutlineRealEstateAgent className="icon" />, label: "SEO" },
     { link: "/clients", icon: <MdOutlineRealEstateAgent className="icon" />, label: "Our Clients" },
     { link: "/media", icon: <MdOutlinePermMedia className="icon" />, label: "Media" },

@@ -4,7 +4,7 @@ import axios from "axios";
 export const getPropertyTypes = async () => {
     try {
       const { data } = await axios.get(
-        `${BASE_URL}/api/admin/propertyType/propertyTypes`
+        `${BASE_URL}/api/admin/propertyTypes`
       );
       return data;
     } catch (error) {

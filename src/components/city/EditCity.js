@@ -33,7 +33,7 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const handleEditCity = async () => {
     try {
       const { data } = await axios.put(
-        `${BASE_URL}/api/admin/city/city-by-id/${cityId}`,
+        `${BASE_URL}/api/admin/city-by-id/${cityId}`,
         {
           name: name,
           description: description,

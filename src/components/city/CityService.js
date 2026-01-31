@@ -3,7 +3,7 @@ import BASE_URL from "../../apiConfig";
 export const getCity = async (setCities, setLoading) => {
   try {
     setLoading(true);
-    const { data } = await axios.get(`${BASE_URL}/api/admin/city/cities`);
+    const { data } = await axios.get(`${BASE_URL}/api/admin/cities`);
     setLoading(false);
     setCities(data);
   } catch (error) {
