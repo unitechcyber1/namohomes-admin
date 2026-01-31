@@ -1,9 +1,40 @@
 .mainBox {
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
-    rgba(0, 0, 0, 0.22) 0px 15px 12px;
-  width: 58%;
-  margin: auto;
-  border-radius: 14px;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  
+}
+
+.login-card {
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 10, 10, 1);
+  border: 1px solid #e2e8f0;
+}
+
+.login-heading {
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.forgot_password a {
+  font-size: 14px;
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.forgot_password a:hover {
+  text-decoration: underline;
+}
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.login-logo {
+  max-height: 180px;   /* 🔥 perfect for this illustration */
+  width: auto;
+  object-fit: contain;
 }
 input {
   width: 100%;

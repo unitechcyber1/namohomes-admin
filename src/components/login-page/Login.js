@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import loginbg from "./login-bg.jpg";
 import "./Login.css";
-import logo from "./spacite-logo.png";
+import logo from "./adminloginpage.png";
 import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 import { useNavigate, NavLink } from "react-router-dom";
@@ -84,56 +84,65 @@ function Login() {
   };
 
   return (
-    <div>
-      <div className="mainBox">
-        <div className="container my-5">
-          <div className="row">
-            <div className="col-md-12 m-5 d-flex align-items-center justify-content-center">
-              <div>
-                <h3 className="login-heading">NAMOHOMES</h3>
-                <VStack spacing="-10px">
-                  <FormControl id="emaillogin" isRequired>
-                    <Input
-                      placeholder="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      type={"text"}
-                    />
-                  </FormControl>
-                  <InputGroup>
-                    <FormControl id="passwordlogin" isRequired>
-                      <Input
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        type={show ? "text" : "password"}
-                      />
-                    </FormControl>
-                    <InputRightElement top="15px" width="4.5rem">
-                      <Button h="1.75rem" size="sm" onClick={handleClick}>
-                        {show ? "Hide" : "Show"}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                  <p className="forgot_password">
-                    <NavLink to="/password-reset">Forgot Password?</NavLink>{" "}
-                  </p>
-                  <Button
-                    colorScheme="blue"
-                    width="100%"
-                    style={{ marginTop: 15 }}
-                    onClick={submitHandle}
-                    isLoading={loading}
-                  >
-                    Login
-                  </Button>
-                </VStack>
-              </div>
+   <div className="mainBox d-flex align-items-center justify-content-center">
+  <div className="container">
+    <div className="row justify-content-center">
+      <div className="col-md-5 col-lg-4">
+        <div className="login-card p-4 shadow-sm rounded">
+            <div className="logo-wrapper">
+             <img src={logo} alt="NAMOHOMES Logo" className="login-logo" />
             </div>
-          </div>
+          <h3 className="login-heading text-center mb-4">
+            NAMOHOMES
+          </h3>
+
+          <VStack spacing="10px">
+            <FormControl id="emaillogin" isRequired>
+              <Input
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+              />
+            </FormControl>
+
+            <InputGroup>
+              <FormControl id="passwordlogin" isRequired>
+                <Input
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={show ? "text" : "password"}
+                />
+              </FormControl>
+
+              <InputRightElement height="100%" display="flex" alignItems="center" width="4.5rem">
+                <Button h="1.75rem" size="sm" onClick={handleClick}>
+                  {show ? "Hide" : "Show"}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+
+            <p className="forgot_password text-end w-100">
+              <NavLink to="/password-reset">Forgot Password?</NavLink>
+            </p>
+
+            <Button
+              colorScheme="blue"
+              width="100%"
+              mt={2}
+              onClick={submitHandle}
+              isLoading={loading}
+            >
+              Login
+            </Button>
+          </VStack>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 }
 

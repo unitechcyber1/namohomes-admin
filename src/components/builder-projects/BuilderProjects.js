@@ -48,6 +48,7 @@ function BuilderProjects() {
     setTotalCount(data?.totalCount)
     setLoading(false)
   }
+
   const handleFetchCity = async () => {
     await getCity(setCities, setLoading);
   };
@@ -67,6 +68,7 @@ function BuilderProjects() {
       default:
         break;
     }
+    console.log(data)
   };
   const microLocationOptions = microlocations?.map((microLocation) => ({
     value: microLocation._id,
