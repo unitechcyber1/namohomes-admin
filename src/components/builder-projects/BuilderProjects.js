@@ -68,7 +68,6 @@ function BuilderProjects() {
       default:
         break;
     }
-    console.log(data)
   };
   const microLocationOptions = microlocations?.map((microLocation) => ({
     value: microLocation._id,
