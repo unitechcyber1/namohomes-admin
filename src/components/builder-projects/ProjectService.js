@@ -194,11 +194,11 @@ export const deleteImage = async (data, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
      return await axios.post(
-        `${BASE_URL}/api/admin/dwarkaProject/file/delete`, data
+        `${BASE_URL}/api/admin/file/delete`, data
       );
     } else {
       return await axios.post(
-        `${BASE_URL}/api/admin/project/file/delete`, data
+        `${BASE_URL}/api/admin/file/delete`, data
       );
     }
   } catch (error) {

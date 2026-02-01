@@ -48,6 +48,7 @@ function BuilderProjects() {
     setTotalCount(data?.totalCount)
     setLoading(false)
   }
+
   const handleFetchCity = async () => {
     await getCity(setCities, setLoading);
   };
