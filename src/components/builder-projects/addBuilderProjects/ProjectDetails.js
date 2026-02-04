@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getBuilderData } from "../ProjectService";
+import { getBuilders } from "services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
-import { getPropertyTypes } from "../../plans-priority/PlansPriorityService";
+import { getPropertyTypes } from "services/propertyTypeService";
 const ProjectDetails = () => {
   const {
     projects,
@@ -40,7 +40,7 @@ const ProjectDetails = () => {
     }
   };
   const handleFetchbuilders = async () => {
-    await getBuilderData(setbuilders);
+    await getBuilders(setbuilders);
   };
   const handleFetchPlanType = async () => {
     const data = await getPropertyTypes();

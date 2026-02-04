@@ -13,7 +13,7 @@ import { GpState } from "../../../context/context";
 import ImageUpload from "../../../ImageUpload";
 import { uploadImageFile } from "../../../services/Services";
 import { Link, useParams } from "react-router-dom";
-import { getProjectsById, saveDwarkaProjects, saveProjects, updatedDwarkaProjects, updatedProjects } from "../ProjectService";
+import { getProjectById, createProject, updateProject } from "services/projectService";
 import Loader from "../../loader/Loader";
 import { project } from "../../../models/builderProjectModel";
 function AddBuilderprojects() {
@@ -33,7 +33,7 @@ function AddBuilderprojects() {
   const handleFetchDatabyId = async () => {
     setLoading(true);
     setIsEditable(true);
-    const data = await getProjectsById(id, url);
+    const data = await getProjectById(id, url);
     setEditProject(data);
     setLoading(false);
   };
@@ -94,19 +94,9 @@ function AddBuilderprojects() {
     updatedProjectsData.location_map = updatedProjectsData.location_map?._id
     try {
       if (isEditable) {
-        if (url.includes('dwarkaexpressway')) {
-          await updatedDwarkaProjects(id, updatedProjectsData)
-        }
-        else {
-          await updatedProjects(id, updatedProjectsData)
-        }
+          await updateProject(id, updatedProjectsData)
       } else {
-        if (url.includes('dwarkaexpressway')) {
-          await saveDwarkaProjects(updatedProjectsData)
-        }
-        else {
-          await saveProjects(updatedProjectsData)
-        }
+          await createProject(updatedProjectsData)
       }
       toast({
         title: isEditable ? "Update Successfully!" : "Saved Successfully!",

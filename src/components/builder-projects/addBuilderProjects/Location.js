@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-  getCityByState,
-  getCountry,
-  getMicrolocationByCity,
-  getStateByCountry,
-} from "../ProjectService";
+  getCitiesByState,
+  getCountries,
+  getMicrolocationsByCity,
+  getStatesByCountry,
+} from "services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
 const Location = () => {
@@ -39,17 +39,17 @@ const Location = () => {
     });
   };
   const handleFetchCity = async (stateId) => {
-    await getCityByState(stateId, setCities);
+    await getCitiesByState(stateId, setCities);
   };
   const handleFetchStates = async (countryId) => {
-    await getStateByCountry(countryId, setStates);
+    await getStatesByCountry(countryId, setStates);
   };
   const handleFetchMicrolocation = async (cityId) => {
-    await getMicrolocationByCity(cityId, setMicrolocations);
+    await getMicrolocationsByCity(cityId, setMicrolocations);
   };
 
   const handleFetchCountry = async () => {
-    await getCountry(setCountry);
+    await getCountries(setCountry);
   };
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {

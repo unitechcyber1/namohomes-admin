@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { IoIosAddCircle } from "react-icons/io";
 import { AiFillDelete } from "react-icons/ai";
-import { getCategory } from "../ProjectService";
+import { getCategories } from "services/projectService";
 import { uploadImageFile } from "../../../services/Services";
 import { GpState } from "../../../context/context";
 import { FaUpload } from "react-icons/fa";
@@ -13,7 +13,8 @@ const FloorPlans = () => {
   const [checkUrl, setCheckUrl] = useState(false)
   const url = window.location.href
   const handleFetchCategory = async () => {
-    await getCategory(setCategories);
+    const data = await getCategories();
+     setCategories(data);
   };
 
   const createPlans = () => {
