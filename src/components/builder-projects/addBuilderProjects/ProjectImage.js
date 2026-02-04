@@ -13,7 +13,7 @@ import {
 import { GpState } from "../../../context/context";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Delete from "../../delete/Delete";
-import { deleteImage } from "../ProjectService";
+import { deleteImage } from "services/projectService";
 import { useToast } from "@chakra-ui/react";
 const ProjectImage = () => {
   const [progress, setProgress] = useState(0);

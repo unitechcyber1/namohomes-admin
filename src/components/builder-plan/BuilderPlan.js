@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { BsBookmarkPlus } from "react-icons/bs";
 import {
@@ -10,6 +10,8 @@ import {
   Td,
   TableContainer,
   useToast,
+  Spinner,
+  Button,
 } from "@chakra-ui/react";
 import {
   Modal,
@@ -19,33 +21,40 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button,
   useDisclosure,
-  Spinner,
 } from "@chakra-ui/react";
-import axios from "axios";
 import Delete from "../delete/Delete";
-import BASE_URL from "../../apiConfig";
+import {
+  getPropertyTypes,
+  createPropertyType,
+  deletePropertyTypeById,
+} from "../../services/propertyTypeService";
+
 function ResPropertyType() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [name, setName] = useState("");
-  const [updateTable, setUpdateTable] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const [propertyTypes, setPropertyTypes] = useState([]);
   const toast = useToast();
 
-  const handleSavePropertyTypes = async () => {
+  const [name, setName] = useState("");
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [updateTable, setUpdateTable] = useState(false);
+
+  const fetchPropertyTypes = useCallback(async () => {
     try {
-      const { data } = await axios.post(
-        `${BASE_URL}/api/admin/propertyTypes`,
-        {
-          name: name,
-        }
-      );  
-      setName("");
-      setUpdateTable((prev) => !prev);
-      onClose();
+      setLoading(true);
+      const data = await getPropertyTypes();
+      setPropertyTypes(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSavePropertyType = async () => {
+    try {
+      await createPropertyType({ name });
+
       toast({
         title: "Saved Successfully!",
         status: "success",
@@ -53,10 +62,15 @@ function ResPropertyType() {
         isClosable: true,
         position: "bottom",
       });
+
+      setName("");
+      onClose();
+      setUpdateTable((prev) => !prev);
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Error Occurred!",
+        description:
+          error.response?.data?.message || "Failed to save property type",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -65,26 +79,10 @@ function ResPropertyType() {
     }
   };
 
-  const getPropertyTypes = async () => {
+  const handleDeletePropertyType = async (id) => {
     try {
-      setLoading(true);
+      await deletePropertyTypeById(id);
 
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/propertyTypes`
-      );
-      setPropertyTypes(data);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
- 
-  const handleDeletePropertyTypes = async (id) => {
-    try {
-      const { data } = await axios.delete(
-        `${BASE_URL}/api/admin/propertyType/delete/${id}`
-      );
-      setUpdateTable((prev) => !prev);
       toast({
         title: "Deleted Successfully!",
         status: "success",
@@ -92,10 +90,13 @@ function ResPropertyType() {
         isClosable: true,
         position: "bottom",
       });
+
+      setUpdateTable((prev) => !prev);
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Error Occurred!",
+        description:
+          error.response?.data?.message || "Failed to delete property type",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -103,89 +104,84 @@ function ResPropertyType() {
       });
     }
   };
+
   useEffect(() => {
-    getPropertyTypes();
-  }, [updateTable]);
+    fetchPropertyTypes();
+  }, [fetchPropertyTypes, updateTable]);
+
   return (
-    <>
-      <div className="mx-5 mt-3">
-        <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100 mt-2">
-          <Button className="addnew-btn" onClick={onOpen}>
-            <BsBookmarkPlus />
-            ADD NEW
-          </Button>
-        </div>
-        <div>
-          <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Add New Plan</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <input
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  type="text"
-                  placeholder="Name"
-                  className="property-input"
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button colorScheme="blue" mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button variant="ghost" onClick={handleSavePropertyTypes}>
-                  Save
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </div>
-        <div className="table-box">
-          <div className="table-top-box">Builder Plans Module</div>
-          <TableContainer marginTop="60px" variant="striped" color="teal">
-            <Table variant="simple">
-              <Thead>
+    <div className="mx-5 mt-3">
+      <Mainpanelnav />
+
+      <div className="d-flex justify-content-end w-100 mt-2">
+        <Button className="addnew-btn" onClick={onOpen}>
+          <BsBookmarkPlus /> ADD NEW
+        </Button>
+      </div>
+
+      {/* Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add New Property Type</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              placeholder="Name"
+              className="property-input"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="ghost" onClick={handleSavePropertyType}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Table */}
+      <div className="table-box">
+        <div className="table-top-box">Property Types</div>
+        <TableContainer marginTop="60px">
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Name</Th>
+                <Th>Delete</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {loading ? (
                 <Tr>
-                  <Th>Name</Th>
-                  <Th>Delete</Th>
+                  <Td colSpan={2} textAlign="center">
+                    <Spinner size="xl" />
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody>
-                {loading ? (
-                  <Tr>
+              ) : (
+                propertyTypes.map((type) => (
+                  <Tr key={type._id}>
+                    <Td>{type.name}</Td>
                     <Td>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
+                      <Delete
+                        handleFunction={() =>
+                          handleDeletePropertyType(type._id)
+                        }
                       />
                     </Td>
                   </Tr>
-                ) : (
-                  propertyTypes?.map((types) => (
-                    <Tr key={types._id} id={types._id}>
-                      <Td>{types.name}</Td>
-                      <Td>
-                        <Delete
-                          handleFunction={() =>
-                            handleDeletePropertyTypes(types._id)
-                          }
-                        />
-                      </Td>
-                    </Tr>
-                  ))
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </div>
+                ))
+              )}
+            </Tbody>
+          </Table>
+        </TableContainer>
       </div>
-    </>
+    </div>
   );
 }
 

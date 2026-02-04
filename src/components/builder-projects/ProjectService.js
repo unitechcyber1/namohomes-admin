@@ -75,14 +75,6 @@ export const getCategory = async (setCategories) => {
   }
 };
 
-// export const getProjectData = async (page, limit) => {
-//   try {
-//     const { data } = await axios.get(`${BASE_URL}/api/admin/project/projects-page/?page=${page}&limit=${limit}`);
-//     return data;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 export const getProjectData = async (params, url) => {
   try {
     if (url.includes("dwarkaexpressway")) {
@@ -133,28 +125,17 @@ export const changeProjectStatus = async (
 
 export const deleteprojects = async (id, url) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-     return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
-    } else {
       return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
-    }
   } catch (error) {
     console.log(error)
   }
 };
 export const getProjectsById = async (id, url) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
       const { data } = await axios.get(
         `${BASE_URL}/api/admin/projects/${id}`
       );
       return data;
-    } else {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/projects/${id}`
-      );
-      return data;
-    }
   } catch (error) {
     console.log(error);
   }
