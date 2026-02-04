@@ -163,108 +163,115 @@ const Location = () => {
   }, [microlocations]);
   return (
     <>
-      <div className="row top-margin">
-        <h4 className="property_form_h4">Location</h4>
-        <div className="col-md-6">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Address"
-              name="address"
-              value={projects.location.address}
-              onChange={(e) => handleInputChange(e, 'location')}
-            />
-            <label htmlFor="floatingInputAddress">Address</label>
-          </div>
+      <div className="project-card">
+        <div className="row top-margin">
+          <h4 className="property_form_h4">Location</h4>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-4">
-          <div>
-            <Select
-              placeholder="Country*"
-              value={selectedCountry}
-              options={countryOptions}
-              onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "country")
-              }
-              isSearchable
-              required
-            />
+        <div className="row mt-4">
+          <div className="col-md-4">
+            <div>
+              <Select
+                placeholder="Country*"
+                value={selectedCountry}
+                options={countryOptions}
+                onChange={(selectedOption) =>
+                  onChangeOptionHandler(selectedOption, "country")
+                }
+                isSearchable
+                required
+              />
+            </div>
           </div>
-        </div>
-        <div className="col-md-4">
-          <div>
-            <Select
-              placeholder="State*"
-              value={selectedState}
-              options={stateOptions}
-              onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "state")
-              }
-              onMenuOpen={handleFetchCity}
-              isSearchable
-              required
-            />
+          <div className="col-md-4">
+            <div>
+              <Select
+                placeholder="State*"
+                value={selectedState}
+                options={stateOptions}
+                onChange={(selectedOption) =>
+                  onChangeOptionHandler(selectedOption, "state")
+                }
+                onMenuOpen={handleFetchCity}
+                isSearchable
+                required
+              />
+            </div>
           </div>
-        </div>
-        <div className="col-md-4">
-          <div>
-            <Select
-              placeholder="City*"
-              value={selectedCity}
-              options={cityOptions}
-              onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "city")
-              }
-              isSearchable
-              required
-            />
+          <div className="col-md-4">
+            <div>
+              <Select
+                placeholder="City*"
+                value={selectedCity}
+                options={cityOptions}
+                onChange={(selectedOption) =>
+                  onChangeOptionHandler(selectedOption, "city")
+                }
+                isSearchable
+                required
+              />
+            </div>
           </div>
-        </div>
 
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-6">
-          <div>
-            <Select
-              placeholder="Location*"
-              value={selectedMicroLocation}
-              options={microLocationOptions}
-              onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "microLocation")
-              }
-              isMulti
-              isSearchable
-              required
-            />
+        </div>
+        <div className="row mt-4">
+          <div className="col-md-6">
+            <div className="form-floating border_field">
+              <input
+                type="text"
+                className="form-control uniform-select "
+                id="floatingInputAddress"
+                placeholder="Address"
+                name="address"
+                value={projects.location.address}
+                onChange={(e) => handleInputChange(e, 'location')}
+              />
+              <label htmlFor="floatingInputAddress">Address</label>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div>
+              <Select
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Location*"
+                value={selectedMicroLocation}
+                options={microLocationOptions}
+                onChange={(selectedOption) =>
+                  onChangeOptionHandler(selectedOption, "microLocation")
+                }
+                isMulti
+                isSearchable
+                required
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="row mt-4 mb-4">
+        <div className="row mt-4 mb-4">
+          <div className="row align-items-center">
+            <div className="col-auto">
+              <h5 className="property_form_h5 mb-0">Primary</h5>
+            </div>
 
-        <div className="col-md-6">
-          <div className="row">
-            <h5 className="property_form_h4">Primary</h5>
-            <div className="col-md-3">
-              <div className="form-floating border_field">
+
+            <div className="col">
+              <div className="form-floating">
                 <input
                   type="text"
                   className="form-control"
                   id="floatingInputLatti"
-                  placeholder="Lattitude"
+                  placeholder="Latitude"
                   name="latitude"
                   value={projects.location.latitude}
                   onChange={(e) => handleInputChange(e, 'location')}
                   required
                 />
-                <label htmlFor="floatingInputLatti">Lattitude</label>
+                <label htmlFor="floatingInputLatti">Latitude</label>
               </div>
             </div>
-            <div className="col-md-3">
-              <div className="form-floating border_field">
+
+
+            <div className="col">
+              <div className="form-floating">
                 <input
                   type="text"
                   className="form-control"
@@ -279,74 +286,81 @@ const Location = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="col-md-6">
-          <div className="row">
-            <h5 className="property_form_h4">Secondary</h5>
-            <div className="col-md-3">
+
+          <div className="row align-items-center mb-3">
+            {/* Label */}
+            <div className="col-auto">
+              <h4 className="property_form_h4 mb-0">Secondary</h4>
+            </div>
+
+            {/* Latitude input */}
+            <div className="col">
               <div className="form-floating border_field">
                 <input
                   type="text"
                   className="form-control"
-                  id="floatingInputLatti"
+                  id="floatingInputLatti2"
                   placeholder="Latitude"
                   name="latitude2"
                   value={projects.location.latitude2}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
-                <label htmlFor="floatingInputLatti">Latitude</label>
+                <label htmlFor="floatingInputLatti2">Latitude</label>
               </div>
             </div>
-            <div className="col-md-3">
+
+            {/* Longitude input */}
+            <div className="col">
               <div className="form-floating border_field">
                 <input
                   type="text"
                   className="form-control"
-                  id="floatingInputLongi"
+                  id="floatingInputLongi2"
                   placeholder="Longitude"
                   name="longitude2"
                   value={projects.location.longitude2}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
-                <label htmlFor="floatingInputLongi">Longitude</label>
+                <label htmlFor="floatingInputLongi2">Longitude</label>
               </div>
             </div>
           </div>
+
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <h4 className="property_form_h4">Metro Details</h4>
-        </div>
-        <div className="col-md-4">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="flexCheckDefault"
-              name="is_near_metro"
-              checked={projects?.location?.metro_detail?.is_near_metro}
-              onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
-            />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
-              Is Metro Near
-            </label>
+        <div className="row mt-4">
+          <div className="col-md-12">
+            <h4 className="property_form_h4">Metro Details</h4>
           </div>
-        </div>
-        {projects?.location?.metro_detail?.is_near_metro && <div className="col-md-3">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputLongi"
-              placeholder="Nearest Metro"
-              name="name"
-              value={projects.location.metro_detail.name}
-              onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
-            />
-            <label htmlFor="floatingInputLongi">Nearest Metro</label>
+          <div className="col-md-4">
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="flexCheckDefault"
+                name="is_near_metro"
+                checked={projects?.location?.metro_detail?.is_near_metro}
+                onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
+              />
+              <label className="form-check-label" htmlFor="flexCheckDefault">
+                Is Metro Near
+              </label>
+            </div>
           </div>
-        </div>}
+          {projects?.location?.metro_detail?.is_near_metro && <div className="col-md-3">
+            <div className="form-floating border_field">
+              <input
+                type="text"
+                className="form-control"
+                id="floatingInputLongi"
+                placeholder="Nearest Metro"
+                name="name"
+                value={projects.location.metro_detail.name}
+                onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
+              />
+              <label htmlFor="floatingInputLongi">Nearest Metro</label>
+            </div>
+          </div>}
+        </div>
       </div>
     </>
   );

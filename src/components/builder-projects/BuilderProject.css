@@ -102,3 +102,56 @@
   padding: 20px;
   border-radius: 10px;
 }
+.project-card {
+  background: #eedfdf;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
+}
+.uniform-select {
+  height: 48px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+}
+.react-select-container {
+  width: 100%;
+}
+
+.react-select__control {
+  height: 48px;
+  min-height: 48px;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+}
+
+.react-select__value-container {
+  height: 48px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+
+.react-select__input-container {
+  margin: 0;
+  padding: 0;
+}
+
+.react-select__placeholder {
+  margin: 0;
+  color: #000000;
+}
+
+.react-select__indicator-separator {
+  display: none;
+}
+
+.react-select__dropdown-indicator {
+  padding: 8px;
+}
+.property_form_h5 {
+  padding-right: 20px;
+}
