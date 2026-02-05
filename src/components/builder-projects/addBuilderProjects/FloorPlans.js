@@ -14,7 +14,7 @@ const FloorPlans = () => {
   const url = window.location.href
   const handleFetchCategory = async () => {
     const data = await getCategories();
-     setCategories(data);
+    setCategories(data);
   };
 
   const createPlans = () => {
@@ -87,7 +87,7 @@ const FloorPlans = () => {
       }),
     }));
   };
-  const onChangePlanHandler = (e, id) => {  
+  const onChangePlanHandler = (e, id) => {
     const { name, value } = e.target;
     setProjects((prevProjects) => ({
       ...prevProjects,
@@ -142,244 +142,259 @@ const FloorPlans = () => {
     }))
   };
   const handleUploadFile = async (files, rowId, planId, isFloorPlan) => {
-    const data = await uploadImageFile(files, {setProgress: () => {}, setIsUploaded: () => {}, checkUrl});
-      previewFile(data, rowId, planId, isFloorPlan)
+    const data = await uploadImageFile(files, { setProgress: () => { }, setIsUploaded: () => { }, checkUrl });
+    previewFile(data, rowId, planId, isFloorPlan)
   };
 
   const handleInputByClick = (e, rowId, planId, isFloorPlan) => {
     const files = Array.from(e.target.files);
     handleUploadFile(files, rowId, planId, isFloorPlan);
   };
-useEffect(() => {
-  if(url.includes('dwarkaexpressway')){
-setCheckUrl(true)
-}else{
-setCheckUrl(false)
-}
-handleFetchCategory();
-},[checkUrl])
+  useEffect(() => {
+    if (url.includes('dwarkaexpressway')) {
+      setCheckUrl(true)
+    } else {
+      setCheckUrl(false)
+    }
+    handleFetchCategory();
+  }, [checkUrl])
   return (
     <>
       <div className="d-flex w-50 justify-content-between align-items-center top-margin">
-      <h4 className="property_form_h4">Floor Plans & Pricing</h4>
+        <h4 className="property_form_h4">Floor Plans & Pricing</h4>
         <IoIosAddCircle
           onClick={createPlans}
           className="icon"
           style={{ cursor: "pointer" }}
         />
       </div>
-      <div className="mb-5">
-        {projects.plans.map((row, id) => (
-          <div className="row mt-4" key={row.id}>
-          <h5>Plan</h5>
-            <div className="col-md-3">
-              <div
-                style={{
-                  borderBottom: "1px solid #cccccc",
-                  margin: "20px 0",
-                }}
-              >
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  name="category"
-                  value={row.category}
-                  onChange={(e) => onChangePlanHandler(e, row.id)}
-                  required
-                >
-                  <option>Select Category*</option>
-                  {categories?.map((category) => (
-                    <option
-                      id={category._id}
-                      key={category._id}
-                      value={category._id}
-                    >
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputPrice"
-                  placeholder="Price*"
-                  name="price"
-                  value={row.price}
-                  onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
-                  required
-                />
-                <label htmlFor="floatingInputPrice">Price*</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputPrice"
-                  placeholder="Area*"
-                  name="size"
-                  value={row.size}
-                  onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
-                  required
-                />
-                <label htmlFor="floatingInputPrice">Area</label>
-              </div>
-            </div>
-            <div className="col-md-2">
-              <div
-                style={{
-                  borderBottom: "1px solid #cccccc",
-                  margin: "20px 0",
-                }}
-              >
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  name="size_sq"
-                  value={row.size_sq}
-                  onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
-                  required
-                >
-                  <option>Sq.Ft.</option>
-                  <option>Sq.Yd.</option>
-                  <option>Ft.</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-md-2 d-flex align-items-center">
-              <AiFillDelete
-                className="icon"
-                style={{ cursor: "pointer" }}
-                onClick={() => removePlan(row.id)}
-              />
-            </div>
-            <div className="row">
-            <div className="col-md-3">
-              <h5>Floor Plans</h5>
-             </div>
-             <div className="col-md-3">
-             <IoIosAddCircle
-                onClick={() => addFloorPlan(row.id)}
-                className="icon"
-                style={{ cursor: "pointer" }}
-              />
-             </div>
-            </div>
-            {row.floor_plans.map((plan, id) => (
-              <div className="row" key={plan.id}>
-                <div className="col-md-2">
-                  <div
-                    className="form-floating border_field"
-                    style={{ marginTop: "6px" }}
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="floatingInputPrice"
-                      placeholder="Name*"
-                      name="name"
-                      value={plan.name}
-                      //  onChange={(e) => handleInputPlanChange(e, row.id, plan.id)}
-                      onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
-                    />
-                    <label htmlFor="floatingInputPrice">Name</label>
-                  </div>
-                </div>
-                <div className="col-md-2">
-                  <div
-                    className="form-floating border_field"
-                    style={{ marginTop: "6px" }}
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="floatingInputPrice"
-                      placeholder="Area*"
-                      name="area"
-                      value={plan.area}
-                      //  onChange={(e) => handleInputPlanChange(e, row.id, plan.id)}
-                      onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
-                    />
-                    <label htmlFor="floatingInputPrice">Area</label>
-                  </div>
-                </div>
-                <div className="col-md-2">
-                  <div
-                    className="form-floating border_field"
-                    style={{ marginTop: "6px" }}
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="floatingInputPrice"
-                      placeholder="Rent Price*"
-                      name="rent_price"
-                      value={plan.rent_price}
-                      onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
-                    />
-                    <label htmlFor="floatingInputPrice">Rent Price*</label>
-                  </div>
-                </div>
-                <div className="col-md-2">
-                  <div
-                    className="form-floating border_field"
-                    style={{ marginTop: "6px" }}
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="floatingInputPrice"
-                      placeholder="Sale Price*"
-                      name="sale_price"
-                      value={plan.sale_price}
-                      onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
-                    />
-                    <label htmlFor="floatingInputPrice">Sale Price*</label>
-                  </div>
-                </div>
-                <div className="col-md-2">
-                  <label className="file file_label">
-                    <span className="upload_text">Upload</span>
-                    <FaUpload className="upload_icon" />
-                    <input
-                      type="file"
-                      id={`file-input-${plan.id}`}
-                      aria-label="File browser example"
-                      onChange={(e) => handleInputByClick(e, row.id, plan.id, true)}
-                      className="file_hide"
-                    />
-                  </label>
-                  <div
-                    id={`preview-${plan.id}`}
-                    className="mt-3 d-flex align-items-center"
-                  >
-                    {(plan.image || plan.image?.s3_link) && <Fragment>
-                      <img src={plan.image?.s3_link || plan.image} alt="media" width="50%" />
-                    </Fragment>}
-                  </div>
-                </div>
+      <div className="project-card">
+        <div className="mb-5">
+          {projects.plans.map((row, id) => (
+            <div className="row mt-4" key={row.id}>
+              <div className="col-12 d-flex align-items-center justify-content-between">
+                <h5 className="mb-0">Plan</h5>
                 <div className="col-md-2 d-flex align-items-center">
                   <AiFillDelete
                     className="icon"
                     style={{ cursor: "pointer" }}
-                    onClick={() => removeFloorPlan(row.id, plan.id)}
+                    onClick={() => removePlan(row.id)}
                   />
                 </div>
               </div>
-            ))}
-          </div>
-        ))}
+              <div className="col-md-3">
+                <div
+                  style={{
+                    borderBottom: "1px solid #cccccc",
+                    margin: "20px 0",
+                  }}
+                >
+                  <select
+                    className="form-control custom-input-height"
+                    aria-label="Default select example"
+                    name="category"
+                    value={row.category}
+                    onChange={(e) => onChangePlanHandler(e, row.id)}
+                    required
+                  >
+                    <option>Select Category*</option>
+                    {categories?.map((category) => (
+                      <option
+                        id={category._id}
+                        key={category._id}
+                        value={category._id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-md-3">
+                <div
+                  className="form-floating border_field"
+                  style={{
+                    borderBottom: "1px solid #cccccc",
+                    margin: "20px 0",
+                  }}
+                >
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="floatingInputPrice"
+                    placeholder="Price*"
+                    name="price"
+                    value={row.price}
+                    onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
+                    required
+                  />
+                  <label className="custompadd" htmlFor="floatingInputPrice">Price*</label>
+                </div>
+              </div>
+              <div className="col-md-2">
+                <div
+                  className="form-floating border_field"
+                  style={{
+                    borderBottom: "1px solid #cccccc",
+                    margin: "20px 0",
+                  }}
+                >
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="floatingInputPrice"
+                    placeholder="Area*"
+                    name="size"
+                    value={row.size}
+                    onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
+                    required
+                  />
+                  <label className="custompadd" htmlFor="floatingInputPrice">Area</label>
+                </div>
+              </div>
+              <div className="col-md-2">
+                <div
+                  style={{
+                    borderBottom: "1px solid #cccccc",
+                    margin: "20px 0",
+                  }}
+                >
+                  <select
+                    className="form-control custom-input-height"
+                    aria-label="Default select example"
+                    name="size_sq"
+                    value={row.size_sq}
+                    onChange={(e) => handleInputPlanChange(e, row.id, null, false)}
+                    required
+                  >
+                    <option>Sq.Ft.</option>
+                    <option>Sq.Yd.</option>
+                    <option>Ft.</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-3">
+                  <h5>Floor Plans</h5>
+                </div>
+                <div className="col-md-3">
+                  <IoIosAddCircle
+                    onClick={() => addFloorPlan(row.id)}
+                    className="icon"
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
+              </div>
+              {row.floor_plans.map((plan, id) => (
+                <div className="row" key={plan.id}>
+                  <div className="col-md-2">
+                    <div
+                      className="form-floating border_field"
+                      style={{ marginTop: "6px" }}
+                    >
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="floatingInputPrice"
+                        placeholder="Name*"
+                        name="name"
+                        value={plan.name}
+                        //  onChange={(e) => handleInputPlanChange(e, row.id, plan.id)}
+                        onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
+                      />
+                      <label className="custompadd" htmlFor="floatingInputPrice">Name</label>
+                    </div>
+                  </div>
+                  <div className="col-md-2">
+                    <div
+                      className="form-floating border_field"
+                      style={{ marginTop: "6px" }}
+                    >
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="floatingInputPrice"
+                        placeholder="Area*"
+                        name="area"
+                        value={plan.area}
+                        //  onChange={(e) => handleInputPlanChange(e, row.id, plan.id)}
+                        onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
+                      />
+                      <label className="custompadd" htmlFor="floatingInputPrice">Area</label>
+                    </div>
+                  </div>
+                  <div className="col-md-2">
+                    <div
+                      className="form-floating border_field"
+                      style={{ marginTop: "6px" }}
+                    >
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="floatingInputPrice"
+                        placeholder="Rent Price*"
+                        name="rent_price"
+                        value={plan.rent_price}
+                        onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
+                      />
+                      <label className="custompadd" htmlFor="floatingInputPrice">Rent Price*</label>
+                    </div>
+                  </div>
+                  <div className="col-md-2">
+                    <div
+                      className="form-floating border_field"
+                      style={{ marginTop: "6px" }}
+                    >
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="floatingInputPrice"
+                        placeholder="Sale Price*"
+                        name="sale_price"
+                        value={plan.sale_price}
+                        onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
+                      />
+                      <label className="custompadd" htmlFor="floatingInputPrice">Sale Price*</label>
+                    </div>
+                  </div>
+                  <div className="col-md-2"
+                    style={{
+                      padding: "10px"
+                    }}
+                  >
+                    <label className="file file_label">
+                      <span className="upload_text">Upload</span>
+                      <FaUpload className="upload_icon" />
+                      <input
+                        type="file"
+                        id={`file-input-${plan.id}`}
+                        aria-label="File browser example"
+                        onChange={(e) => handleInputByClick(e, row.id, plan.id, true)}
+                        className="file_hide"
+                      />
+                    </label>
+                    <div
+                      id={`preview-${plan.id}`}
+                      className="mt-3 d-flex align-items-center"
+                    >
+                      {(plan.image || plan.image?.s3_link) && <Fragment>
+                        <img src={plan.image?.s3_link || plan.image} alt="media" width="50%" />
+                      </Fragment>}
+                    </div>
+                  </div>
+                  <div className="col-md-2 d-flex align-items-center">
+                    <AiFillDelete
+                      className="icon"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => removeFloorPlan(row.id, plan.id)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

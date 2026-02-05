@@ -151,11 +151,12 @@ function AddBuilderprojects() {
             <ProjectDetails />
             <Location />
             <FloorPlans />
-            <div className="row top-margin">
-              <div className="col-md-12">
+            <div className="project-card">
+            <div className="d-flex justify-content-between col-10">
+              <div className="row-md-12">
                 <h4 className="property_form_h4">Master Plan</h4>
               </div>
-              <div className="col-md-6">
+              <div className="row-md-6">
                 <ImageUpload
                   images={images}
                   setImages={setImages}
@@ -167,7 +168,7 @@ function AddBuilderprojects() {
               </div>
               {(projects?.master_plan?.s3_link || projects.master_plan) && <img src={projects?.master_plan?.s3_link} style={{ width: "25%" }} />}
             </div>
-
+          </div>
             <ProjectAmenities />
             <ProjectEditor />
 

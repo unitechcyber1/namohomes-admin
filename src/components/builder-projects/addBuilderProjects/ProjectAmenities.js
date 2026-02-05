@@ -57,7 +57,8 @@ const ProjectAmenities = () => {
   return (
     <>
       {" "}
-      <div className="row top-margin">
+       <div className="project-card">
+      <div className="row ">
         <h4 className="property_form_h4">Project Amenities</h4>
         <div className="form-check" style={{ marginLeft: "9px" }}>
           {amenities?.map((amenity) => (
@@ -77,6 +78,7 @@ const ProjectAmenities = () => {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </>
   );

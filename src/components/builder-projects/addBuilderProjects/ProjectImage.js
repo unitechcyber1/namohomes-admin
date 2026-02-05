@@ -117,7 +117,8 @@ const ProjectImage = () => {
     },[checkUrl])
     return (
       <>
-        <div className="row top-margin image-border">
+        <div className="project-card">
+        <div className="row image-border">
           <h4 className="property_form_h4">Project Images</h4>
           <div className="container">
          
@@ -279,6 +280,7 @@ const ProjectImage = () => {
           {(projects.location_map || projects.location_map?.s3_link) && <Fragment>
                       <img src={projects.location_map?.s3_link} alt="media" style={{ width: "25%" }} />
                     </Fragment>}
+        </div>
         </div>
       </>
     );
