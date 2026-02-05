@@ -100,27 +100,15 @@ const ProjectDetails = () => {
   return (
     <>
       {" "}
+       <div className="project-card">
       <div className="row top-margin">
+     
         <div className="col-md-12">
           <h4>Projects Details</h4>
-        </div>
       </div>
-      <div className="row d-flex align-items-baseline">
-        <div className="col-md-3">
-          <div>
-            <Select
-              placeholder="Builder"
-              value={selectedBuilder}
-              options={builderOptions}
-              onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "builder")
-              }
-              isSearchable
-            />
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
+      </div>
+      <div className="col-md-4 my-4">
+          <div className="form-floating border_field ">
             <input
               type="text"
               className="form-control"
@@ -134,14 +122,27 @@ const ProjectDetails = () => {
             <label htmlFor="floatingInput">Name of Project</label>
           </div>
         </div>
+      <div className="row d-flex align-items-baseline">
+        <div className="col-md-4">
+          <div>
+            <Select
+              placeholder="Builder"
+              value={selectedBuilder}
+              options={builderOptions}
+              onChange={(v) => onChangeOptionHandler(v, "builder")}
+              isSearchable
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
 
-        <div className="col-md-2">
-          <div
-            style={{
-              borderBottom: "1px solid #cccccc",
-            }}
-          >
+          </div>
+        </div>
+        
+
+        <div className="col-md-4">
+          <div>
             <select
+              className="uniform-select"
               value={projects.project_type}
               name="project_type"
               onChange={handleInputChange}
@@ -151,13 +152,9 @@ const ProjectDetails = () => {
             </select>
           </div>
         </div>
-        <div className="col-md-3">
-          <div
-            style={{
-              borderBottom: "1px solid #cccccc",
-            }}
-          >
-            <select value={selectedPlanName} onChange={handleItemSelect}>
+        <div className="col-md-4">
+          <div>
+            <select className="uniform-select" value={selectedPlanName} onChange={handleItemSelect}>
               <option>
                 Select Plan
               </option>
@@ -409,6 +406,7 @@ const ProjectDetails = () => {
             </label>
           </div>
         </div>
+      </div>
       </div>
     </>
   );
