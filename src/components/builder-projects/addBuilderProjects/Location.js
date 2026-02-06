@@ -218,14 +218,14 @@ const Location = () => {
             <div className="form-floating border_field">
               <input
                 type="text"
-                className="form-control uniform-select "
+                className="form-control uniform-select  "
                 id="floatingInputAddress"
                 placeholder="Address"
                 name="address"
                 value={projects.location.address}
                 onChange={(e) => handleInputChange(e, 'location')}
               />
-              <label htmlFor="floatingInputAddress">Address</label>
+              <label className="custompadd" htmlFor="floatingInputAddress">Address</label>
             </div>
           </div>
           <div className="col-md-6">
@@ -265,7 +265,7 @@ const Location = () => {
                   onChange={(e) => handleInputChange(e, 'location')}
                   required
                 />
-                <label htmlFor="floatingInputLatti">Latitude</label>
+                <label className="custompadd" htmlFor="floatingInputLatti">Latitude</label>
               </div>
             </div>
 
@@ -282,7 +282,7 @@ const Location = () => {
                   onChange={(e) => handleInputChange(e, 'location')}
                   required
                 />
-                <label htmlFor="floatingInputLongi">Longitude</label>
+                <label className="custompadd" htmlFor="floatingInputLongi">Longitude</label>
               </div>
             </div>
           </div>
@@ -305,7 +305,7 @@ const Location = () => {
                   value={projects.location.latitude2}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
-                <label htmlFor="floatingInputLatti2">Latitude</label>
+                <label className="custompadd" htmlFor="floatingInputLatti2">Latitude</label>
               </div>
             </div>
 
@@ -321,7 +321,7 @@ const Location = () => {
                   value={projects.location.longitude2}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
-                <label htmlFor="floatingInputLongi2">Longitude</label>
+                <label  className="custompadd" htmlFor="floatingInputLongi2">Longitude</label>
               </div>
             </div>
           </div>

@@ -28,7 +28,8 @@ const ProjectSeo = () => {
   return (
     <>
       {" "}
-      <div className="row top-margin">
+      <div className="project-card">
+      <div className="row ">
         <h4 className="property_form_h4">SEO Details</h4>
         <div className="col-md-6">
           <div className="form-floating seo_floating border_field">
@@ -41,7 +42,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.title}
               onChange={(e) => handleInputChange(e, 'seo')}
             />
-            <label htmlFor="floatingInput">Title</label>
+            <label className="custompadd" htmlFor="floatingInput">Title</label>
           </div>
         </div>
       </div>
@@ -57,7 +58,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.keywords}
               onChange={(e) => handleInputChange(e, 'seo')}
             />
-            <label htmlFor="floatingInput">Keywords</label>
+            <label className="custompadd" htmlFor="floatingInput">Keywords</label>
           </div>
         </div>
       </div>
@@ -73,7 +74,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.description}
               onChange={(e) => handleInputChange(e, 'seo')}
             />
-            <label htmlFor="floatingInputDescription">Description</label>
+            <label className="custompadd" htmlFor="floatingInputDescription">Description</label>
           </div>
         </div>
       </div>
@@ -89,7 +90,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.twitter?.title || ""}
               onChange={(e) => handleInputChange(e, 'seo', 'twitter')}
             />
-            <label htmlFor="floatingInputTwitter">Twitter Title</label>
+            <label className="custompadd" htmlFor="floatingInputTwitter">Twitter Title</label>
           </div>
         </div>
       </div>
@@ -105,7 +106,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.twitter?.description}
               onChange={(e) => handleInputChange(e, 'seo', 'twitter')}
             />
-            <label htmlFor="floatingInputTwitDesc">Twitter Description</label>
+            <label className="custompadd" htmlFor="floatingInputTwitDesc">Twitter Description</label>
           </div>
         </div>
       </div>
@@ -121,7 +122,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.open_graph?.title}
               onChange={(e) => handleInputChange(e, 'seo', 'open_graph')}
             />
-            <label htmlFor="floatingInputOgTitle">Open Graph Title</label>
+            <label className="custompadd" htmlFor="floatingInputOgTitle">Open Graph Title</label>
           </div>
         </div>
       </div>
@@ -137,7 +138,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.open_graph?.description}
               onChange={(e) => handleInputChange(e, 'seo', 'open_graph')}
             />
-            <label htmlFor="floatingInputOgDesc">Open Graph Description</label>
+            <label className="custompadd" htmlFor="floatingInputOgDesc">Open Graph Description</label>
           </div>
         </div>
       </div>
@@ -153,7 +154,7 @@ const ProjectSeo = () => {
               value={projects?.seo?.script}
               onChange={(e) => handleInputChange(e, 'seo')}
             />
-            <label htmlFor="floatingInputOgDesc">Schema</label>
+            <label className="custompadd" htmlFor="floatingInputOgDesc">Schema</label>
           </div>
         </div>
       </div>
@@ -173,6 +174,7 @@ const ProjectSeo = () => {
             </label>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

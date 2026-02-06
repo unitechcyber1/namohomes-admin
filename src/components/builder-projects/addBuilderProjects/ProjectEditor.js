@@ -122,6 +122,7 @@ const ProjectEditor = () => {
 
   return (
     <>
+     <div className="project-card">
       <div className="row top-margin">
         <div className="col-md-12">
           <h4 className="property_form_h4">About Project</h4>
@@ -197,6 +198,7 @@ const ProjectEditor = () => {
           />
         </div>
       </div>}
+      </div>
     </>
   );
 };

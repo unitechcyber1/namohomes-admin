@@ -107,7 +107,7 @@ const ProjectDetails = () => {
           <h4>Projects Details</h4>
       </div>
       </div>
-      <div className="col-md-4 my-4">
+      <div className="col-md-4 my-4 ">
           <div className="form-floating border_field ">
             <input
               type="text"
@@ -119,7 +119,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInput">Name of Project</label>
+            <label className="custompadd" htmlFor="floatingInput">Name of Project</label>
           </div>
         </div>
       <div className="row d-flex align-items-baseline">
@@ -180,7 +180,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInputSlug">Slug</label>
+            <label className="custompadd" htmlFor="floatingInputSlug">Slug</label>
           </div>
         </div>
         <div className="col-md-4">
@@ -195,7 +195,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInputAddress">Starting Price*</label>
+            <label  className="custompadd" htmlFor="floatingInputAddress">Starting Price*</label>
           </div>
         </div>
         <div className="col-md-4">
@@ -210,15 +210,15 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInputAddress">Configuration*</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Configuration*</label>
           </div>
         </div>
       </div>
       <div className="row mt-4">
         <div className="col-md-4">
-          <div className="form-floating border_field">
+          <div className="form-floating border_field ">
             <select
-              className="form-select property-input"
+              className="form-select property-input "
               name="project_status"
               aria-label="Default select example"
               value={projects.project_status}
@@ -243,7 +243,7 @@ const ProjectDetails = () => {
               value={projects.project_size}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Project Size*</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Project Size*</label>
           </div>
         </div>
         <div className="col-md-4">
@@ -257,7 +257,7 @@ const ProjectDetails = () => {
               value={projects.ratings}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Ratings</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Ratings</label>
           </div>
         </div>
       </div>
@@ -274,7 +274,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
 
             />
-            <label htmlFor="floatingInputAddress">Coming Soon</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Coming Soon</label>
           </div>
         </div>
         <div className="col-md-4">
@@ -289,7 +289,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
 
             />
-            <label htmlFor="floatingInputAddress">Tagline</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Tagline</label>
           </div>
         </div>
         <div className="col-md-4">
@@ -304,7 +304,7 @@ const ProjectDetails = () => {
               onChange={handleInputChange}
 
             />
-            <label htmlFor="floatingInputAddress">Project Tag</label>
+            <label className="custompadd" htmlFor="floatingInputAddress">Project Tag</label>
           </div>
         </div>
       </div>
@@ -319,7 +319,7 @@ const ProjectDetails = () => {
               checked={projects.for_sale}
               onChange={handleCheckboxChange}
             />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
+            <label className="form-check-label " htmlFor="flexCheckDefault">
               For Sale
             </label>
           </div>
@@ -383,7 +383,7 @@ const ProjectDetails = () => {
               value={projects.short_descrip}
               onChange={handleInputChange}
             ></textarea>
-            <label htmlFor="floatingInputAddress">
+            <label  className="custompadd" htmlFor="floatingInputAddress">
               Short Description About Project
             </label>
           </div>
@@ -401,7 +401,7 @@ const ProjectDetails = () => {
               value={projects?.video}
               onChange={handleInputChange}
             ></textarea>
-            <label htmlFor="floatingInputAddress">
+            <label  className="custompadd" htmlFor="floatingInputAddress">
               Video Link
             </label>
           </div>
