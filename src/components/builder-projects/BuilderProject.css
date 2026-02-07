@@ -113,6 +113,8 @@
   height: 48px;
   border: none;
   border-bottom: 1px solid #ccc;
+  color:  black !important;
+  padding: 10px !important;
   width: 100%;
 }
 .react-select-container {

@@ -218,7 +218,7 @@ const ProjectDetails = () => {
         <div className="col-md-4">
           <div className="form-floating border_field ">
             <select
-              className="form-select property-input "
+              className="uniform-select"
               name="project_status"
               aria-label="Default select example"
               value={projects.project_status}
