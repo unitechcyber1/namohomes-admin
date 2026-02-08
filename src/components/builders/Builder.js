@@ -78,6 +78,10 @@ const Builder = () => {
     firstIndex,
     firstIndex + perPage
   );
+   const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
 
   const prePage = () =>
     curPage > 1 && setCurPage(p => p - 1);
@@ -89,19 +93,19 @@ const Builder = () => {
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">Builder Module</h2>
+      
       <Link to="/builder/add-builder" className="btnLink mt-2">
         <Addpropertybtn buttonText="ADD NEW" />
       </Link>
+      </div>
 
-      <div className="table-box space-table-box">
-        <div className="table-top-box">Builder Module</div>
-
-        <TableContainer mt="60px" overflowX="hidden">
-
-          {/* Search */}
+       {/* Search */}
+       <div className="row mt-2 project-card2">
+        <div className="col-md-10 px-4">
           <input
-            className="form-control mb-3"
+            className="uniform-select-seo filter_row"
             placeholder="Search by name"
             value={searchTerm}
             onChange={(e) => {
@@ -109,7 +113,11 @@ const Builder = () => {
               setCurPage(1);
             }}
           />
-
+        </div>
+        </div>
+      <div className="table-box ">
+        
+        <TableContainer overflowX="hidden">
           <Table>
             <Thead>
               <Tr>
@@ -167,30 +175,35 @@ const Builder = () => {
         </TableContainer>
 
         {/* Pagination */}
-        <div className="mt-4 d-flex gap-3 align-items-center">
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-          <select
-            value={perPage}
-            onChange={e => {
-              setPerPage(Number(e.target.value));
-              setCurPage(1);
-            }}
-          >
-            {[10,25,50,100].map(n => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+          </div>
 
-          <BiSkipPrevious onClick={() => setCurPage(1)} />
-          <GrFormPrevious onClick={prePage} />
-          <GrFormNext onClick={nextPage} />
-          <BiSkipNext onClick={() => setCurPage(totalPages)} />
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
 
-          <span>
-            {firstIndex + 1}–
-            {Math.min(firstIndex + perPage, filteredBuilders.length)}
-            of {filteredBuilders.length}
-          </span>
+            <span className="current-page">
+              {curPage}
+            </span>
+
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
 
         </div>
       </div>

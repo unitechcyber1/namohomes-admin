@@ -32,7 +32,9 @@ function Seo() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [selectItemNum, setSelectItemNum] = useState(10);
+
   const [curPage, setCurPage] = useState(1);
+
 
   const isDwarka = window.location.href.includes("dwarkaexpressway");
   const baseSeoPath = isDwarka ? "/dwarkaexpressway/seo" : "/seo";
@@ -120,37 +122,42 @@ function Seo() {
     setCurPage(1);
   };
 
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
+
+
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">SEO Module</h2>
+        <Link to={`${baseSeoPath}/add-seo`} className="btnLink mt-2">
+          <Addpropertybtn buttonText="ADD NEW" />
+        </Link>
+      </div>
 
-      <Link to={`${baseSeoPath}/add-seo`} className="btnLink mt-2">
-        <Addpropertybtn buttonText="ADD NEW" />
-      </Link>
-
-      <div className="table-box space-table-box">
-        <div className="table-top-box">SEO Module</div>
-
-        <TableContainer marginTop="60px" overflowX="hidden">
-          {/* Search */}
-          <div className="row">
-            <div className="col-md-3">
-              <div className="form-floating border_field">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search by Path"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurPage(1);
-                  }}
-                />
-                <label>Search by Path</label>
-              </div>
-            </div>
+      <div className="row mt-2 project-card2">
+        <div className="row ">
+          <div className="col-md-10 px-4">
+            <input
+              type="text"
+              className="uniform-select-seo"
+              placeholder="Search by Path"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurPage(1);
+              }}
+            />
           </div>
+        </div>
 
+      </div>
+
+      <div className="table-box ">
+        <TableContainer  overflowX="hidden">
           {/* Table */}
           <Table variant="simple" marginTop="20px">
             <Thead>
@@ -209,50 +216,38 @@ function Seo() {
         </TableContainer>
 
         {/* Pagination */}
-        <nav className="mt-5">
-          <div
-            className="d-flex align-items-center justify-content-between"
-            style={{ width: "51%" }}
-          >
-            <p className="mb-0">Items per page:</p>
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-            <select
-              className="form-select"
-              value={selectItemNum}
-              onChange={itemsPerPageHandler}
-              style={{ width: 100 }}
-            >
-              {[10, 20, 30, 50, 100].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-
-            <div style={{ width: 140 }}>
-              {filteredSeos.length === 0
-                ? "0"
-                : `${firstIndex + 1}-${Math.min(
-                    lastIndex,
-                    filteredSeos.length
-                  )}`}{" "}
-              of {filteredSeos.length}
-            </div>
-
-            <div className="page-item">
-              <BiSkipPrevious onClick={getFirstPage} />
-            </div>
-            <div className="page-item">
-              <GrFormPrevious onClick={prePage} />
-            </div>
-            <div className="page-item">
-              <GrFormNext onClick={nextPage} />
-            </div>
-            <div className="page-item">
-              <BiSkipNext onClick={getLastPage} />
-            </div>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
           </div>
-        </nav>
+
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
+
+            <span className="current-page">
+              {curPage}
+            </span>
+
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );
