@@ -103,7 +103,7 @@
   border-radius: 10px;
 }
 .project-card {
-  background: #eedfdf;
+  background: rgb(255, 240, 241);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -171,4 +171,102 @@
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
+}
+.project-card2{
+  background-color: rgb(255, 240, 241);
+  border-radius: 12px;
+  box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
+}
+.uniform-select2 {
+  height: 40px;
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  color:black;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+.uniform-select2::placeholder {
+  color: black;
+}
+
+.reset_button {
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  background: #fff;
+  font-size: 14px;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+/* Pending */
+.status-pill.pending {
+  background-color: #fff1dc;
+  color: #c88719;
+}
+
+/* Approved */
+.status-pill.approve {
+  background-color: #e6f6e9;
+  color: #2e7d32;
+}
+
+/* Rejected */
+.status-pill.reject {
+  background-color: #fde8ec;
+  color: #c62828;
+}
+
+.status-pill .arrow {
+  font-weight: 600;
+}
+.pagination-bar {
+  font-size: 14px;
+}
+
+/* Left text */
+.page-info {
+  color: #555;
+}
+
+/* Buttons */
+.page-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Current page */
+.current-page {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #ff385dd4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }

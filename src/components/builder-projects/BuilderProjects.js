@@ -112,23 +112,23 @@ function BuilderProjects() {
     }
   }, [query, url]);
 
-const fetchInitialData = useCallback(async () => {
-  try {
-    setLoading(true);
+  const fetchInitialData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-    const [citiesData, microData] = await Promise.all([
-      getCities(),
-      getMicrolocations(),
-    ]);
+      const [citiesData, microData] = await Promise.all([
+        getCities(),
+        getMicrolocations(),
+      ]);
 
-    setCities(citiesData);
-    setMicrolocations(microData);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-}, []);
+      setCities(citiesData);
+      setMicrolocations(microData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
 
   const handleDelete = async (id) => {
@@ -201,87 +201,84 @@ const fetchInitialData = useCallback(async () => {
   /* -------------------------------- RENDER -------------------------------- */
 
   return (
-    <div className="mx-5 mt-3">
+    <div className="mx-5 mt-4">
       <Mainpanelnav />
-
-      <Link
-        to={
-          url.includes("dwarkaexpressway")
-            ? "/dwarkaexpressway/builder-projects/add-builder-projects"
-            : "/builder-projects/add-builder-projects"
-        }
-        className="btnLink mt-2"
-      >
-        <Addpropertybtn buttonText="ADD Project" />
-      </Link>
-
-      <div className="table-box space-table-box">
-        <div className="table-top-box">Projects Module</div>
-
-        {/* ------------------------------ FILTERS ----------------------------- */}
-        <div className="row my-5 filter_row">
-          <div className="col-md-2">
-            <input
-              className="form-control"
-              placeholder="Search by name"
-              name="name"
-              value={query.name}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="col-md-2">
-            <select
-              className="form-select"
-              name="project_type"
-              value={query.project_type}
-              onChange={handleInputChange}
-            >
-              <option value="">All</option>
-              <option value="residential">Residential</option>
-              <option value="commercial">Commercial</option>
-            </select>
-          </div>
-
-          <div className="col-md-2">
-            <Select
-              placeholder="City"
-              value={selectedCity}
-              options={cityOptions}
-              onChange={(o) => handleSelectChange(o, "city")}
-            />
-          </div>
-
-          <div className="col-md-2">
-            <Select
-              placeholder="Location"
-              value={selectedMicroLocation}
-              options={microLocationOptions}
-              onChange={(o) => handleSelectChange(o, "location")}
-            />
-          </div>
-
-          <div className="col-md-2">
-            <select
-              className="form-select"
-              name="status"
-              value={query.status}
-              onChange={handleInputChange}
-            >
-              <option value="">All</option>
-              <option value="pending">Pending</option>
-              <option value="approve">Approved</option>
-              <option value="reject">Rejected</option>
-            </select>
-          </div>
-
-          <div className="col-md-2">
-            <button className="reset_button" onClick={handleReset}>
-              Reset
-            </button>
-          </div>
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">Projects Module</h2>
+        <Link
+          to={
+            url.includes("dwarkaexpressway")
+              ? "/dwarkaexpressway/builder-projects/add-builder-projects"
+              : "/builder-projects/add-builder-projects"
+          }
+          className="btnLink mt-2">
+          <Addpropertybtn buttonText="ADD Project" />
+        </Link>
+      </div>
+      {/* ------------------------------ FILTERS ----------------------------- */}
+      <div className="  project-card2 mt-4 row  filter_row">
+        <div className="col-md-2">
+          <input
+            className="uniform-select2"
+            placeholder="Search by name"
+            name="name"
+            value={query.name}
+            onChange={handleInputChange}
+          />
         </div>
 
+        <div className="col-md-2">
+          <select
+            className="uniform-select2"
+            name="project_type"
+            value={query.project_type}
+            onChange={handleInputChange}
+          >
+            <option value="">All</option>
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+          </select>
+        </div>
+
+        <div className="col-md-2">
+          <Select
+            placeholder="City"
+            value={selectedCity}
+            options={cityOptions}
+            onChange={(o) => handleSelectChange(o, "city")}
+          />
+        </div>
+
+        <div className="col-md-2">
+          <Select
+            placeholder="Location"
+            value={selectedMicroLocation}
+            options={microLocationOptions}
+            onChange={(o) => handleSelectChange(o, "location")}
+          />
+        </div>
+
+        <div className="col-md-2">
+          <select
+            className="uniform-select2"
+            name="status"
+            value={query.status}
+            onChange={handleInputChange}
+          >
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="approve">Approved</option>
+            <option value="reject">Rejected</option>
+          </select>
+        </div>
+
+        <div className="col-md-2">
+          <button className="reset_button" onClick={handleReset}>
+            Reset
+          </button>
+        </div>
+      </div>
+      <div className="table-box pb-3">
         {/* ------------------------------ TABLE ------------------------------- */}
         <TableContainer>
           <Table>
@@ -313,7 +310,19 @@ const fetchInitialData = useCallback(async () => {
                     <Td>{project.location?.city?.name}</Td>
                     <Td>{project.location?.micro_location?.[0]?.name}</Td>
                     <Td>{DATE_FORMATTER.format(new Date(project.createdAt))}</Td>
-                    <Td>{project.status}</Td>
+                    <Td>
+                      <button
+                        type="button"
+                        className={`status-pill ${project.status}`}
+                      >
+                        {project.status === "approve" && "Approved"}
+                        {project.status === "reject" && "Rejected"}
+                        {project.status === "pending" && "Pending"}
+                        <span className="arrow">›</span>
+                      </button>
+                    </Td>
+
+
                     <Td>
                       <Link
                         to={`/builder-projects/edit-project/${project._id}`}
@@ -327,9 +336,8 @@ const fetchInitialData = useCallback(async () => {
                         <Link
                           to={`https://propularity.in/${generateSlug(
                             project?.builder?.name
-                          )}/${project?.location?.city?.name?.toLowerCase()}/$${
-                            project.slug
-                          }`}
+                          )}/${project?.location?.city?.name?.toLowerCase()}/$${project.slug
+                            }`}
                           target="_blank"
                         >
                           <AiOutlineEye />
@@ -368,29 +376,37 @@ const fetchInitialData = useCallback(async () => {
           </Table>
         </TableContainer>
 
-        {/* --------------------------- PAGINATION ----------------------------- */}
-        <div className="d-flex align-items-center gap-3 mt-4">
-          <select
-            name="limit"
-            value={query.limit}
-            onChange={handleInputChange}
-          >
-            {[10, 25, 50, 100].map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-          <span>
-            {firstIndex + 1} - {firstIndex + projects.length} of {totalCount}
-          </span>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page  <strong>{query.page}</strong> Out of <strong>{totalPages}</strong>
+          </div>
 
-          <BiSkipPrevious onClick={() => goToPage(1)} />
-          <GrFormPrevious onClick={() => goToPage(query.page - 1)} />
-          <GrFormNext onClick={() => goToPage(query.page + 1)} />
-          <BiSkipNext onClick={() => goToPage(totalPages)} />
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={query.page === 1}
+              onClick={() => goToPage(query.page - 1)}
+            >
+              Previous
+            </button>
+
+            <span className="current-page">
+              {query.page}
+            </span>
+
+            <button
+              className="page-btn"
+              disabled={query.page === totalPages}
+              onClick={() => goToPage(query.page + 1)}
+            >
+              Next
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   );
