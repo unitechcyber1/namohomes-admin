@@ -1,217 +1,245 @@
 import React, { useEffect, useState } from "react";
-import BuilderDetail from "./BuilderDetail";
 import Mainpanelnav from "../../mainpanel-header/Mainpanelnav";
+import BuilderDetail from "./BuilderDetail";
 import BuilderSeo from "./BuilderSeo";
-import ImageUpload from "../../../ImageUpload";
 import BuilderImage from "./BuilderImage";
-import { uploadFile } from "../../../services/Services";
+import ImageUpload from "../../../ImageUpload";
+
 import Select from "react-select";
-import { getCity, getbuildersDataById } from "../BuilderService";
-import BASE_URL from "../../../apiConfig";
 import { useToast } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { GpState } from "../../../context/context"; 
+
+import { uploadFile } from "../../../services/Services";
+import { GpState } from "../../../context/context";
 import Loader from "../../loader/Loader";
-import { builders } from "../../../models/builderModel";
+
+import {
+  getCities,
+  getBuilderById,
+  createBuilder,
+  updateBuilder
+} from "services/builderService";
+
+import { builders as builderModel } from "../../../models/builderModel";
+
 const AddBuilder = () => {
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [images, setImages] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [progress, setProgress] = useState(0);
   const toast = useToast();
+  const { id } = useParams();
+
   const {
     builder,
     builderImage,
     footer_des,
     editBuilder,
-    setEditBuilder, 
+    setEditBuilder,
     isBuilderEditable,
     setIsBuilderEditable,
     aboutEditor,
     setBuilder
   } = GpState();
 
-  const { id } = useParams();
+  const [images, setImages] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [isUploaded, setIsUploaded] = useState(false);
   const [loading, setLoading] = useState(true);
-  const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
-    switch (dropdownIdentifier) {
-      case "city":
-        setSelectedCity(selectedOption);
-        break;
-      default:
-        break;
-    }
+
+  // ---------- Upload ----------
+  const previewFile = (data) => {
+    setImages((prev) => prev.concat(data));
   };
-  const cityOptions = cities?.map((city) => ({
-    value: city._id,
-    label: city.name,
-  }));
-  useEffect(() => {
-    const initialCity = cityOptions.filter((option) =>
-      editBuilder?.cities?.includes(option.value)
-    );
-    if (initialCity && isBuilderEditable) {
-      setSelectedCity(initialCity);
-    } else {
-      setSelectedCity(null);
-    }
-  }, [cities]);
+
   const handleUploadFile = async (files) => {
     await uploadFile(files, setProgress, setIsUploaded, previewFile);
   };
-  const previewFile = (data) => {
-    const allimages = images;
-    setImages(allimages.concat(data));
+
+  // ---------- Fetch Cities ----------
+  const fetchCities = async () => {
+    try {
+      const data = await getCities();
+      setCities(data);
+    } catch {
+      toast({ title: "City load failed", status: "error" });
+    }
   };
 
-  const handleFetchCity = async () => {
-    await getCity(setCities);
+  // ---------- Fetch Builder ----------
+  const fetchBuilder = async () => {
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      setIsBuilderEditable(true);
+
+      const data = await getBuilderById(id);
+      setEditBuilder(data);
+
+    } catch {
+      toast({ title: "Builder load failed", status: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
-  const handleFetchBuilderById = async () => {
-    setLoading(true);
-    setIsBuilderEditable(true);
-    const data = await getbuildersDataById(id);
-    setEditBuilder(data);
-    setLoading(false);
-  };  
-  const allCity = selectedCity?.map((city) => city.value);
-  const allData = {
+
+  useEffect(() => {
+    fetchCities();
+    fetchBuilder();
+
+    if (!id) {
+      setEditBuilder({});
+      setIsBuilderEditable(false);
+      setLoading(false);
+    }
+  }, []);
+
+  // ---------- Sync Builder Model ----------
+  useEffect(() => {
+    if (editBuilder && isBuilderEditable) {
+      setBuilder({ ...editBuilder });
+    } else {
+      setBuilder(builderModel);
+    }
+  }, [editBuilder]);
+
+  // ---------- City Select ----------
+  const cityOptions = cities.map(c => ({
+    value: c._id,
+    label: c.name,
+  }));
+
+  useEffect(() => {
+    if (!isBuilderEditable) return;
+
+    const selected = cityOptions.filter(opt =>
+      editBuilder?.cities?.includes(opt.value)
+    );
+
+    setSelectedCity(selected);
+  }, [cities, editBuilder]);
+
+  const allCityIds = selectedCity?.map(c => c.value);
+
+  // ---------- Payload ----------
+  const payload = {
     ...builder,
     description: footer_des,
     about_builder: aboutEditor,
     images: builderImage,
     BuilderLogo: images[0],
-    cities: allCity,
+    cities: allCityIds,
   };
-  
-  const handleSaveBuilder = async (e) => {
+
+  // ---------- Save ----------
+  const handleSave = async (e) => {
     e.preventDefault();
+
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/builder`, allData);
+      await createBuilder(payload);
+
       toast({
         title: "Saved Successfully!",
         status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
       });
-    } catch (error) {
+
+    } catch (e) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Save failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
-  const handleUpdateBuilder = async (e) => {
+
+  // ---------- Update ----------
+  const handleUpdate = async (e) => {
     e.preventDefault();
+
     try {
-      const { data } = await axios.put(
-        `${BASE_URL}/api/admin/builder/edit-builder/${id}`,
-        allData
-      );
+      await updateBuilder(id, payload);
+
       toast({
-        title: "Update Successfully!",
+        title: "Updated Successfully!",
         status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
       });
-    } catch (error) {
+
+    } catch (e) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to update the results",
+        title: "Update failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
-  useEffect(() => {
-    handleFetchCity();
-    if (id) {
-      handleFetchBuilderById();
-    } else {
-      setEditBuilder({});
-      setIsBuilderEditable(false);
-    }
-  }, []);
-  useEffect(() => {
-    if (editBuilder && isBuilderEditable) {
-      setBuilder({...editBuilder})
-    }
-    else{
-      setBuilder(builders);
-    }
-  }, [editBuilder]);
-  if (loading && isBuilderEditable) {
-    return <Loader />;
-  }
+
+  if (loading && isBuilderEditable) return <Loader />;
+
+  // ---------- UI ----------
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
+
       <div className="container form-box">
-        <form
-          style={{ textAlign: "left" }}
-          onSubmit={isBuilderEditable ? handleUpdateBuilder : handleSaveBuilder}
-        >
-          <div className="container">
-            <div className="row mt-4">
-              <BuilderDetail />
-            </div>
-            <div className="row mt-4">
-              <h5 style={{ marginTop: "25px" }}>Select City</h5>
-              <div className="col-md-6">
-                <div
-                  style={{
-                    borderBottom: "1px solid #cccccc",
-                  }}
-                >
-                  <Select
-                    placeholder="City"
-                    value={selectedCity}
-                    options={cityOptions}
-                    onChange={(selectedOption) =>
-                      onChangeOptionHandler(selectedOption, "city")
-                    }
-                    isMulti
-                    isSearchable
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="row mt-4">
-              <div className="col-md-6">
-                <h5 style={{ marginTop: "25px" }}>Builder Logo</h5>
-                <ImageUpload
-                  images={images}
-                  setImages={setImages}
-                  progress={progress}
-                  setProgress={setProgress}
-                  uploadFile={handleUploadFile}
-                  isUploaded={isUploaded}
-                />
-              </div>
-              <img src={editBuilder?.BuilderLogo} style={{ width: "25%" }} />
-            </div>
-            <div className="row mt-4">
-              <BuilderImage />
-            </div>
-            <BuilderSeo />
+        <form onSubmit={isBuilderEditable ? handleUpdate : handleSave}>
+
+          <div className="row mt-4">
+            <BuilderDetail />
           </div>
+
+          {/* City Select */}
+          <div className="row mt-4">
+            <h5>Select City</h5>
+            <div className="col-md-6">
+              <Select
+                value={selectedCity}
+                options={cityOptions}
+                onChange={setSelectedCity}
+                isMulti
+                isSearchable
+                required
+              />
+            </div>
+          </div>
+
+          {/* Logo Upload */}
+          <div className="row mt-4">
+            <div className="col-md-6">
+              <h5>Builder Logo</h5>
+
+              <ImageUpload
+                images={images}
+                setImages={setImages}
+                progress={progress}
+                setProgress={setProgress}
+                uploadFile={handleUploadFile}
+                isUploaded={isUploaded}
+              />
+            </div>
+
+            {editBuilder?.BuilderLogo && (
+              <img
+                src={editBuilder.BuilderLogo}
+                style={{ width: "25%" }}
+              />
+            )}
+          </div>
+
+          <div className="row mt-4">
+            <BuilderImage />
+          </div>
+
+          <BuilderSeo />
+
           <div className="form-footer">
             <button type="submit" className="saveproperty-btn">
               {isBuilderEditable ? "EDIT" : "SAVE"}
             </button>
-            <button className="cancel-btn">Cancel</button>
+
+            <button type="button" className="cancel-btn">
+              Cancel
+            </button>
           </div>
+
         </form>
       </div>
     </div>

@@ -1,313 +1,232 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
-import { GpState } from "../../context/context";
-import { useToast } from "@chakra-ui/react";
 import { BsBookmarkPlus } from "react-icons/bs";
-import axios from "axios";
+
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
+  Table, Thead, Tbody, Tr, Th, Td,
+  TableContainer, Modal, ModalOverlay,
+  ModalContent, ModalHeader, ModalFooter,
+  ModalBody, ModalCloseButton, Button,
+  useDisclosure, Spinner, useToast
 } from "@chakra-ui/react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  useDisclosure,
-  Spinner,
-} from "@chakra-ui/react";
+
 import Delete from "../delete/Delete";
-import "./OurClient.css";
+import ImageUpload from "../../ImageUpload";
+
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import BASE_URL from "../../apiConfig";
-import ImageUpload from "../../ImageUpload";
+
 import { uploadFile } from "../../services/Services";
+import {
+  getClients,
+  createClient,
+  deleteClientById
+} from "services/clientService";
+
 function OurClient() {
-  const [ourClient, setOurClient] = useState([]);
-  const [ourClientField, setOurClientField] = useState({
-    name: "",
-    logo_url: "",
-  });
-  const [updateTable, setUpdateTable] = useState(false);
-  const [loading, setLoading] = useState(false);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectItemNum, setSelectItemNum] = useState(10);
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [images, setImages] = useState([]);
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-  };
-  const [curPage, setCurPage] = useState(1);
-  const recordsPerPage = selectItemNum;
-  const lastIndex = curPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = ourClient?.slice(firstIndex, lastIndex);
-  const nPage = Math.ceil(ourClient?.length / recordsPerPage);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setOurClientField({
-      ...ourClientField,
-      [name]: value,
-    });
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [updateTable, setUpdateTable] = useState(false);
+
+  const [form, setForm] = useState({ name: "" });
+
+  const [images, setImages] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const [isUploaded, setIsUploaded] = useState(false);
+
+  const [perPage, setPerPage] = useState(10);
+  const [curPage, setCurPage] = useState(1);
+
+  // ---------- Fetch ----------
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const data = await getClients();
+      setClients([...data].reverse());
+    } catch (e) {
+      toast({ title: "Failed to load clients", status: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchClients();
+  }, [updateTable]);
+
+  // ---------- Form ----------
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const previewFile = (data) => {
-    const allimages = images;
-    setImages(allimages.concat(data));
+    setImages((prev) => prev.concat(data));
   };
 
   const handleUploadFile = async (files) => {
     await uploadFile(files, setProgress, setIsUploaded, previewFile);
   };
-  const handleSaveOurClient = async () => {
-    if (!ourClientField.name) {
-      toast({
-        title: "Please Fill all The Fields!",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+
+  // ---------- Create ----------
+  const handleSaveClient = async () => {
+    if (!form.name) {
+      toast({ title: "Name required", status: "warning" });
       return;
     }
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/client`, {
-        name: ourClientField.name,
+      await createClient({
+        name: form.name,
         logo_url: images[0],
       });
-      setOurClientField({
-        name: "",
-        logo_url: "",
-      });
+
+      toast({ title: "Saved Successfully!", status: "success" });
+
+      setForm({ name: "" });
       setImages([]);
-      setUpdateTable((prev) => !prev);
+      setUpdateTable(p => !p);
       onClose();
+
+    } catch (e) {
       toast({
-        title: "Saved Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Save Results",
+        title: "Save failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
 
-  const getOurClients = async () => {
+  // ---------- Delete ----------
+  const handleDelete = async (id) => {
     try {
-      setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/admin/clients`);
-      const newData = data.reverse();
-      setOurClient(newData);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleDeleteClient = async (id) => {
-    try {
-      const { data } = await axios.delete(
-        `${BASE_URL}/api/admin/client/delete/${id}`
-      );
-      setUpdateTable((prev) => !prev);
+      await deleteClientById(id);
+      toast({ title: "Deleted", status: "success" });
+      setUpdateTable(p => !p);
+    } catch (e) {
       toast({
-        title: "Deleted Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Delete failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
 
-  useEffect(() => {
-    getOurClients();
-  }, [updateTable]);
+  // ---------- Pagination ----------
+  const totalPages = Math.ceil(clients.length / perPage);
+  const firstIndex = (curPage - 1) * perPage;
+  const pageData = clients.slice(firstIndex, firstIndex + perPage);
 
-  if (firstIndex > 0) {
-    var prePage = () => {
-      if (curPage !== firstIndex) {
-        setCurPage(curPage - 1);
-      }
-    };
-  }
+  const prePage = () => curPage > 1 && setCurPage(p => p - 1);
+  const nextPage = () => curPage < totalPages && setCurPage(p => p + 1);
 
-  if (records?.length === selectItemNum) {
-    var nextPage = () => {
-      if (curPage !== lastIndex) {
-        setCurPage(curPage + 1);
-      }
-    };
-  }
-
-  const getFirstPage = () => {
-    setCurPage(1);
-  };
-
-  const getLastPage = () => {
-    setCurPage(nPage);
-  };
-
+  // ---------- UI ----------
   return (
-    <>
-      <div className="mx-5 mt-3">
-        <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100 mt-2">
-          <Button className="addnew-btn" onClick={onOpen}>
-            <BsBookmarkPlus />
-            ADD NEW
-          </Button>
-        </div>
-        <div>
-          <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Add New Client</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <input
-                  type="text"
-                  value={ourClientField.name}
-                  onChange={handleInputChange}
-                  placeholder="Name*"
-                  name="name"
-                  className="property-input"
-                />
-                <ImageUpload
-                  images={images}
-                  setImages={setImages}
-                  progress={progress}
-                  setProgress={setProgress}
-                  uploadFile={handleUploadFile}
-                  isUploaded={isUploaded}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button colorScheme="blue" mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button variant="ghost" onClick={handleSaveOurClient}>
-                  Save
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </div>
-        <div className="table-box">
-          <div className="table-top-box">Client Module</div>
-          <TableContainer marginTop="60px" variant="striped" color="teal">
-            <Table variant="simple">
-              <Thead>
+    <div className="mx-5 mt-3">
+      <Mainpanelnav />
+
+      <div className="d-flex justify-content-end w-100 mt-2">
+        <Button className="addnew-btn" onClick={onOpen}>
+          <BsBookmarkPlus /> ADD NEW
+        </Button>
+      </div>
+
+      {/* Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add New Client</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleInputChange}
+              placeholder="Name*"
+              className="property-input"
+            />
+
+            <ImageUpload
+              images={images}
+              setImages={setImages}
+              progress={progress}
+              setProgress={setProgress}
+              uploadFile={handleUploadFile}
+              isUploaded={isUploaded}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>Cancel</Button>
+            <Button onClick={handleSaveClient}>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Table */}
+      <div className="table-box">
+        <div className="table-top-box">Client Module</div>
+
+        <TableContainer mt="60px">
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Name</Th>
+                <Th>Logo</Th>
+                <Th>Delete</Th>
+              </Tr>
+            </Thead>
+
+            <Tbody>
+              {loading ? (
                 <Tr>
-                  <Th>Name</Th>
-                  <Th>Logo Url</Th>
-                  <Th>Delete</Th>
+                  <Td colSpan={3} textAlign="center">
+                    <Spinner size="xl" />
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody>
-                {loading ? (
-                  <Tr>
-                    <Td align="center" style={{ width: "50px" }}>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
-                      />
+              ) : (
+                pageData.map(c => (
+                  <Tr key={c._id}>
+                    <Td>{c.name}</Td>
+                    <Td>{c.logo_url}</Td>
+                    <Td>
+                      <Delete handleFunction={() => handleDelete(c._id)} />
                     </Td>
                   </Tr>
-                ) : (
-                  records?.map((client) => (
-                    <Tr key={client._id} id={client._id}>
-                      <Td>{client.name}</Td>
-                      <Td>{client.logo_url}</Td>
+                ))
+              )}
+            </Tbody>
+          </Table>
+        </TableContainer>
 
-                      <Td>
-                        <Delete
-                          handleFunction={() => handleDeleteClient(client._id)}
-                        />
-                      </Td>
-                    </Tr>
-                  ))
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-          <nav className="mt-5">
-            <div
-              className="d-flex align-items-center justify-content-between"
-              style={{ width: "51%" }}
-            >
-              <p className="mb-0">Items per page: </p>
-              <div style={{ borderBottom: "1px solid gray" }}>
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  required
-                  value={selectItemNum}
-                  onChange={itemsPerPageHandler}
-                  style={{ paddingLeft: "0" }}
-                >
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
-              <div style={{ width: "110px" }}>
-                {firstIndex + 1} - {records?.length + firstIndex} of{" "}
-                {ourClient?.length}
-              </div>
+        {/* Pagination */}
+        <div className="mt-4 d-flex gap-3 align-items-center">
+          <select
+            value={perPage}
+            onChange={e => {
+              setPerPage(Number(e.target.value));
+              setCurPage(1);
+            }}
+          >
+            {[10,25,50,100].map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
 
-              <div className="page-item">
-                <BiSkipPrevious onClick={getFirstPage} />
-              </div>
-              <div className="page-item">
-                <GrFormPrevious onClick={prePage} />
-              </div>
-              <div className="page-item">
-                <GrFormNext onClick={nextPage} />
-              </div>
-              <div className="page-item">
-                <BiSkipNext onClick={getLastPage} />
-              </div>
-            </div>
-          </nav>
+          <BiSkipPrevious onClick={() => setCurPage(1)} />
+          <GrFormPrevious onClick={prePage} />
+          <GrFormNext onClick={nextPage} />
+          <BiSkipNext onClick={() => setCurPage(totalPages)} />
+
+          <span>
+            {firstIndex + 1}–
+            {Math.min(firstIndex + perPage, clients.length)}
+            of {clients.length}
+          </span>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

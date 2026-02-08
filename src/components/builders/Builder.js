@@ -1,288 +1,200 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { Link } from "react-router-dom";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
+
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Spinner,
-  useToast,
+  Table, Thead, Tbody, Tr, Th, Td,
+  TableContainer, Spinner, useToast
 } from "@chakra-ui/react";
+
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import { deleteBuildersById, getbuildersData } from "./BuilderService";
+
+import {
+  getBuilders,
+  deleteBuilderById
+} from "services/builderService";
+
 const Builder = () => {
-  const [loading, setLoading] = useState(false);
-  const [builders, setbuilders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchedbuilders, setSearchedbuilders] = useState([]);
-  const [showAll, setShowAll] = useState(true);
   const toast = useToast();
 
-  const handleFetchBuilders = async () => {
-  setLoading(true)
-  const data = await getbuildersData();
-  setbuilders(data)
-  setLoading(false)
+  const [loading, setLoading] = useState(false);
+  const [builders, setBuilders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [perPage, setPerPage] = useState(10);
+  const [curPage, setCurPage] = useState(1);
+
+  // ---------- Fetch ----------
+  const fetchBuilders = async () => {
+    try {
+      setLoading(true);
+      const data = await getBuilders();
+      setBuilders(data);
+    } catch (e) {
+      toast({
+        title: "Failed to load builders",
+        status: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
-    handleFetchBuilders();
+    fetchBuilders();
   }, []);
 
-  const handleDeletebuilders = async (id) => {
+  // ---------- Delete ----------
+  const handleDelete = async (id) => {
     try {
-      await deleteBuildersById(id)
-      handleFetchBuilders();
+      await deleteBuilderById(id);
+      toast({ title: "Deleted", status: "success" });
+      fetchBuilders();
+    } catch (e) {
       toast({
-        title: "Deleted Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Delete failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
-  const handleSearch = () => {
-    const filteredbuilders = builders.filter((builder) => {
-      const matchName =
-        builder.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(builder.name.toLowerCase());
 
-      return matchName;
-    });
-
-    setSearchedbuilders(filteredbuilders);
-    setCurPage(1);
-  };
-  useEffect(() => {
-    handleSearch();
-    setShowAll(searchTerm === "");
-  }, [searchTerm]);
-
-  const [selectItemNum, setSelectItemNum] = useState(10);
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-  };
-  const [curPage, setCurPage] = useState(1);
-  const recordsPerPage = selectItemNum;
-  const lastIndex = curPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const nPage = Math.ceil(
-    (showAll ? builders.length : searchedbuilders.length) / selectItemNum
-  );
-  if (firstIndex > 0) {
-    var prePage = () => {
-      if (curPage !== firstIndex) {
-        setCurPage(curPage - 1);
-      }
-    };
-  }
-
-  var nextPage = () => {
-    const lastPage = Math.ceil(
-      (showAll ? builders.length : searchedbuilders.length) / selectItemNum
+  // ---------- Derived Search ----------
+  const filteredBuilders = useMemo(() => {
+    if (!searchTerm) return builders;
+    return builders.filter(b =>
+      b.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    if (curPage < lastPage) {
-      setCurPage((prev) => prev + 1);
-    }
-  };
-  const getFirstPage = () => {
-    setCurPage(1);
-  };
+  }, [builders, searchTerm]);
 
-  const getLastPage = () => {
-    setCurPage(nPage);
-  };
+  // ---------- Pagination ----------
+  const totalPages = Math.ceil(filteredBuilders.length / perPage);
+  const firstIndex = (curPage - 1) * perPage;
+  const pageData = filteredBuilders.slice(
+    firstIndex,
+    firstIndex + perPage
+  );
 
+  const prePage = () =>
+    curPage > 1 && setCurPage(p => p - 1);
+
+  const nextPage = () =>
+    curPage < totalPages && setCurPage(p => p + 1);
+
+  // ---------- UI ----------
   return (
-    <>
-      <div className="mx-5 mt-3">
-        <Mainpanelnav />
-        <Link to="/builder/add-builder" className="btnLink mt-2">
-          <Addpropertybtn buttonText={"ADD NEW"} />
-        </Link>
-        <div className="table-box space-table-box">
-          <div className="table-top-box">Builder Module</div>
-          <TableContainer
-            marginTop="60px"
-            variant="striped"
-            color="teal"
-            overflowX="hidden"
-          >
-            <div className="row">
-              <div className="col-md-3">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="floatingInput"
-                    placeholder="Search by name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <label htmlFor="floatingInput">Search by name</label>
-                </div>
-              </div>
-            </div>
-            <Table variant="simple" marginTop="20px">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Description</Th>
+    <div className="mx-5 mt-3">
+      <Mainpanelnav />
 
-                  <Th>Edit</Th>
-                  <Th>Delete</Th>
+      <Link to="/builder/add-builder" className="btnLink mt-2">
+        <Addpropertybtn buttonText="ADD NEW" />
+      </Link>
+
+      <div className="table-box space-table-box">
+        <div className="table-top-box">Builder Module</div>
+
+        <TableContainer mt="60px" overflowX="hidden">
+
+          {/* Search */}
+          <input
+            className="form-control mb-3"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurPage(1);
+            }}
+          />
+
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>Name</Th>
+                <Th>Description</Th>
+                <Th>Edit</Th>
+                <Th>Delete</Th>
+              </Tr>
+            </Thead>
+
+            <Tbody>
+              {loading ? (
+                <Tr>
+                  <Td colSpan={4} textAlign="center">
+                    <Spinner size="xl" />
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody>
-                {loading ? (
-                  <Tr>
+              ) : pageData.length > 0 ? (
+                pageData.map(b => (
+                  <Tr key={b._id}>
+                    <Td>{b.name?.toUpperCase()}</Td>
+
+                    <Td className="tableDescription">
+                      {b?.seo?.description
+                        ? b.seo.description.length > 50
+                          ? b.seo.description.slice(0, 50) + "..."
+                          : b.seo.description
+                        : "Empty"}
+                    </Td>
+
                     <Td>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
+                      <Link to={`/builder/edit-builder/${b._id}`}>
+                        <AiFillEdit style={{ fontSize: 22 }} />
+                      </Link>
+                    </Td>
+
+                    <Td>
+                      <Delete
+                        handleFunction={() =>
+                          handleDelete(b._id)
+                        }
                       />
                     </Td>
                   </Tr>
-                ) : showAll ? (
-                  builders
-                    .slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    )
-                    .map((builder) => (
-                      <Tr key={builder._id} id={builder._id}>
-                        <Td>{builder.name.toUpperCase()}</Td>
-                        <Td className="tableDescription">
-                          {(builder?.seo?.description?.length > 50
-                            ? builder?.seo?.description.substring(0, 50) + "..."
-                            : builder?.seo?.description) || "Empty"}
-                        </Td>
+                ))
+              ) : (
+                <Tr>
+                  <Td colSpan={4}>
+                    No matching results found
+                  </Td>
+                </Tr>
+              )}
+            </Tbody>
+          </Table>
+        </TableContainer>
 
-                        <Td>
-                          <Link to={`/builder/edit-builder/${builder._id}`}>
-                            <AiFillEdit
-                              style={{ fontSize: "22px", cursor: "pointer" }}
-                            />
-                          </Link>
-                        </Td>
-                        <Td>
-                          <Delete
-                            handleFunction={() =>
-                              handleDeletebuilders(builder._id)
-                            }
-                          />
-                        </Td>
-                      </Tr>
-                    ))
-                ) : searchedbuilders.length > 0 ? (
-                  searchedbuilders
-                    .slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    )
-                    .map((builder) => (
-                      <Tr key={builder._id} id={builder._id}>
-                        <Td>{builder.name.toUpperCase()}</Td>
-                        <Td className="tableDescription">
-                          {(builder?.seo?.description?.length > 50
-                            ? builder?.seo?.description.substring(0, 50) + "..."
-                            : builder?.seo?.description) || "Empty"}
-                        </Td>
+        {/* Pagination */}
+        <div className="mt-4 d-flex gap-3 align-items-center">
 
-                        <Td>
-                          <Link to={`/builder/edit-builder/${builder._id}`}>
-                            <AiFillEdit
-                              style={{ fontSize: "22px", cursor: "pointer" }}
-                            />
-                          </Link>
-                        </Td>
-                        <Td>
-                          <Delete
-                            handleFunction={() =>
-                              handleDeletebuilders(builder._id)
-                            }
-                          />
-                        </Td>
-                      </Tr>
-                    ))
-                ) : (
-                  <Tr>
-                    <Td colSpan={8}>No matching results found.</Td>
-                  </Tr>
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-          <nav className="mt-5">
-            <div
-              className="d-flex align-items-center justify-content-between"
-              style={{ width: "51%" }}
-            >
-              <p className="mb-0">Items per page: </p>
-              <div style={{ borderBottom: "1px solid gray" }}>
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  value={selectItemNum}
-                  onChange={itemsPerPageHandler}
-                >
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
-              <div style={{ width: "110px" }}>
-                {firstIndex + 1} -{" "}
-                {showAll
-                  ? builders.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex
-                  : searchedbuilders?.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex}{" "}
-                of {showAll ? builders?.length : searchedbuilders.length}
-              </div>
+          <select
+            value={perPage}
+            onChange={e => {
+              setPerPage(Number(e.target.value));
+              setCurPage(1);
+            }}
+          >
+            {[10,25,50,100].map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
 
-              <div className="page-item">
-                <BiSkipPrevious onClick={getFirstPage} />
-              </div>
-              <div className="page-item">
-                <GrFormPrevious onClick={prePage} />
-              </div>
-              <div className="page-item">
-                <GrFormNext onClick={nextPage} />
-              </div>
-              <div className="page-item">
-                <BiSkipNext onClick={getLastPage} />
-              </div>
-            </div>
-          </nav>
+          <BiSkipPrevious onClick={() => setCurPage(1)} />
+          <GrFormPrevious onClick={prePage} />
+          <GrFormNext onClick={nextPage} />
+          <BiSkipNext onClick={() => setCurPage(totalPages)} />
+
+          <span>
+            {firstIndex + 1}–
+            {Math.min(firstIndex + perPage, filteredBuilders.length)}
+            of {filteredBuilders.length}
+          </span>
+
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

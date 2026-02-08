@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Seo.css";
+
 import {
   Table,
   Thead,
@@ -14,149 +15,143 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
+
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
-import { getSeoData } from "./SeoService";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import BASE_URL from "../../apiConfig";
-import Cookies from "js-cookie";
+
+import { getSeoList, deleteSeoById } from "services/seoService";
+
 function Seo() {
+  const toast = useToast();
+
   const [loading, setLoading] = useState(false);
   const [seos, setSeos] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
-  const [searchedSeos, setSearchedSeos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAll, setShowAll] = useState(true);
-  const toast = useToast();
-  const url = window.location.href;
-  const config = {
-    headers: {
-      Authorization: `Bearer ${Cookies.get("token")}`,
-    },
-  };
+
+  const [selectItemNum, setSelectItemNum] = useState(10);
+  const [curPage, setCurPage] = useState(1);
+
+  const isDwarka = window.location.href.includes("dwarkaexpressway");
+  const baseSeoPath = isDwarka ? "/dwarkaexpressway/seo" : "/seo";
+
+  // ✅ Fetch SEO list
   const handleFetchSeo = async () => {
-    await getSeoData(setLoading, setSeos, url);
+    try {
+      setLoading(true);
+      const data = await getSeoList();
+      setSeos([...data].reverse());
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Failed to load SEO data",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
     handleFetchSeo();
-  }, [updateTable, url]);
+  }, [updateTable]);
 
+  // ✅ Delete SEO
   const handleDeleteSeo = async (id) => {
     try {
-      if (url.includes("dwarkaexpressway")) {
-         await axios.delete(
-          `${BASE_URL}/api/admin/dwarka/delete/${id}`, config
-        );
-      }
-      else{
-        await axios.delete(
-          `${BASE_URL}/api/admin/seo/delete/${id}`,
-          config
-        );
-      }
-      setUpdateTable((prev) => !prev);
+      await deleteSeoById({
+        id,
+        type: isDwarka ? "dwarka" : "default",
+      });
+
       toast({
         title: "Deleted Successfully!",
         status: "success",
-        duration: 5000,
+        duration: 4000,
         isClosable: true,
-        position: "bottom",
       });
+
+      setUpdateTable((p) => !p);
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Error Occurred!",
+        description: error.response?.data?.message,
         status: "error",
-        duration: 5000,
+        duration: 4000,
         isClosable: true,
-        position: "bottom-left",
       });
     }
   };
-  const handleSearch = () => {
-    const filteredSeos = seos.filter((seo) => {
-      const matchName =
-        seo.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(seo.path.toLowerCase());
 
-      return matchName;
-    });
+  // ✅ Derived filtered data (scalable)
+  const filteredSeos = useMemo(() => {
+    if (!searchTerm) return seos;
+    return seos.filter((seo) =>
+      seo.path?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [seos, searchTerm]);
 
-    setSearchedSeos(filteredSeos);
-    setCurPage(1);
-  };
-
-  useEffect(() => {
-    handleSearch();
-    setShowAll(searchTerm === "");
-  }, [updateTable, searchTerm]);
-
-  const [selectItemNum, setSelectItemNum] = useState(10);
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-  };
-  const [curPage, setCurPage] = useState(1);
-  const recordsPerPage = selectItemNum;
+  // ✅ Pagination calculations
+  const recordsPerPage = Number(selectItemNum);
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const nPage = Math.ceil(
-    (showAll ? seos.length : searchedSeos.length) / selectItemNum
-  );
-  if (firstIndex > 0) {
-    var prePage = () => {
-      if (curPage !== firstIndex) {
-        setCurPage(curPage - 1);
-      }
-    };
-  }
+  const totalPages = Math.ceil(filteredSeos.length / recordsPerPage);
 
-  var nextPage = () => {
-    const lastPage = Math.ceil(
-      (showAll ? seos.length : searchedSeos.length) / selectItemNum
-    );
-    if (curPage < lastPage) {
-      setCurPage((prev) => prev + 1);
-    }
+  const pageData = filteredSeos.slice(firstIndex, lastIndex);
+
+  // ✅ Pagination handlers
+  const prePage = () => {
+    if (curPage > 1) setCurPage((p) => p - 1);
   };
 
-  const getFirstPage = () => {
+  const nextPage = () => {
+    if (curPage < totalPages) setCurPage((p) => p + 1);
+  };
+
+  const getFirstPage = () => setCurPage(1);
+  const getLastPage = () => setCurPage(totalPages);
+
+  const itemsPerPageHandler = (e) => {
+    setSelectItemNum(e.target.value);
     setCurPage(1);
   };
 
-  const getLastPage = () => {
-    setCurPage(nPage);
-  };
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-      <Link to={url.includes("dwarkaexpressway") ? "/dwarkaexpressway/seo/add-seo" : "/seo/add-seo"} className="btnLink mt-2">
-        <Addpropertybtn buttonText={"ADD NEW"} />
+
+      <Link to={`${baseSeoPath}/add-seo`} className="btnLink mt-2">
+        <Addpropertybtn buttonText="ADD NEW" />
       </Link>
+
       <div className="table-box space-table-box">
         <div className="table-top-box">SEO Module</div>
-        <TableContainer
-          marginTop="60px"
-          variant="striped"
-          color="teal"
-          overflowX="hidden"
-        >
+
+        <TableContainer marginTop="60px" overflowX="hidden">
+          {/* Search */}
           <div className="row">
             <div className="col-md-3">
               <div className="form-floating border_field">
                 <input
                   type="text"
                   className="form-control"
-                  id="floatingInput"
                   placeholder="Search by Path"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurPage(1);
+                  }}
                 />
-                <label htmlFor="floatingInput">Search by Path</label>
+                <label>Search by Path</label>
               </div>
             </div>
           </div>
+
+          {/* Table */}
           <Table variant="simple" marginTop="20px">
             <Thead>
               <Tr>
@@ -166,110 +161,82 @@ function Seo() {
                 <Th>Delete</Th>
               </Tr>
             </Thead>
+
             <Tbody>
               {loading ? (
                 <Tr>
-                  <Td align="center" style={{ width: "50px" }}>
-                    <Spinner
-                      size="xl"
-                      w={20}
-                      h={20}
-                      alignSelf="center"
-                      style={{ position: "absolute", left: "482px" }}
-                    />
+                  <Td colSpan={4} textAlign="center">
+                    <Spinner size="xl" />
                   </Td>
                 </Tr>
-              ) : showAll ? (
-                seos
-                  .slice((curPage - 1) * selectItemNum, curPage * selectItemNum)
-                  .map((seo) => (
-                    <Tr key={seo._id} id={seo._id}>
-                      <Td>{seo?.path}</Td>
-                      <Td>
-                        {seo?.title.length > 35
-                          ? seo?.title.substring(0, 35) + "..."
-                          : seo.title}
-                      </Td>
-                      <Td>
-                        <Link to={url.includes("dwarkaexpressway") ? `/dwarkaexpressway/seo/editseo/${seo._id}`:  `/seo/editseo/${seo._id}`} target="_blank">
-                          <AiFillEdit
-                            style={{ fontSize: "22px", cursor: "pointer" }}
-                          />
-                        </Link>
-                      </Td>
-                      <Td>
-                        <Delete
-                          handleFunction={() => handleDeleteSeo(seo._id)}
-                        />
-                      </Td>
-                    </Tr>
-                  ))
-              ) : searchedSeos.length > 0 ? (
-                searchedSeos
-                  .slice((curPage - 1) * selectItemNum, curPage * selectItemNum)
-                  .map((seo) => (
-                    <Tr key={seo._id} id={seo._id}>
-                      <Td>{seo?.path}</Td>
-                      <Td>
-                        {seo?.title.length > 35
-                          ? seo?.title.substring(0, 35) + "..."
-                          : seo.title}
-                      </Td>
+              ) : pageData.length > 0 ? (
+                pageData.map((seo) => (
+                  <Tr key={seo._id}>
+                    <Td>{seo.path}</Td>
+                    <Td>
+                      {seo.title?.length > 35
+                        ? seo.title.substring(0, 35) + "..."
+                        : seo.title}
+                    </Td>
 
-                      <Td>
-                        <Link to={url.includes("dwarkaexpressway") ?`/dwarkaexpressway/seo/editseo/${seo._id}`: `/seo/editseo/${seo._id}`} target="_blank">
-                          <AiFillEdit
-                            style={{ fontSize: "22px", cursor: "pointer" }}
-                          />
-                        </Link>
-                      </Td>
-                      <Td>
-                        <Delete
-                          handleFunction={() => handleDeleteSeo(seo._id)}
+                    <Td>
+                      <Link
+                        to={`${baseSeoPath}/editseo/${seo._id}`}
+                        target="_blank"
+                      >
+                        <AiFillEdit
+                          style={{ fontSize: 22, cursor: "pointer" }}
                         />
-                      </Td>
-                    </Tr>
-                  ))
+                      </Link>
+                    </Td>
+
+                    <Td>
+                      <Delete
+                        handleFunction={() =>
+                          handleDeleteSeo(seo._id)
+                        }
+                      />
+                    </Td>
+                  </Tr>
+                ))
               ) : (
                 <Tr>
-                  <Td colSpan={8}>No matching results found.</Td>
+                  <Td colSpan={4}>No matching results found.</Td>
                 </Tr>
               )}
             </Tbody>
           </Table>
         </TableContainer>
+
+        {/* Pagination */}
         <nav className="mt-5">
           <div
             className="d-flex align-items-center justify-content-between"
             style={{ width: "51%" }}
           >
-            <p className="mb-0">Items per page: </p>
-            <div style={{ borderBottom: "1px solid gray" }}>
-              <select
-                className="form-select"
-                aria-label="Default select example"
-                value={selectItemNum}
-                onChange={itemsPerPageHandler}
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={30}>30</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-            <div style={{ width: "110px" }}>
-              {firstIndex + 1} -{" "}
-              {showAll
-                ? seos.slice(
-                    (curPage - 1) * selectItemNum,
-                    curPage * selectItemNum
-                  ).length + firstIndex
-                : searchedSeos?.slice(
-                    (curPage - 1) * selectItemNum,
-                    curPage * selectItemNum
-                  ).length + firstIndex}{" "}
-              of {showAll ? seos?.length : searchedSeos.length}
+            <p className="mb-0">Items per page:</p>
+
+            <select
+              className="form-select"
+              value={selectItemNum}
+              onChange={itemsPerPageHandler}
+              style={{ width: 100 }}
+            >
+              {[10, 20, 30, 50, 100].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+
+            <div style={{ width: 140 }}>
+              {filteredSeos.length === 0
+                ? "0"
+                : `${firstIndex + 1}-${Math.min(
+                    lastIndex,
+                    filteredSeos.length
+                  )}`}{" "}
+              of {filteredSeos.length}
             </div>
 
             <div className="page-item">
