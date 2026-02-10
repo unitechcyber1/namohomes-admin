@@ -30,7 +30,7 @@ import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
 import BASE_URL from "../../apiConfig";
 import { getCountry } from "../builder-projects/ProjectService";
-import { deleteStates, getState } from "./stateService";
+import { deleteStateById, getStateData } from "services/stateService";
 import Select from "react-select";
 function State() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -122,11 +122,34 @@ function State() {
     await getCountry(setCountry);
   };
   const handleFetchStates = async () => {
-    await getState(setStates, setLoading);
-  };
+      setLoading(true);
+      let data =await getStateData();
+      setStates(data);
+      setLoading(false);
+    };
   const handleDeleteStates = async (id) => {
-    await deleteStates(id, setUpdateTable, toast);
-  };
+     
+       try {
+      await deleteStateById(id);
+      setUpdateTable((prev) => !prev);
+      toast({
+        title: "Deleted Successfully!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+    };
   useEffect(() => {
     handleFetchStates();
     handleFetchCountry();

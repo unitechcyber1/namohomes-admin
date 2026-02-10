@@ -3,6 +3,7 @@ import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { BsBookmarkPlus } from "react-icons/bs";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
+
 import {
   Table,
   Thead,
@@ -30,7 +31,7 @@ import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
 import BASE_URL from "../../apiConfig";
 import Select from "react-select";
-import { deleteCity, getCity } from "./CityService";
+import { deleteCityById, getCities } from "services/cityService";
 import {
   getStateByCountry,
   getCountry,
@@ -134,11 +135,34 @@ function City() {
     await getCountry(setCountry);
   };
   const handleFetchCity = async () => {
-    await getCity(setCities, setLoading);
+    setLoading(true);
+    let data =await getCities();
+    setCities(data);
+    setLoading(false);
   };
 
   const handleDeleteCity = async (id) => {
-    await deleteCity(id, setUpdateTable, toast);
+   
+     try {
+    await deleteCityById(id);
+    setUpdateTable((prev) => !prev);
+    toast({
+      title: "Deleted Successfully!",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  } catch (error) {
+    toast({
+      title: "Error Occured!",
+      description: error.response.data.message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom-left",
+    });
+  }
   };
   useEffect(() => {
     handleFetchCountry();

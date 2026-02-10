@@ -140,7 +140,7 @@ function Seo() {
 
       <div className="row mt-2 project-card2">
         <div className="row ">
-          <div className="col-md-10 px-4">
+          <div className="col-md-4 px-4">
             <input
               type="text"
               className="uniform-select-seo"
