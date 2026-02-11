@@ -18,9 +18,9 @@ import { AiFillEdit } from "react-icons/ai";
 import BASE_URL from "../../apiConfig";
 import Select from "react-select";
 import {
-  getCountry,
-  getStateByCountry,
-} from "../microlocation/MicrolocationService";
+  getStatesByCountry,
+} from "services/microlocationService";
+import { getCountries } from "services/countryService";
 const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState(cities.name);
@@ -57,7 +57,8 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
     }
   };
   const handleFetchStates = async (countryId) => {
-    await getStateByCountry(countryId, setStates);
+    const data = await getStatesByCountry(countryId);
+    setStates(data);
     const initialState = stateOptions.find(
       (option) => option.value === cities.state._id
     );
@@ -66,8 +67,9 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
     }
   };
   const handleFetchCountry = async () => {
-    await getCountry(setCountry);
-    const initialCountry = countryOptions.find(
+    const data = await getCountries();
+    setCountry(data);
+        const initialCountry = countryOptions.find(
       (option) => option.value === cities.country._id
     );
     if (initialCountry) {

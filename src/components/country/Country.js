@@ -1,309 +1,255 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { GpState } from "../../context/context";
 import { useToast } from "@chakra-ui/react";
 import { BsBookmarkPlus } from "react-icons/bs";
-import axios from "axios";
+
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
+  Table, Thead, Tbody, Tr, Th, Td,
+  TableContainer, Modal, ModalOverlay,
+  ModalContent, ModalHeader, ModalFooter,
+  ModalBody, ModalCloseButton, Button,
+  useDisclosure, Spinner
 } from "@chakra-ui/react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  useDisclosure,
-  Spinner,
-} from "@chakra-ui/react";
+
 import Delete from "../delete/Delete";
-import "./Country.css";
 import EditCountry from "./EditCountry";
-import { GrFormPrevious, GrFormNext } from "react-icons/gr";
-import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import BASE_URL from "../../apiConfig";
+
+import {
+  getCountries,
+  createCountry,
+  deleteCountryById
+} from "services/countryService";
+
 function Country() {
+  const toast = useToast();
   const { country, setCountry } = GpState();
-  const [countryfield, setCountryfield] = useState({
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [loading, setLoading] = useState(false);
+  const [updateTable, setUpdateTable] = useState(false);
+
+  const [form, setForm] = useState({
     name: "",
     description: "",
     dialCode: "",
     isoCode: "",
   });
-  const [updateTable, setUpdateTable] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectItemNum, setSelectItemNum] = useState(10);
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-  };
-  const [curPage, setCurPage] = useState(1);
-  const recordsPerPage = selectItemNum;
-  const lastIndex = curPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = country?.slice(firstIndex, lastIndex);
-  const totalPages  = Math.ceil(country?.length / recordsPerPage);
- 
 
+  const [perPage, setPerPage] = useState(10);
+  const [curPage, setCurPage] = useState(1);
+
+  // ---------- Fetch ----------
+  const fetchCountries = async () => {
+    try {
+      setLoading(true);
+      const data = await getCountries();
+      setCountry(data);
+      setCurPage(1); // 🔥 reset page
+
+    } catch {
+      toast({
+        title: "Failed to load countries",
+        status: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCountries();
+  }, [updateTable]);
+
+  // ---------- Form ----------
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCountryfield({
-      ...countryfield,
-      [name]: value,
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
   };
-  const handleSaveCountry = async () => {
-    if ((!countryfield.name, !countryfield.dialCode)) {
-      toast({
-        title: "Please Fill all The Fields!",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+
+  // ---------- Save ----------
+  const handleSave = async () => {
+    if (!form.name || !form.dialCode) {
+      toast({ title: "Name & Dial Code required", status: "warning" });
       return;
     }
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/allCountry/country`, {
-        name: countryfield.name,
-        description: countryfield.description,
-        dial_code: countryfield.dialCode,
-        iso_code: countryfield.isoCode,
+      await createCountry({
+        name: form.name,
+        description: form.description,
+        dial_code: form.dialCode,
+        iso_code: form.isoCode,
       });
-      setCountryfield({
+
+      toast({ title: "Saved", status: "success" });
+
+      setForm({
         name: "",
         description: "",
         dialCode: "",
         isoCode: "",
       });
-      setUpdateTable((prev) => !prev);
+
       onClose();
+      setUpdateTable(p => !p);
+
+    } catch (e) {
       toast({
-        title: "Saved Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Save failed",
+        description: e.response?.data?.message,
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
 
-  const getCountry = async () => {
+  // ---------- Delete ----------
+  const handleDelete = async (id) => {
     try {
-      setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/admin/allCountry/countries`);
-
-      setCountry(data.country);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleDeleteCountry = async (id) => {
-    try {
-      const { data } = await axios.delete(
-        `${BASE_URL}/api/admin/allCountry/delete/${id}`
-      );
-      setUpdateTable((prev) => !prev);
+      await deleteCountryById(id);
+      toast({ title: "Deleted", status: "success" });
+      setUpdateTable(p => !p);
+    } catch (e) {
       toast({
-        title: "Deleted Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Delete failed",
         status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
       });
     }
   };
 
+  // ---------- Safe Array ----------
+  const countryList = Array.isArray(country) ? country : [];
+
+  // ---------- Pagination ----------
+  const totalPages = Math.max(
+    1,
+    Math.ceil(countryList.length / perPage)
+  );
+
+  // 🔥 guard page overflow
   useEffect(() => {
-    getCountry();
-  }, [updateTable]);
+    if (curPage > totalPages) setCurPage(1);
+  }, [countryList.length, perPage]);
 
+  const firstIndex = (curPage - 1) * perPage;
+  const pageData = countryList.slice(
+    firstIndex,
+    firstIndex + perPage
+  );
 
+  const prePage = () =>
+    curPage > 1 && setCurPage(p => p - 1);
 
-   const goToPage = (page) => {
-    if (page < 1 || page > totalPages) return;
-    setCurPage(page);
-  };
-
-
+  const nextPage = () =>
+    curPage < totalPages && setCurPage(p => p + 1);
+console.log(pageData)
+  // ---------- UI ----------
   return (
-    <>
-      <div className="mx-5 mt-3">
-        <Mainpanelnav />
-        <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">Country Module</h2>
-          <Button className="addnew-btn" onClick={onOpen}>
-            <BsBookmarkPlus />
-            ADD NEW
-          </Button>
-        </div>
-        <div>
-          <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Add New Country</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <input
-                  type="text"
-                  value={countryfield.name}
-                  onChange={handleInputChange}
-                  placeholder="Name*"
-                  name="name"
-                  className="property-input"
-                />
-                <input
-                  type="text"
-                  value={countryfield.description}
-                  onChange={handleInputChange}
-                  placeholder="Description"
-                  name="description"
-                  className="property-input"
-                />
-                <input
-                  type="text"
-                  value={countryfield.dialCode}
-                  onChange={handleInputChange}
-                  placeholder="Dial Code*"
-                  name="dialCode"
-                  className="property-input"
-                />
-                <input
-                  type="text"
-                  value={countryfield.isoCode}
-                  onChange={handleInputChange}
-                  placeholder="Iso Code"
-                  name="isoCode"
-                  className="property-input"
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button colorScheme="blue" mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button variant="ghost" onClick={handleSaveCountry}>
-                  Save
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </div>
-        <div className="table-box">
-          <TableContainer variant="striped" color="teal">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Dial Code</Th>
-                  <Th>Edit</Th>
-                  <Th>Delete</Th>
+    <div className="mx-5 mt-3">
+      <Mainpanelnav />
+
+      <Button className="addnew-btn mt-2" onClick={onOpen}>
+        <BsBookmarkPlus /> ADD NEW
+      </Button>
+
+      {/* Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Country</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody>
+            {["name","description","dialCode","isoCode"].map(f => (
+              <input
+                key={f}
+                name={f}
+                value={form[f]}
+                onChange={handleInputChange}
+                placeholder={f}
+                className="property-input"
+              />
+            ))}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>Cancel</Button>
+            <Button onClick={handleSave}>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Table */}
+      <TableContainer mt="60px">
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Name</Th>
+              <Th>Dial Code</Th>
+              <Th>Edit</Th>
+              <Th>Delete</Th>
+            </Tr>
+          </Thead>
+
+          <Tbody>
+            {loading ? (
+              <Tr>
+                <Td colSpan={4} textAlign="center">
+                  <Spinner size="xl" />
+                </Td>
+              </Tr>
+            ) : (
+              pageData.map(c => (
+                <Tr key={c._id}>
+                  <Td>{c.name}</Td>
+                  <Td>{c.dial_code}</Td>
+                  <Td>
+                    <EditCountry
+                      id={c._id}
+                      countries={c}
+                      setUpdateTable={setUpdateTable}
+                    />
+                  </Td>
+                  <Td>
+                    <Delete handleFunction={() => handleDelete(c._id)} />
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody>
-                {loading ? (
-                  <Tr>
-                    <Td align="center" style={{ width: "50px" }}>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
-                      />
-                    </Td>
-                  </Tr>
-                ) : (
-                  records?.map((countries) => (
-                    <Tr key={countries._id} id={countries._id}>
-                      <Td>{countries.name}</Td>
-                      <Td>{countries.dial_code}</Td>
-                      <Td>
-                        <EditCountry
-                          id={countries._id}
-                          countries={countries}
-                          setUpdateTable={setUpdateTable}
-                          // handleFunction={() => handleEditCountry(countries._id)}
-                        />
-                      </Td>
-                      <Td>
-                        <Delete
-                          handleFunction={() =>
-                            handleDeleteCountry(countries._id)
-                          }
-                        />
-                      </Td>
-                    </Tr>
-                  ))
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      </TableContainer>
 
-          <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
+      {/* Pagination */}
+      <div className="mt-4 d-flex gap-3 align-items-center">
 
-          {/* LEFT SIDE */}
-          <div className="page-info">
-            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
-          </div>
+        <select
+          value={perPage}
+          onChange={e => {
+            setPerPage(Number(e.target.value)); // 🔥 important
+            setCurPage(1);
+          }}
+        >
+          {[10,25,50,100].map(n => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
 
-          {/* RIGHT SIDE */}
-          <div className="d-flex align-items-center gap-2 pagination-controls">
-            <button
-              className="page-btn"
-              disabled={curPage === 1}
-              onClick={() => goToPage(curPage - 1)}
-            >
-              Previous
-            </button>
+        <button onClick={() => setCurPage(1)}>«</button>
+        <button onClick={prePage}>‹</button>
+        <button onClick={nextPage}>›</button>
+        <button onClick={() => setCurPage(totalPages)}>»</button>
 
-            <span className="current-page">
-              {curPage}
-            </span>
+        <span>
+          {firstIndex + 1}–
+          {Math.min(firstIndex + perPage, countryList.length)}
+          of {countryList.length}
+        </span>
 
-            <button
-              className="page-btn"
-              disabled={curPage === totalPages}
-              onClick={() => goToPage(curPage + 1)}
-            >
-              Next
-            </button>
-          </div>
-
-        </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }
 

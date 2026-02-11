@@ -33,9 +33,9 @@ import BASE_URL from "../../apiConfig";
 import Select from "react-select";
 import { deleteCityById, getCities } from "services/cityService";
 import {
-  getStateByCountry,
-  getCountry,
-} from "../builder-projects/ProjectService";
+  getCountries,
+} from "services/countryService";
+import {getStatesByCountry} from 'services/microlocationService'
 import EditCity from "./EditCity";
 
 function City() {
@@ -129,10 +129,12 @@ function City() {
     setShowAll(searchTerm === "");
   }, [updateTable, searchTerm]);
   const handleFetchStates = async (countryId) => {
-    await getStateByCountry(countryId, setStates);
+    const data = await getStatesByCountry(countryId);
+    setStates(data)
   };
   const handleFetchCountry = async () => {
-    await getCountry(setCountry);
+   const data =  await getCountries();
+   setCountry(data)
   };
   const handleFetchCity = async () => {
     setLoading(true);
