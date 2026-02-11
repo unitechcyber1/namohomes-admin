@@ -105,22 +105,7 @@ function Seo() {
 
   const pageData = filteredSeos.slice(firstIndex, lastIndex);
 
-  // ✅ Pagination handlers
-  const prePage = () => {
-    if (curPage > 1) setCurPage((p) => p - 1);
-  };
 
-  const nextPage = () => {
-    if (curPage < totalPages) setCurPage((p) => p + 1);
-  };
-
-  const getFirstPage = () => setCurPage(1);
-  const getLastPage = () => setCurPage(totalPages);
-
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-    setCurPage(1);
-  };
 
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;

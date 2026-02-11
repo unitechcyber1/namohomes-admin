@@ -64,7 +64,7 @@ function City() {
   const recordsPerPage = selectItemNum;
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const nPage = Math.ceil(
+  const totalPages = Math.ceil(
     (showAll ? cities.length : searchedCity?.length) / recordsPerPage
   );
 
@@ -169,29 +169,7 @@ function City() {
     handleFetchCity();
   }, [updateTable]);
 
-  if (firstIndex > 0) {
-    var prePage = () => {
-      if (curPage !== firstIndex) {
-        setCurPage(curPage - 1);
-      }
-    };
-  }
-  var nextPage = () => {
-    const lastPage = Math.ceil(
-      (showAll ? cities.length : searchedCity.length) / selectItemNum
-    );
-    if (curPage < lastPage) {
-      setCurPage((prev) => prev + 1);
-    }
-  };
 
-  const getFirstPage = () => {
-    setCurPage(1);
-  };
-
-  const getLastPage = () => {
-    setCurPage(nPage);
-  };
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
 
@@ -219,11 +197,16 @@ function City() {
     label: item.name,
   }));
 
+    const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
   return (
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100 mt-2">
+         <div className="d-flex my-3 align-items-center justify-content-between">
+         <h2 className=" mb-0"> City Module</h2>
           <Button className="addnew-btn" onClick={onOpen}>
             <BsBookmarkPlus />
             ADD NEW
@@ -291,29 +274,28 @@ function City() {
             </ModalContent>
           </Modal>
         </div>
-        <div className="table-box">
-          <div className="table-top-box">City Module</div>
-          <TableContainer
-            marginTop="60px"
-            variant="striped"
-            color="teal"
-            overflowX="hidden"
-          >
-            <div className="row">
-              <div className="col-md-3">
-                <div className="form-floating border_field">
+       <div className="row mt-2 project-card2">
+              <div className="row">
+                <div className="col-md-4 px-4">
                   <input
                     type="text"
-                    className="form-control"
+                    className="uniform-select-seo"
                     id="floatingInput"
                     placeholder="Search by name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <label htmlFor="floatingInput">Search by name</label>
                 </div>
               </div>
             </div>
+
+        <div className="table-box">
+          <TableContainer
+            variant="striped"
+            color="teal"
+            overflowX="hidden"
+          >
+           
             <Table variant="simple" marginTop="20px">
               <Thead>
                 <Tr>
@@ -400,55 +382,38 @@ function City() {
               </Tbody>
             </Table>
           </TableContainer>
-          <nav className="mt-5">
-            <div
-              className="d-flex align-items-center justify-content-between"
-              style={{ width: "51%" }}
-            >
-              <p className="mb-0">Items per page: </p>
-              <div style={{ borderBottom: "1px solid gray" }}>
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  required
-                  value={selectItemNum}
-                  onChange={itemsPerPageHandler}
-                  style={{ paddingLeft: "0" }}
-                >
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
-              <div style={{ width: "110px" }}>
-                {firstIndex + 1} -{" "}
-                {showAll
-                  ? cities.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex
-                  : searchedCity?.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex}{" "}
-                of {showAll ? cities?.length : searchedCity.length}
-              </div>
+           {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-              <div className="page-item">
-                <BiSkipPrevious onClick={getFirstPage} />
-              </div>
-              <div className="page-item">
-                <GrFormPrevious onClick={prePage} />
-              </div>
-              <div className="page-item">
-                <GrFormNext onClick={nextPage} />
-              </div>
-              <div className="page-item">
-                <BiSkipNext onClick={getLastPage} />
-              </div>
-            </div>
-          </nav>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+          </div>
+
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
+
+            <span className="current-page">
+              {curPage}
+            </span>
+
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+
+        </div>
         </div>
       </div>
     </>
