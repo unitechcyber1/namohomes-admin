@@ -22,6 +22,8 @@ import {
   getCityByState,
   getStateByCountry,
 } from "./MicrolocationService";
+import { getCountries } from "services/countryService";
+import { getStatesByCountry, getCitiesByState } from "services/microlocationService";
 import ImageUpload from "../../ImageUpload";
 import { uploadFile } from "../../services/Services";
 const EditMicrolocation = ({
@@ -78,7 +80,8 @@ const EditMicrolocation = ({
     }
   };
   const handleFetchCity = async (stateId) => {
-    await getCityByState(stateId, setCities);
+    const data = await getCitiesByState(stateId);
+    setCities(data);
     const initialCity = cityOptions.find(
       (option) => option.value === microlocations.city._id
     );
@@ -87,7 +90,8 @@ const EditMicrolocation = ({
     }
   };
   const handleFetchStates = async (countryId) => {
-    await getStateByCountry(countryId, setStates);
+    const data = await getStatesByCountry(countryId);
+    setStates(data);
     const initialState = stateOptions.find(
       (option) => option.value === microlocations.state._id
     );
@@ -96,7 +100,8 @@ const EditMicrolocation = ({
     }
   };
   const handleFetchCountry = async () => {
-    await getCountry(setCountry);
+    const data = await getCountries();
+    setCountry(data);
     const initialCountry = countryOptions.find(
       (option) => option.value === microlocations.country._id
     );
@@ -164,7 +169,7 @@ const EditMicrolocation = ({
         style={{ fontSize: "22px", cursor: "pointer" }}
       />
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay/>
+        <ModalOverlay />
         <ModalContent>
           <ModalHeader>Modal Title</ModalHeader>
           <ModalCloseButton />
@@ -206,7 +211,7 @@ const EditMicrolocation = ({
                   onChange={(selectedOption) =>
                     onChangeOptionHandler(selectedOption, "city")
                   }
-                  isSearchable 
+                  isSearchable
                   required
                 />
               </div>
@@ -245,16 +250,16 @@ const EditMicrolocation = ({
               </div>
             </div>
             <div className="row">
-                <ImageUpload
+              <ImageUpload
                 images={images}
                 setImages={setImages}
                 progress={progress}
                 setProgress={setProgress}
                 uploadFile={handleUploadFile}
                 isUploaded={isUploaded}
-                />
-                {microlocations.image && <img src={microlocations.image} style={{width: "50%", marginTop: "40px"}}/>}
-                </div>
+              />
+              {microlocations.image && <img src={microlocations.image} style={{ width: "50%", marginTop: "40px" }} />}
+            </div>
           </ModalBody>
 
           <ModalFooter>

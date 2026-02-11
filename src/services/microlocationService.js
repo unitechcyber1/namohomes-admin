@@ -3,15 +3,14 @@ import axiosInstance from "./axiosInstance";
 /**
  * Get countries
  */
-export const getCountries = async () => {
-  try {
-    const { data } = await axiosInstance.get("/api/admin/countries");
-    return data.country;
-  } catch (error) {
-    throw error;
-  }
-};
 
+export const createMicrolocation = async (payload) => {
+  const { data } = await axiosInstance.post(
+    "/api/admin/microlocation/microlocations",
+    payload
+  );
+  return data;
+};
 /**
  * Get states by country
  */

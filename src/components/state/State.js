@@ -1,401 +1,260 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
-import { BsBookmarkPlus } from "react-icons/bs";
-import { GrFormPrevious, GrFormNext } from "react-icons/gr";
-import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  useToast,
-} from "@chakra-ui/react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  useDisclosure,
-  Spinner,
-} from "@chakra-ui/react";
-import axios from "axios";
-import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
-import BASE_URL from "../../apiConfig";
-import { getCountry } from "../builder-projects/ProjectService";
-import { deleteStateById, getStateData } from "services/stateService";
 import Select from "react-select";
+import { BsBookmarkPlus } from "react-icons/bs";
+import {
+  Table, Thead, Tbody, Tr, Th, Td,
+  TableContainer, Button, Spinner,
+  Modal, ModalOverlay, ModalContent,
+  ModalHeader, ModalFooter, ModalBody,
+  ModalCloseButton, useDisclosure,
+  useToast
+} from "@chakra-ui/react";
+
+import {
+  getStates,
+  createState,
+  deleteStateById
+} from "services/stateService";
+
+import { getCountries } from "services/countryService";
+
 function State() {
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [loading, setLoading] = useState(false);
   const [states, setStates] = useState([]);
-  const [updateTable, setUpdateTable] = useState(false);
-  const [statefield, setStatefield] = useState({
+  const [countries, setCountries] = useState([]);
+
+  const [form, setForm] = useState({
     name: "",
-    country: "",
     description: "",
   });
-  const [searchedState, setSearchedState] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showAll, setShowAll] = useState(true);
-  const { country, setCountry } = GpState();
-
-  const [selectItemNum, setSelectItemNum] = useState(10);
-
-  const itemsPerPageHandler = (e) => {
-    setSelectItemNum(e.target.value);
-  };
-  const [curPage, setCurPage] = useState(1);
-  const recordsPerPage = selectItemNum;
-  const lastIndex = curPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const nPage = Math.ceil(
-    (showAll ? states.length : searchedState?.length) / recordsPerPage
-  );
-  const toast = useToast();
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setStatefield({
-      ...statefield,
-      [name]: value,
-    });
-  };
-
-  const handleSaveStates = async () => {
-    try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/state/states`, {
-        name: statefield.name,
-        description: statefield.description,
-        country: selectedCountry.value,
-      });
-      setStatefield({
-        name: "",
-        description: "",
-        country: "",
-      });
-      setUpdateTable((prev) => !prev);
-      onClose();
-      toast({
-        title: "Saved Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
-    }
-  };
-  const handleSearch = () => {
-    const filteredState = states.filter((state) => {
-      const matchName =
-        state.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(state.name.toLowerCase());
-
-      return matchName;
-    });
-
-    setSearchedState(filteredState);
-    setCurPage(1);
-  };
-
-  useEffect(() => {
-    handleSearch();
-    setShowAll(searchTerm === "");
-  }, [updateTable, searchTerm]);
-  const handleFetchCountry = async () => {
-    await getCountry(setCountry);
-  };
-  const handleFetchStates = async () => {
-      setLoading(true);
-      let data =await getStateData();
-      setStates(data);
-      setLoading(false);
-    };
-  const handleDeleteStates = async (id) => {
-     
-       try {
-      await deleteStateById(id);
-      setUpdateTable((prev) => !prev);
-      toast({
-        title: "Deleted Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
-    }
-    };
-  useEffect(() => {
-    handleFetchStates();
-    handleFetchCountry();
-  }, [updateTable]);
-
-  if (firstIndex > 0) {
-    var prePage = () => {
-      if (curPage !== firstIndex) {
-        setCurPage(curPage - 1);
-      }
-    };
-  }
-
-  var nextPage = () => {
-    const lastPage = Math.ceil(
-      (showAll ? states.length : searchedState.length) / selectItemNum
-    );
-    if (curPage < lastPage) {
-      setCurPage((prev) => prev + 1);
-    }
-  };
-
-  const getFirstPage = () => {
-    setCurPage(1);
-  };
-
-  const getLastPage = () => {
-    setCurPage(nPage);
-  };
 
   const [selectedCountry, setSelectedCountry] = useState(null);
 
-  const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
-    switch (dropdownIdentifier) {
-      case "country":
-        setSelectedCountry(selectedOption);
-        break;
-      default:
-        break;
+  const [search, setSearch] = useState("");
+  const [perPage, setPerPage] = useState(10);
+  const [curPage, setCurPage] = useState(1);
+
+  /* ---------- Fetch ---------- */
+
+  const fetchStates = async () => {
+    try {
+      setLoading(true);
+      const data = await getStates();
+      setStates(data);
+    } catch {
+      toast({ title: "Failed to load states", status: "error" });
+    } finally {
+      setLoading(false);
     }
   };
-  const countryOptions = country?.map((item) => ({
-    value: item._id,
-    label: item.name,
+
+  const fetchCountries = async () => {
+    const data = await getCountries();
+    setCountries(data);
+  };
+
+  useEffect(() => {
+    fetchStates();
+    fetchCountries();
+  }, []);
+
+  /* ---------- Derived Data ---------- */
+
+  const filteredStates = useMemo(() => {
+    if (!search) return states;
+    return states.filter(s =>
+      s.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [states, search]);
+
+  const perPageNum = Number(perPage);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStates.length / perPageNum)
+  );
+
+  const pageData = filteredStates.slice(
+    (curPage - 1) * perPageNum,
+    curPage * perPageNum
+  );
+
+  /* ---------- Handlers ---------- */
+
+  const handleSave = async () => {
+    if (!form.name || !selectedCountry) {
+      toast({ title: "Name & Country required", status: "warning" });
+      return;
+    }
+
+    try {
+      await createState({
+        name: form.name,
+        description: form.description,
+        country: selectedCountry.value,
+      });
+
+      toast({ title: "Saved", status: "success" });
+
+      setForm({ name: "", description: "" });
+      setSelectedCountry(null);
+      onClose();
+      fetchStates();
+
+    } catch (e) {
+      toast({
+        title: "Save failed",
+        description: e.response?.data?.message,
+        status: "error",
+      });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    await deleteStateById(id);
+    toast({ title: "Deleted", status: "success" });
+    fetchStates();
+  };
+
+  const countryOptions = countries.map(c => ({
+    value: c._id,
+    label: c.name,
   }));
 
+  /* ---------- UI ---------- */
+
   return (
-    <>
-      <div className="mx-5 mt-3">
-        <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100 mt-2">
-          <Button className="addnew-btn" onClick={onOpen}>
-            <BsBookmarkPlus />
-            ADD NEW
-          </Button>
-        </div>
-        <div>
-          <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Add New State</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <div className="row">
-                  <div className="col-md-6">
-                    <Select
-                      placeholder="Country*"
-                      value={selectedCountry}
-                      options={countryOptions}
-                      onChange={(selectedOption) =>
-                        onChangeOptionHandler(selectedOption, "country")
-                      }
-                      isSearchable
-                      required
-                    />{" "}
-                  </div>
-                </div>
+    <div className="mx-5 mt-3">
+      <Mainpanelnav />
 
-                <input
-                  name="name"
-                  value={statefield.name}
-                  onChange={handleInputChange}
-                  type="text"
-                  placeholder="Name"
-                  className="property-input"
-                />
-                <input
-                  name="description"
-                  value={statefield.description}
-                  onChange={handleInputChange}
-                  type="text"
-                  placeholder="Description"
-                  className="property-input"
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button colorScheme="blue" mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button variant="ghost" onClick={handleSaveStates}>
-                  Save
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </div>
-        <div className="table-box">
-          <div className="table-top-box">State Module</div>
-          <TableContainer
-            marginTop="60px"
-            variant="striped"
-            color="teal"
-            overflowX="hidden"
-          >
-            <div className="row">
-              <div className="col-md-3">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="floatingInput"
-                    placeholder="Search by name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+      <Button className="addnew-btn mt-2" onClick={onOpen}>
+        <BsBookmarkPlus /> ADD NEW
+      </Button>
+
+      {/* Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add State</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody>
+
+            <Select
+              placeholder="Country"
+              value={selectedCountry}
+              options={countryOptions}
+              onChange={setSelectedCountry}
+            />
+
+            <input
+              className="property-input"
+              placeholder="Name"
+              value={form.name}
+              onChange={e =>
+                setForm({ ...form, name: e.target.value })
+              }
+            />
+
+            <input
+              className="property-input"
+              placeholder="Description"
+              value={form.description}
+              onChange={e =>
+                setForm({
+                  ...form,
+                  description: e.target.value
+                })
+              }
+            />
+
+          </ModalBody>
+
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>Cancel</Button>
+            <Button onClick={handleSave}>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Search */}
+      <input
+        className="form-control mt-4"
+        placeholder="Search state"
+        value={search}
+        onChange={e => {
+          setSearch(e.target.value);
+          setCurPage(1);
+        }}
+      />
+
+      {/* Table */}
+      <TableContainer mt="30px">
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Name</Th>
+              <Th>Country</Th>
+              <Th>Delete</Th>
+            </Tr>
+          </Thead>
+
+          <Tbody>
+            {loading ? (
+              <Tr>
+                <Td colSpan={3} textAlign="center">
+                  <Spinner size="xl" />
+                </Td>
+              </Tr>
+            ) : pageData.map(s => (
+              <Tr key={s._id}>
+                <Td>{s.name}</Td>
+                <Td>{s.country?.name}</Td>
+                <Td>
+                  <Delete
+                    handleFunction={() =>
+                      handleDelete(s._id)
+                    }
                   />
-                  <label htmlFor="floatingInput">Search by name</label>
-                </div>
-              </div>
-            </div>
-            <Table variant="simple" marginTop="20px">
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Country</Th>
-                  <Th>Delete</Th>
-                </Tr>
-              </Thead>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
 
-              <Tbody>
-                {loading ? (
-                  <Tr>
-                    <Td>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
-                      />
-                    </Td>
-                  </Tr>
-                ) : showAll ? (
-                  states
-                    .slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    )
-                    .map((state) => (
-                      <Tr key={state._id} id={state._id}>
-                        <Td>{state?.name}</Td>
-                        <Td>{state?.country?.name}</Td>
+      {/* Pagination */}
+      <div className="mt-4 d-flex gap-3 align-items-center">
 
-                        <Td>
-                          <Delete
-                            handleFunction={() => handleDeleteStates(state._id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))
-                ) : searchedState.length > 0 ? (
-                  searchedState
-                    .slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    )
-                    .map((state) => (
-                      <Tr key={state._id} id={state._id}>
-                        <Td>{state?.name}</Td>
-                        <Td>{state?.country?.name}</Td>
+        <select
+          value={perPage}
+          onChange={e => {
+            setPerPage(e.target.value);
+            setCurPage(1);
+          }}
+        >
+          {[10,25,50,100].map(n =>
+            <option key={n} value={n}>{n}</option>
+          )}
+        </select>
 
-                        <Td>
-                          <Delete
-                            handleFunction={() => handleDeleteStates(state._id)}
-                          />
-                        </Td>
-                      </Tr>
-                    ))
-                ) : (
-                  <Tr>
-                    <Td colSpan={8}>No matching results found.</Td>
-                  </Tr>
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-          <nav className="mt-5">
-            <div
-              className="d-flex align-items-center justify-content-between"
-              style={{ width: "51%" }}
-            >
-              <p className="mb-0">Items per page: </p>
-              <div style={{ borderBottom: "1px solid gray" }}>
-                <select
-                  className="form-select"
-                  aria-label="Default select example"
-                  required
-                  value={selectItemNum}
-                  onChange={itemsPerPageHandler}
-                  style={{ paddingLeft: "0" }}
-                >
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
-              <div style={{ width: "110px" }}>
-                {firstIndex + 1} -{" "}
-                {showAll
-                  ? states.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex
-                  : searchedState?.slice(
-                      (curPage - 1) * selectItemNum,
-                      curPage * selectItemNum
-                    ).length + firstIndex}{" "}
-                of {showAll ? states?.length : searchedState.length}
-              </div>
-              <div className="page-item">
-                <BiSkipPrevious onClick={getFirstPage} />
-              </div>
-              <div className="page-item">
-                <GrFormPrevious onClick={prePage} />
-              </div>
-              <div className="page-item">
-                <GrFormNext onClick={nextPage} />
-              </div>
-              <div className="page-item">
-                <BiSkipNext onClick={getLastPage} />
-              </div>
-            </div>
-          </nav>
-        </div>
+        <Button onClick={() => setCurPage(1)}>{"<<"}</Button>
+        <Button onClick={() => setCurPage(p => Math.max(1,p-1))}>{"<"}</Button>
+        <Button onClick={() => setCurPage(p => Math.min(totalPages,p+1))}>{">"}</Button>
+        <Button onClick={() => setCurPage(totalPages)}>{">>"}</Button>
+
+        <span>
+          {(curPage-1)*perPageNum+1}–
+          {Math.min(curPage*perPageNum, filteredStates.length)}
+          of {filteredStates.length}
+        </span>
+
       </div>
-    </>
+    </div>
   );
 }
 
