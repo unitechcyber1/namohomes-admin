@@ -145,19 +145,27 @@ function Country() {
   const nextPage = () =>
     curPage < totalPages && setCurPage(p => p + 1);
 console.log(pageData)
+
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
   // ---------- UI ----------
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-
+       <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">Country Module</h2>
       <Button className="addnew-btn mt-2" onClick={onOpen}>
         <BsBookmarkPlus /> ADD NEW
       </Button>
+      </div>
 
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent> 
           <ModalHeader>Add Country</ModalHeader>
           <ModalCloseButton />
 
@@ -181,9 +189,10 @@ console.log(pageData)
         </ModalContent>
       </Modal>
 
-      {/* Table */}
-      <TableContainer mt="60px">
-        <Table>
+      <div className="table-box ">
+          <TableContainer  overflowX="hidden">
+                {/* Table */}
+        <Table variant="simple" >
           <Thead>
             <Tr>
               <Th>Name</Th>
@@ -222,33 +231,39 @@ console.log(pageData)
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
-      <div className="mt-4 d-flex gap-3 align-items-center">
+       {/* Pagination */}
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-        <select
-          value={perPage}
-          onChange={e => {
-            setPerPage(Number(e.target.value)); // 🔥 important
-            setCurPage(1);
-          }}
-        >
-          {[10,25,50,100].map(n => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </select>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+          </div>
 
-        <button onClick={() => setCurPage(1)}>«</button>
-        <button onClick={prePage}>‹</button>
-        <button onClick={nextPage}>›</button>
-        <button onClick={() => setCurPage(totalPages)}>»</button>
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
 
-        <span>
-          {firstIndex + 1}–
-          {Math.min(firstIndex + perPage, countryList.length)}
-          of {countryList.length}
-        </span>
+            <span className="current-page">
+              {curPage}
+            </span>
 
-      </div>
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+
+        </div>
+    </div>
     </div>
   );
 }

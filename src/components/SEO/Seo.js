@@ -144,7 +144,7 @@ function Seo() {
       <div className="table-box ">
         <TableContainer  overflowX="hidden">
           {/* Table */}
-          <Table variant="simple" marginTop="20px">
+          <Table variant="simple" >
             <Thead>
               <Tr>
                 <Th>Path</Th>

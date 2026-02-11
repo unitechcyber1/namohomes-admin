@@ -298,7 +298,7 @@ function City() {
             overflowX="hidden"
           >
            
-            <Table variant="simple" marginTop="20px">
+            <Table variant="simple" >
               <Thead>
                 <Tr>
                   <Th>Name</Th>

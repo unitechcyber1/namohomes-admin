@@ -149,9 +149,10 @@ function Microlocation() {
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-
-      <Button onClick={onOpen}>ADD NEW</Button>
-
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">SEO Module</h2>
+      <Button  className="addnew-btn"  onClick={onOpen}>ADD NEW</Button>
+      </div>
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -202,16 +203,23 @@ function Microlocation() {
       </Modal>
 
       {/* Search */}
+      <div className="row mt-2 project-card2">
+      <div className="row">
+      <div className="col-md-4 px-4">
       <input
-        className="form-control mt-4"
+        className="uniform-select-seo"
         placeholder="Search"
         value={search}
         onChange={e=>{setSearch(e.target.value);setCurPage(1);}}
       />
+      </div>
+          </div>
+            </div>
 
       {/* Table */}
-      <TableContainer mt={6}>
-        <Table>
+     <div className="table-box ">
+             <TableContainer  overflowX="hidden">
+               <Table variant="simple" >
           <Thead>
             <Tr>
               <Th>Name</Th>
@@ -247,7 +255,7 @@ function Microlocation() {
           </Tbody>
         </Table>
       </TableContainer>
-
+    </div>
     </div>
   );
 }

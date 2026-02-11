@@ -210,9 +210,11 @@ function Media() {
           />
         </div>
       </div>
-      {/* Table */}
-      <TableContainer bg="white" borderRadius="md" boxShadow="md" p="4">
-  <Table variant="simple">
+      
+      <div className="table-box ">
+              <TableContainer  overflowX="hidden">
+                {/* Table */}
+                <Table variant="simple" >
     <Thead bg="white">
       <Tr>
         <Th>Name</Th>
@@ -276,6 +278,7 @@ function Media() {
           </div>
 
         </div>
+    </div>
     </div>
   );
 }
