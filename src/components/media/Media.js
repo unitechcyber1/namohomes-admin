@@ -58,8 +58,8 @@ function Media() {
     const files = Array.from(e.target.files);
 
     const data = await uploadImageFile(files, {
-      setProgress: () => {},
-      setIsUploaded: () => {},
+      setProgress: () => { },
+      setIsUploaded: () => { },
       checkUrl: true,
     });
 
@@ -134,14 +134,22 @@ function Media() {
   const prePage = () => curPage > 1 && setCurPage(p => p - 1);
   const nextPage = () => curPage < totalPages && setCurPage(p => p + 1);
 
+    const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
+
   // ---------- UI ----------
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
 
-      <Button className="addnew-btn mt-2" onClick={onOpen}>
-        <BsBookmarkPlus /> ADD NEW
-      </Button>
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">Media Module</h2>
+        <Button className="addnew-btn mt-2" onClick={onOpen}>
+          <BsBookmarkPlus /> ADD NEW
+        </Button>
+      </div>
 
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -188,17 +196,22 @@ function Media() {
         </ModalContent>
       </Modal>
 
+      <div className="row mt-2 project-card2">
+        <div className="col-md-10 px-4">
+          <input
+            type="text"
+            placeholder="Search by name"
+            className="uniform-select-seo filter_row"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurPage(1);
+            }}
+          />
+        </div>
+      </div>
       {/* Table */}
       <TableContainer mt="60px">
-        <input
-          placeholder="Search by name"
-          className="form-control mb-3"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurPage(1);
-          }}
-        />
 
         <Table>
           <Thead>
@@ -234,30 +247,37 @@ function Media() {
       </TableContainer>
 
       {/* Pagination */}
-      <div className="mt-4 d-flex gap-3 align-items-center">
-        <select
-          value={perPage}
-          onChange={e => {
-            setPerPage(Number(e.target.value));
-            setCurPage(1);
-          }}
-        >
-          {[10,25,50,100].map(n => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </select>
+         <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-        <BiSkipPrevious onClick={() => setCurPage(1)} />
-        <GrFormPrevious onClick={prePage} />
-        <GrFormNext onClick={nextPage} />
-        <BiSkipNext onClick={() => setCurPage(totalPages)} />
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+          </div>
 
-        <span>
-          {firstIndex + 1}–
-          {Math.min(firstIndex + perPage, filtered.length)}
-          of {filtered.length}
-        </span>
-      </div>
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
+
+            <span className="current-page">
+              {curPage}
+            </span>
+
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+
+        </div>
     </div>
   );
 }

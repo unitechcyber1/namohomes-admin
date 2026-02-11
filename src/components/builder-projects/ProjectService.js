@@ -17,7 +17,7 @@ export const getCityByState = async (stateId, setCities) => {
   try {
     await axios
       .post(`${BASE_URL}/api/admin/citybystate`, { state_id: stateId })
-      .then((result) => {
+      .then((result) => { 
         setCities(result.data);
       });
   } catch (error) {

@@ -113,7 +113,8 @@ function ResPropertyType() {
     <div className="mx-5 mt-3">
       <Mainpanelnav />
 
-      <div className="d-flex justify-content-end w-100 mt-2">
+      <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">Property Types</h2>
         <Button className="addnew-btn" onClick={onOpen}>
           <BsBookmarkPlus /> ADD NEW
         </Button>
@@ -147,8 +148,7 @@ function ResPropertyType() {
 
       {/* Table */}
       <div className="table-box">
-        <div className="table-top-box">Property Types</div>
-        <TableContainer marginTop="60px">
+        <TableContainer >
           <Table>
             <Thead>
               <Tr>
