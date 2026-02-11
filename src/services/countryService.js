@@ -5,8 +5,8 @@ import axiosInstance from "./axiosInstance";
  */
 export const getCountries= async () => {
   try {
-    const { data } = await axiosInstance.get("/api/admin/allCountry/country");
-    return data;
+    const { data } = await axiosInstance.get("/api/admin/countries");
+    return data.country;
   } catch (error) {
     throw error; 
   }
@@ -18,7 +18,19 @@ export const getCountries= async () => {
 export const deleteCountryById = async (id) => {
   try {
     const { data } = await axiosInstance.delete(
-      `/api/admin/allCountry/delete/${id}`
+      `/api/admin/country/delete/${id}`
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createCountry = async (payload) => {
+  try {
+    const { data } = await axiosInstance.post(
+      "/api/admin/country",
+      payload
     );
     return data;
   } catch (error) {
