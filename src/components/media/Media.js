@@ -18,7 +18,8 @@ import { uploadImageFile } from "../../services/Services";
 import {
   getAllMedia,
   createMedia,
-  deleteMediaById
+  deleteMediaById,
+  uploadFiles
 } from "services/mediaService";
 
 function Media() {
@@ -54,25 +55,60 @@ function Media() {
   }, [updateTable]);
 
   // ---------- Upload ----------
-  const handleUploadFile = async (e) => {
-    const files = Array.from(e.target.files);
+  // const handleUploadFile = async (e) => {
+  //   const files = Array.from(e.target.files);
 
-    const data = await uploadImageFile(files, {
-      setProgress: () => { },
-      setIsUploaded: () => { },
-      checkUrl: true,
+  //   const data = await uploadImageFile(files, {
+  //     setProgress: () => { },
+  //     setIsUploaded: () => { },
+  //     checkUrl: true,
+  //   });
+
+  //   if (!data) {
+  //     toast({
+  //       title: "Invalid file type",
+  //       status: "error",
+  //     });
+  //     return;
+  //   }
+
+  //   setMedia((p) => ({ ...p, image: data[0] }));
+  // };
+  const handleUploadFile = async (e) => {
+  const files = Array.from(e.target.files);
+
+  try {
+    setProgress(0);
+
+    const uploaded = await uploadFiles(files, {
+      compressImages: true,
+      onProgress: (percent) => setProgress(percent),
     });
 
-    if (!data) {
+    if (!uploaded || !uploaded.length) {
       toast({
-        title: "Invalid file type",
+        title: "Upload failed",
         status: "error",
       });
       return;
     }
 
-    setMedia((p) => ({ ...p, image: data[0] }));
-  };
+    setMedia((prev) => ({
+      ...prev,
+      image: uploaded[0],
+    }));
+
+    setProgress(0);
+
+  } catch (error) {
+    toast({
+      title: "Upload failed",
+      description: error?.message || "Something went wrong",
+      status: "error",
+    });
+  }
+};
+
 
   // ---------- Save ----------
   const handleSave = async () => {
