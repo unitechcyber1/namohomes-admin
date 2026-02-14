@@ -1,0 +1,25 @@
+[33m2df54e7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdhruv[m[33m, [m[1;31morigin/dhruv[m[33m)[m fix conflicts
+[33m74a226b[m finall fix admin  components
+[33mdf5ccff[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #9 from unitechcyber1/shivam
+[33me6f37b6[m[33m ([m[1;31morigin/shivam[m[33m)[m fix apis
+[33me5cde44[m Merge pull request #8 from unitechcyber1/dhruv
+[33mbc4061f[m Fixs state
+[33mcfd8e3a[m Fixs all pages ui
+[33m8256ee9[m Merge pull request #7 from unitechcyber1/shivam
+[33mc3f09fd[m fix unauthrised issue
+[33m66ff296[m dhruv changes
+[33m509b5fe[m Merge pull request #6 from unitechcyber1/dhruv
+[33m9e9cccd[m Fixs main page
+[33me3a2ec0[m Merge pull request #5 from unitechcyber1/dhruv
+[33m521089e[m Fix builder project styles and project details
+[33ma0741c0[m Merge pull request #4 from unitechcyber1/dhruv
+[33m3f30a3a[m Update project editor styling and builder project forms
+[33mb6b3353[m Merge pull request #3 from unitechcyber1/dhruv
+[33m9050a9c[m Fix ui
+[33m8ecaa54[m Merge pull request #2 from unitechcyber1/shivam
+[33md6855fc[m fix project edit page
+[33m61219f7[m[33m ([m[1;32mmain[m[33m)[m Merge pull request #1 from unitechcyber1/dhruv
+[33mdc235eb[m fix changes
+[33m8884c54[m Added admin auth and user routes
+[33md079ab3[m changes
+[33mf7c3126[m Initial commit

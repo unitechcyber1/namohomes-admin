@@ -125,15 +125,23 @@ function State() {
     label: c.name,
   }));
 
+
+    const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurPage(page);
+  };
   /* ---------- UI ---------- */
 
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-
+      
+       <div className="d-flex my-3 align-items-center justify-content-between">
+        <h2 className=" mb-0">City Module</h2>
       <Button className="addnew-btn mt-2" onClick={onOpen}>
         <BsBookmarkPlus /> ADD NEW
       </Button>
+      </div>
 
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -182,8 +190,11 @@ function State() {
       </Modal>
 
       {/* Search */}
+       <div className="row mt-2 project-card2">
+        <div className="row ">
+        <div className="col-md-4 px-4">
       <input
-        className="form-control mt-4"
+        className="uniform-select-seo"
         placeholder="Search state"
         value={search}
         onChange={e => {
@@ -191,10 +202,15 @@ function State() {
           setCurPage(1);
         }}
       />
+       </div>
+        </div>
 
-      {/* Table */}
-      <TableContainer mt="30px">
-        <Table>
+      </div>
+
+      <div className="table-box ">
+              <TableContainer  overflowX="hidden">
+                {/* Table */}
+                <Table variant="simple" >
           <Thead>
             <Tr>
               <Th>Name</Th>
@@ -228,32 +244,38 @@ function State() {
       </TableContainer>
 
       {/* Pagination */}
-      <div className="mt-4 d-flex gap-3 align-items-center">
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-        <select
-          value={perPage}
-          onChange={e => {
-            setPerPage(e.target.value);
-            setCurPage(1);
-          }}
-        >
-          {[10,25,50,100].map(n =>
-            <option key={n} value={n}>{n}</option>
-          )}
-        </select>
+          {/* LEFT SIDE */}
+          <div className="page-info">
+            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+          </div>
 
-        <Button onClick={() => setCurPage(1)}>{"<<"}</Button>
-        <Button onClick={() => setCurPage(p => Math.max(1,p-1))}>{"<"}</Button>
-        <Button onClick={() => setCurPage(p => Math.min(totalPages,p+1))}>{">"}</Button>
-        <Button onClick={() => setCurPage(totalPages)}>{">>"}</Button>
+          {/* RIGHT SIDE */}
+          <div className="d-flex align-items-center gap-2 pagination-controls">
+            <button
+              className="page-btn"
+              disabled={curPage === 1}
+              onClick={() => goToPage(curPage - 1)}
+            >
+              Previous
+            </button>
 
-        <span>
-          {(curPage-1)*perPageNum+1}–
-          {Math.min(curPage*perPageNum, filteredStates.length)}
-          of {filteredStates.length}
-        </span>
+            <span className="current-page">
+              {curPage}
+            </span>
 
-      </div>
+            <button
+              className="page-btn"
+              disabled={curPage === totalPages}
+              onClick={() => goToPage(curPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+
+        </div>
+    </div>
     </div>
   );
 }

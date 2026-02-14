@@ -197,7 +197,7 @@ function Media() {
       </Modal>
 
       <div className="row mt-2 project-card2">
-        <div className="col-md-10 px-4">
+        <div className="col-md-4 px-4">
           <input
             type="text"
             placeholder="Search by name"
@@ -210,41 +210,41 @@ function Media() {
           />
         </div>
       </div>
-      {/* Table */}
-      <TableContainer mt="60px">
+      
+      <div className="table-box ">
+              <TableContainer  overflowX="hidden">
+                {/* Table */}
+                <Table variant="simple" >
+    <Thead bg="white">
+      <Tr>
+        <Th>Name</Th>
+        <Th>Image Link</Th>
+        <Th>Delete</Th>
+      </Tr>
+    </Thead>
 
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Image Link</Th>
-              <Th>Delete</Th>
-            </Tr>
-          </Thead>
+    <Tbody>
+      {loading ? (
+        <Tr>
+          <Td colSpan={3} textAlign="center">
+            <Spinner size="xl" />
+          </Td>
+        </Tr>
+      ) : (
+        pageData.map((img) => (
+          <Tr key={img._id}>
+            <Td>{img.name}</Td>
+            <Td>{img.image?.s3_link}</Td>
+            <Td>
+              <Delete handleFunction={() => handleDelete(img._id)} />
+            </Td>
+          </Tr>
+        ))
+      )}
+    </Tbody>
+  </Table>
+</TableContainer>
 
-          <Tbody>
-            {loading ? (
-              <Tr>
-                <Td colSpan={3} textAlign="center">
-                  <Spinner size="xl" />
-                </Td>
-              </Tr>
-            ) : (
-              pageData.map(img => (
-                <Tr key={img._id}>
-                  <Td>{img.name}</Td>
-                  <Td>{img.image?.s3_link}</Td>
-                  <Td>
-                    <Delete
-                      handleFunction={() => handleDelete(img._id)}
-                    />
-                  </Td>
-                </Tr>
-              ))
-            )}
-          </Tbody>
-        </Table>
-      </TableContainer>
 
       {/* Pagination */}
          <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
@@ -278,6 +278,7 @@ function Media() {
           </div>
 
         </div>
+    </div>
     </div>
   );
 }

@@ -103,7 +103,7 @@ const Builder = () => {
 
        {/* Search */}
        <div className="row mt-2 project-card2">
-        <div className="col-md-10 px-4">
+        <div className="col-md-4 px-4">
           <input
             className="uniform-select-seo filter_row"
             placeholder="Search by name"

@@ -347,6 +347,7 @@ function BuilderProjects() {
                       )}
                     </Td>
                     <Td>
+                       <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
                       <Approve
                         isEnabled={project.status !== "approve"}
                         handleFunction={() =>
@@ -362,6 +363,7 @@ function BuilderProjects() {
                       <Delete
                         handleFunction={() => handleDelete(project._id)}
                       />
+                      </div>
                     </Td>
                   </Tr>
                 ))
