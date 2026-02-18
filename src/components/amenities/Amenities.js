@@ -27,7 +27,7 @@ import {
 import Delete from "../delete/Delete";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import { deleteAmenity, getallAmenities, saveAmenities, getAmenityById, editAmenities } from "./amenityService";
+import { getAmenityById, getAmenities, updateAmenity, createAmenity, deleteAmenityById } from "services/amenityService";
 
 function Amenities() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -45,13 +45,13 @@ function Amenities() {
   const handleSaveAmenities = async () => {
     try {
       if (isEdit) {
-        await editAmenities(amenity._id, amenity)
+        await updateAmenity(amenity._id, amenity)
       } else {
-        await saveAmenities(amenity)
+        await createAmenity(amenity)
       }
       setAmenity({ name: "", icon: "", isResidential: false, isCommercial: false })
       onClose();
-      getAmenities();
+      getAmenitiesData();
       toast({
         title: isEdit ? "Update Successfully!" : "Saved Successfully!",
         status: "success",
@@ -61,8 +61,8 @@ function Amenities() {
       });
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Error Occurred!",
+        description: error.message || "Failed to save amenity. Please check all fields and try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -78,14 +78,22 @@ function Amenities() {
       return updateAmenity
     })
   }
-  const getAmenities = async () => {
+  const getAmenitiesData = async () => {
     try {
       setisLoading(true);
-      const data = await getallAmenities()
+      const data = await getAmenities();
       setAmenities(data);
       setisLoading(false);
     } catch (error) {
-      console.log(error);
+      setisLoading(false);
+      toast({
+        title: "Error Loading Amenities",
+        description: error.message || "Failed to load amenities. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   const handleGetAmenityById = async (id) => {
@@ -94,7 +102,14 @@ function Amenities() {
       setAmenity(data);
       setIsEdit(true)
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Error Loading Amenity",
+        description: error.message || "Failed to load amenity details. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   const handleClickEdit = (id) => {
@@ -108,8 +123,8 @@ function Amenities() {
   }
   const handleDeleteAmenities = async (id) => {
     try {
-      await deleteAmenity(id)
-      getAmenities();
+      await deleteAmenityById(id);
+      getAmenitiesData();
       toast({
         title: "Deleted Successfully!",
         status: "success",
@@ -119,8 +134,8 @@ function Amenities() {
       });
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Error Occurred!",
+        description: error.message || "Failed to delete amenity. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -139,7 +154,7 @@ function Amenities() {
     setCurPage(1);
   };
   useEffect(() => {
-    getAmenities();
+    getAmenitiesData();
   }, []);
   useEffect(() => {
     handleSearch();

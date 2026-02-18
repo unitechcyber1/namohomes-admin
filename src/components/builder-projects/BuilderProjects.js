@@ -124,7 +124,7 @@ function BuilderProjects() {
       setCities(citiesData);
       setMicrolocations(microData);
     } catch (error) {
-      console.error(error);
+      // Error handled by service function
     } finally {
       setLoading(false);
     }

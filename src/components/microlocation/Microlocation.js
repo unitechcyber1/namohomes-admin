@@ -65,7 +65,6 @@ function Microlocation() {
     setMicrolocations(microData);
     setLoading(false);
   };
-  console.log(countries)
   useEffect(() => { loadAll(); }, []);
 
   /* ---------- Cascading ---------- */

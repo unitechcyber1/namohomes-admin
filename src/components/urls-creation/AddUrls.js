@@ -150,7 +150,13 @@ function AddUrls() {
                 }));
             }
         } catch (error) {
-            console.error("An error occurred:", error);
+            toast({
+              title: "Error",
+              description: error.message || "An error occurred. Please try again.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
         }
     };
     const _setProjectIdForServer = () => {
@@ -211,7 +217,13 @@ function AddUrls() {
                 DwarkaProjects: [...updatedOrderPayload]
             }));
         } catch (error) {
-            console.error("An error occurred:", error);
+            toast({
+              title: "Error",
+              description: error.message || "An error occurred. Please try again.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
         }
     };
     return (

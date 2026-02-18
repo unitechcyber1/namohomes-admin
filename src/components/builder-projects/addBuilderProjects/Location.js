@@ -31,42 +31,75 @@ const Location = () => {
     setProjects(prevProjects => {
       const updatedProjects = { ...prevProjects };
       if (subSection) {
+        // Ensure nested objects exist
+        if (!updatedProjects[section]) {
+          updatedProjects[section] = {};
+        }
+        if (!updatedProjects[section][subSection]) {
+          updatedProjects[section][subSection] = {};
+        }
         updatedProjects[section][subSection][name] = type === 'checkbox' ? checked : value;
       } else {
+        // Ensure section object exists
+        if (!updatedProjects[section]) {
+          updatedProjects[section] = {};
+        }
         updatedProjects[section][name] = type === 'checkbox' ? checked : value;
       }
       return updatedProjects;
     });
   };
   const handleFetchCity = async (stateId) => {
-    await getCitiesByState(stateId, setCities);
+    const data = await getCitiesByState(stateId);
+    setCities(data);
   };
   const handleFetchStates = async (countryId) => {
-    await getStatesByCountry(countryId, setStates);
+    const data = await getStatesByCountry(countryId);
+    setStates(data);
   };
   const handleFetchMicrolocation = async (cityId) => {
-    await getMicrolocationsByCity(cityId, setMicrolocations);
+    const data = await getMicrolocationsByCity(cityId);
+    setMicrolocations(data)
   };
 
   const handleFetchCountry = async () => {
-    await getCountries(setCountry);
+    const data = await getCountries();
+    setCountry(data);
   };
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
       case "country":
         setSelectedCountry(selectedOption);
         handleFetchStates(selectedOption ? selectedOption.value : null);
-        projects.location.country = selectedOption.value
+        setProjects((prevProjects) => ({
+          ...prevProjects,
+          location: {
+            ...prevProjects.location,
+            country: selectedOption ? selectedOption.value : "",
+          },
+        }));
         break;
       case "city":
         setSelectedCity(selectedOption);
         handleFetchMicrolocation(selectedOption ? selectedOption.value : null);
-        projects.location.city = selectedOption.value
+        setProjects((prevProjects) => ({
+          ...prevProjects,
+          location: {
+            ...prevProjects.location,
+            city: selectedOption ? selectedOption.value : "",
+          },
+        }));
         break;
       case "state":
         setSelectedState(selectedOption);
         handleFetchCity(selectedOption ? selectedOption.value : null);
-        projects.location.state = selectedOption.value
+        setProjects((prevProjects) => ({
+          ...prevProjects,
+          location: {
+            ...prevProjects.location,
+            state: selectedOption ? selectedOption.value : "",
+          },
+        }));
         break;
       case "microLocation":
         setSelectedMicroLocation(selectedOption);
@@ -81,8 +114,8 @@ const Location = () => {
     setProjects((prevProjects) => ({
       ...prevProjects,
       location: {
-        ...prevProjects.location,
-        micro_location: location,
+        ...(prevProjects.location || {}),
+        micro_location: location || [],
       },
     }));
   };
@@ -112,7 +145,7 @@ const Location = () => {
       setProjects((prevProjects) => ({
         ...prevProjects,
         location: {
-          ...prevProjects.location,
+          ...(prevProjects.location || {}),
           country: defaultCountryOption.value,
         },
       }));
@@ -222,7 +255,7 @@ const Location = () => {
                 id="floatingInputAddress"
                 placeholder="Address"
                 name="address"
-                value={projects.location.address}
+                value={projects?.location?.address || ""}
                 onChange={(e) => handleInputChange(e, 'location')}
               />
               <label className="custompadd" htmlFor="floatingInputAddress">Address</label>
@@ -261,7 +294,7 @@ const Location = () => {
                   id="floatingInputLatti"
                   placeholder="Latitude"
                   name="latitude"
-                  value={projects.location.latitude}
+                  value={projects?.location?.latitude || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
                   required
                 />
@@ -278,7 +311,7 @@ const Location = () => {
                   id="floatingInputLongi"
                   placeholder="Longitude"
                   name="longitude"
-                  value={projects.location.longitude}
+                  value={projects?.location?.longitude || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
                   required
                 />
@@ -302,7 +335,7 @@ const Location = () => {
                   id="floatingInputLatti2"
                   placeholder="Latitude"
                   name="latitude2"
-                  value={projects.location.latitude2}
+                  value={projects?.location?.latitude2 || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
                 <label className="custompadd" htmlFor="floatingInputLatti2">Latitude</label>
@@ -318,10 +351,10 @@ const Location = () => {
                   id="floatingInputLongi2"
                   placeholder="Longitude"
                   name="longitude2"
-                  value={projects.location.longitude2}
+                  value={projects?.location?.longitude2 || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
                 />
-                <label  className="custompadd" htmlFor="floatingInputLongi2">Longitude</label>
+                <label className="custompadd" htmlFor="floatingInputLongi2">Longitude</label>
               </div>
             </div>
           </div>
@@ -354,7 +387,7 @@ const Location = () => {
                 id="floatingInputLongi"
                 placeholder="Nearest Metro"
                 name="name"
-                value={projects.location.metro_detail.name}
+                value={projects?.location?.metro_detail?.name || ""}
                 onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
               />
               <label htmlFor="floatingInputLongi">Nearest Metro</label>

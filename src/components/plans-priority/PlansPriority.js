@@ -11,6 +11,7 @@ import {
   Td,
   TableContainer,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Select from "react-select";
@@ -26,6 +27,7 @@ import { getCity } from "../builders/BuilderService";
 import { getPropertyTypes } from "./PlansPriorityService";
 import { getProjectData } from "../builder-projects/ProjectService";
 function BuilderPriority() {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
@@ -170,7 +172,13 @@ const filteredPlanType = planTypes.filter(item => {
       setprojects([...projects]);
       handleFetchTopProjects(selectedPlanTypeId,selectedCity?.value);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const onDragEnd = async (result) => {
@@ -191,7 +199,13 @@ const filteredPlanType = planTypes.filter(item => {
     try {
      await changePlanOrderOfProjectsByDrag(updatedOrderPayload, url)
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

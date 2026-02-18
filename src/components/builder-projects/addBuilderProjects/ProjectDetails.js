@@ -40,7 +40,8 @@ const ProjectDetails = () => {
     }
   };
   const handleFetchbuilders = async () => {
-    await getBuilders(setbuilders);
+    const data = await getBuilders();
+    setbuilders(data)
   };
   const handleFetchPlanType = async () => {
     const data = await getPropertyTypes();

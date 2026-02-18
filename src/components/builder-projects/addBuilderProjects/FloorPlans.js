@@ -5,6 +5,7 @@ import { getCategories } from "services/projectService";
 import { uploadImageFile } from "../../../services/Services";
 import { GpState } from "../../../context/context";
 import { FaUpload } from "react-icons/fa";
+import { uploadFiles } from "services/mediaService";
 const FloorPlans = () => {
   const { projects, setProjects } = GpState();
   const [categories, setCategories] = useState([]);
@@ -18,8 +19,9 @@ const FloorPlans = () => {
   };
 
   const createPlans = () => {
+    const currentPlans = projects?.plans || [];
     const newRow = {
-      id: projects.plans.length + 1,
+      id: currentPlans.length + 1,
       category: "",
       price: "",
       size: "",
@@ -38,16 +40,17 @@ const FloorPlans = () => {
     };
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: [...prevProjects.plans, newRow],
+      plans: [...(prevProjects.plans || []), newRow],
     }));
   };
   const addFloorPlan = (planId) => {
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.map((plan) => {
+      plans: (prevProjects.plans || []).map((plan) => {
         if (plan.id === planId) {
+          const currentFloorPlans = plan.floor_plans || [];
           const newFloorPlan = {
-            id: plan.floor_plans.length + 1,
+            id: currentFloorPlans.length + 1,
             name: "",
             area: "",
             rent_price: "",
@@ -56,7 +59,7 @@ const FloorPlans = () => {
           };
           return {
             ...plan,
-            floor_plans: [...plan.floor_plans, newFloorPlan],
+            floor_plans: [...currentFloorPlans, newFloorPlan],
           };
         }
         return plan;
@@ -66,15 +69,15 @@ const FloorPlans = () => {
   const removePlan = (id) => {
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.filter((row) => row.id !== id),
+      plans: (prevProjects.plans || []).filter((row) => row.id !== id),
     }));
   };
   const removeFloorPlan = (planId, floorPlanId) => {
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.map((plan) => {
+      plans: (prevProjects.plans || []).map((plan) => {
         if (plan.id === planId) {
-          const updatedFloorPlans = plan.floor_plans.filter(
+          const updatedFloorPlans = (plan.floor_plans || []).filter(
             (floorPlan) => floorPlan.id !== floorPlanId
           );
 
@@ -91,19 +94,19 @@ const FloorPlans = () => {
     const { name, value } = e.target;
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.map((row) => (row.id === id ? { ...row, [name]: value } : row)),
+      plans: (prevProjects.plans || []).map((row) => (row.id === id ? { ...row, [name]: value } : row)),
     }));
   };
   const handleInputPlanChange = (e, rowId, planId, isFloorPlan) => {
     const { name, value } = e.target;
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.map((row) => {
+      plans: (prevProjects.plans || []).map((row) => {
         if (row.id === rowId) {
           if (isFloorPlan) {
             return {
               ...row,
-              floor_plans: row.floor_plans.map((plan) => {
+              floor_plans: (row.floor_plans || []).map((plan) => {
                 if (plan.id === planId) {
                   return { ...plan, [name]: value };
                 }
@@ -123,12 +126,12 @@ const FloorPlans = () => {
     const imageUrl = data;
     setProjects((prevProjects) => ({
       ...prevProjects,
-      plans: prevProjects.plans.map((row) => {
+      plans: (prevProjects.plans || []).map((row) => {
         if (row.id === rowId) {
           if (isFloorPlan) {
             return {
               ...row,
-              floor_plans: row.floor_plans.map((plan) => {
+              floor_plans: (row.floor_plans || []).map((plan) => {
                 if (plan.id === planId) {
                   return { ...plan, image: imageUrl[0] };
                 }
@@ -142,9 +145,21 @@ const FloorPlans = () => {
     }))
   };
   const handleUploadFile = async (files, rowId, planId, isFloorPlan) => {
-    const data = await uploadImageFile(files, { setProgress: () => { }, setIsUploaded: () => { }, checkUrl });
-    previewFile(data, rowId, planId, isFloorPlan)
+    try {
+      const data = await uploadFiles(files, {
+        compressImages: true,
+        onProgress: (percent) => {
+          // Upload progress tracking
+        },
+      });
+
+      previewFile(data, rowId, planId, isFloorPlan);
+
+    } catch (error) {
+      // Error handled by uploadFiles function
+    }
   };
+
 
   const handleInputByClick = (e, rowId, planId, isFloorPlan) => {
     const files = Array.from(e.target.files);
@@ -170,7 +185,7 @@ const FloorPlans = () => {
       </div>
       <div className="project-card">
         <div className="mb-5">
-          {projects.plans.map((row, id) => (
+          {(projects?.plans || []).map((row, id) => (
             <div className="row mt-4" key={row.id}>
               <div className="col-12 d-flex align-items-center justify-content-between">
                 <h5 className="mb-0">Plan</h5>
@@ -286,7 +301,7 @@ const FloorPlans = () => {
                   />
                 </div>
               </div>
-              {row.floor_plans.map((plan, id) => (
+              {(row.floor_plans || []).map((plan, id) => (
                 <div className="row" key={plan.id}>
                   <div className="col-md-2">
                     <div

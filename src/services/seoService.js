@@ -27,35 +27,20 @@ export const getSeoById = async (id) => {
 /**
  * Delete SEO (dynamic type)
  */
-export const deleteSeoById = async ({ id, type }) => {
-  const path =
-    type === "dwarka"
-      ? `/api/admin/dwarka/delete/${id}`
-      : `/api/admin/seo/delete/${id}`;
-
-  const { data } = await api.delete(path);
+export const deleteSeoById = async ({ id }) => {
+  const { data } = await api.delete(`/api/admin/seo/delete/${id}`);
   return data;
 };
 
-export const createSeo = async ({ payload, type }) => {
-  const path =
-    type === "dwarka"
-      ? "/api/admin/dwarka/seos"
-      : "/api/admin/seo/seos";
-
-  const { data } = await api.post(path, payload);
+export const createSeo = async ({ payload }) => {
+  const { data } = await api.post("/api/admin/seos", payload);
   return data;
 };
 
 /**
  * Update SEO
  */
-export const updateSeo = async ({ id, payload, type }) => {
-  const path =
-    type === "dwarka"
-      ? `/api/admin/dwarka/seos/${id}`
-      : `/api/admin/seo/seos/${id}`;
-
-  const { data } = await api.put(path, payload);
+export const updateSeo = async ({ id, payload }) => {
+  const { data } = await api.put(`/api/admin/seos/${id}`, payload);
   return data;
 };

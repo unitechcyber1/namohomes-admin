@@ -58,7 +58,13 @@ function PriorityProjects() {
       setprojects(updatedProjects);
       setPriorityprojects(priorityData);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      toast({
+        title: "Error Loading Data",
+        description: error.message || "Failed to load priority projects. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -177,7 +183,13 @@ function PriorityProjects() {
       setprojects([...projects]);
       handleFetchPriorityprojects(selectedMicroLocationId);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -210,7 +222,13 @@ function PriorityProjects() {
         throw new Error("Failed to update priority order.");
       }
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 

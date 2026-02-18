@@ -1,5 +1,7 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
+
 export const getStateByCountry = async (countryId, setStates) => {
   try {
     const result = await axios.get(
@@ -10,7 +12,7 @@ export const getStateByCountry = async (countryId, setStates) => {
     );
     setStates(result.data);
   } catch (error) {
-    console.log(error.message);
+    throw createUserFriendlyError(error, "Failed to load states. Please try again.");
   }
 };
 export const getCityByState = async (stateId, setCities) => {
@@ -21,7 +23,7 @@ export const getCityByState = async (stateId, setCities) => {
         setCities(result.data);
       });
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load cities. Please try again.");
   }
 };
 
@@ -33,7 +35,7 @@ export const getMicrolocationByCity = async (cityId, setMicrolocations) => {
         setMicrolocations(result.data);
       });
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load microlocations. Please try again.");
   }
 };
 
@@ -43,7 +45,7 @@ export const getCountry = async (setCountry) => {
 
     setCountry(data.country);
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load countries. Please try again.");
   }
 };
 
@@ -52,7 +54,7 @@ export const getBuilderData = async (setbuilders) => {
     const { data } = await axios.get(`${BASE_URL}/api/admin/builders`);
     setbuilders(data);
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load builders. Please try again.");
   }
 };
 export const getAmenities = async (params) => {
@@ -60,7 +62,7 @@ export const getAmenities = async (params) => {
     const { data } = await axios.get(`${BASE_URL}/api/admin/amenity`, {params});
     return data
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load amenities. Please try again.");
   }
 };
 export const getCategory = async (setCategories) => {
@@ -71,7 +73,7 @@ export const getCategory = async (setCategories) => {
 
     setCategories(data);
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load categories. Please try again.");
   }
 };
 
@@ -90,7 +92,7 @@ export const getProjectData = async (params, url) => {
       return data;
     }
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load projects. Please try again.");
   }
 };
 export const searchedProjects = async (name, city, microlocation, status, page, limit) => {
@@ -98,7 +100,7 @@ export const searchedProjects = async (name, city, microlocation, status, page, 
     const { data } = await axios.get(`${BASE_URL}/api/admin/search-projects?name=${name}&city=${city}&microlocation=${microlocation}&status=${status}&page=${page}&limit=${limit}`);
     return data;
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to search projects. Please try again.");
   }
 };
 export const changeProjectStatus = async (
@@ -119,7 +121,7 @@ export const changeProjectStatus = async (
       );
      }
   } catch (error) {
-    console.log(error)
+    throw createUserFriendlyError(error, "Failed to update project status. Please try again.");
   }
 };
 
@@ -127,7 +129,7 @@ export const deleteprojects = async (id, url) => {
   try {
       return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
   } catch (error) {
-    console.log(error)
+    throw createUserFriendlyError(error, "Failed to delete project. Please try again.");
   }
 };
 export const getProjectsById = async (id, url) => {
@@ -137,7 +139,7 @@ export const getProjectsById = async (id, url) => {
       );
       return data;
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load project details. Please try again.");
   }
 };
 
@@ -145,14 +147,14 @@ export const saveProjects = async (data) => {
   try {
     return await axios.post(`${BASE_URL}/api/admin/project`, data)
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to save project. Please check all fields and try again.");
   }
 }
 export const saveDwarkaProjects = async (data) => {
   try {
     return await axios.post(`${BASE_URL}/api/admin/dwarkaProject`, data)
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to save project. Please check all fields and try again.");
   }
 }
 
@@ -160,14 +162,14 @@ export const updatedProjects = async (id, data) => {
   try {
     return await axios.put(`${BASE_URL}/api/admin/edit-project/${id}`, data)
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to update project. Please check all fields and try again.");
   }
 }
 export const updatedDwarkaProjects = async (id, data) => {
   try {
     return await axios.put(`${BASE_URL}/api/admin/edit-project/${id}`, data)
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to update project. Please check all fields and try again.");
   }
 }
 
@@ -183,6 +185,6 @@ export const deleteImage = async (data, url) => {
       );
     }
   } catch (error) {
-    console.error('Error deleting image:', error.message);
+    throw createUserFriendlyError(error, "Failed to delete image. Please try again.");
   }
 }

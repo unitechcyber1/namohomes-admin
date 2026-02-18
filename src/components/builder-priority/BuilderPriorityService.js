@@ -1,5 +1,6 @@
 import BASE_URL from "../../apiConfig";
 import axios from "axios";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 export const getProjectsDataByBuilder = async (builderId) => {
     try {
       const { data } = await axios.get(
@@ -8,7 +9,7 @@ export const getProjectsDataByBuilder = async (builderId) => {
   
      return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to load builder projects. Please try again.");
     }
   };
   
@@ -19,7 +20,7 @@ export const getProjectsDataByBuilder = async (builderId) => {
       );
   return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to load builder projects. Please try again.");
     }
   };
   

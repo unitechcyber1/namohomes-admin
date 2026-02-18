@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 export const getState = async (setStates, setLoading) => {
   try {
@@ -8,7 +9,8 @@ export const getState = async (setStates, setLoading) => {
     setLoading(false);
     setStates(data);
   } catch (error) {
-    console.log(error);
+    setLoading(false);
+    throw new Error(getErrorMessage(error));
   }
 };
 export const deleteStates = async (id, setUpdateTable, toast) => {
@@ -24,8 +26,8 @@ export const deleteStates = async (id, setUpdateTable, toast) => {
     });
   } catch (error) {
     toast({
-      title: "Error Occured!",
-      description: error.response.data.message,
+      title: "Error Occurred!",
+      description: getErrorMessage(error),
       status: "error",
       duration: 5000,
       isClosable: true,

@@ -53,7 +53,7 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
         position: "bottom",
       });
     } catch (error) {
-      console.log(error);
+      // Error handled by service function
     }
   };
   const handleFetchStates = async (countryId) => {

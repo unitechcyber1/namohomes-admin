@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const getProjectsDataByCity = async (
   setLoading,
@@ -14,7 +15,8 @@ export const getProjectsDataByCity = async (
     setProjects(data);
     setLoading(false);
   } catch (error) {
-    console.log(error);
+    setLoading(false);
+    throw createUserFriendlyError(error, "Failed to load projects. Please try again.");
   }
 };
 
@@ -31,7 +33,7 @@ export const changeOrderOfProjects = async (data, id, url) => {
         );
     }
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
   }
 };
 export const changeOrderOfProjectsByDrag = async (data, url) => {
@@ -48,7 +50,7 @@ export const changeOrderOfProjectsByDrag = async (data, url) => {
       );
     }
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
   }
 };
 
@@ -67,6 +69,6 @@ export const getTopProjectsByCity = async (cityId, url) => {
       return data;
     }
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load top projects. Please try again.");
   }
 };

@@ -61,7 +61,7 @@ export const uploadFiles = async (
     });
 
     const { data } = await api.post(
-      "/api/admin/dwarkaProject/upload", // ✅ Only one endpoint now
+      "/api/admin/upload", // ✅ Only one endpoint now
       formData,
       {
         headers: {

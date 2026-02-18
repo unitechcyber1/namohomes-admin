@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const changeOrderOfBuilder = async (data, id) => {
     try {
@@ -7,7 +8,7 @@ export const changeOrderOfBuilder = async (data, id) => {
           `${BASE_URL}/api/admin/builder/update-order/${id}`, data
           );
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update builder order. Please try again.");
     }
   };
   export const changeOrderOfBuildersByDrag = async (data) => {
@@ -17,7 +18,7 @@ export const changeOrderOfBuilder = async (data, id) => {
           data
         );
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update builder order. Please try again.");
     }
   };
   
@@ -28,6 +29,6 @@ export const changeOrderOfBuilder = async (data, id) => {
         );
         return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update builder order. Please try again.");
     }
   };

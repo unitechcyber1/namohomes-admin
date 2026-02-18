@@ -1,5 +1,6 @@
 import BASE_URL from "../../apiConfig";
 import axios from "axios";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const getPropertyTypes = async () => {
     try {
@@ -8,7 +9,7 @@ export const getPropertyTypes = async () => {
       );
       return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to load property types. Please try again.");
     }
   };
 export const getProjectsDataByPlanAndCity = async (plansId, city) => {
@@ -19,7 +20,7 @@ export const getProjectsDataByPlanAndCity = async (plansId, city) => {
   
      return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to load property types. Please try again.");
     }
   };
   
@@ -30,7 +31,7 @@ export const getProjectsDataByPlanAndCity = async (plansId, city) => {
       );
   return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to load property types. Please try again.");
     }
   };
   

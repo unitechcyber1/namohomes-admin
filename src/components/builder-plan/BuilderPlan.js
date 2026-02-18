@@ -45,7 +45,7 @@ function ResPropertyType() {
       const data = await getPropertyTypes();
       setPropertyTypes(data);
     } catch (error) {
-      console.error(error);
+      // Error handled by service function
     } finally {
       setLoading(false);
     }

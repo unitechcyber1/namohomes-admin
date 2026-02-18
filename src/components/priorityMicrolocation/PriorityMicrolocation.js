@@ -24,6 +24,7 @@ import { getMicrolocationWithPriority } from "./PriorityService";
 
 
 function PriorityMicrolocation() {
+  const toast = useToast();
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAll, setShowAll] = useState(true);
@@ -143,7 +144,13 @@ function PriorityMicrolocation() {
       setMicrolocations([...microlocations]);
       handleFetchPriorityMicrolocation(selectedCity?.value);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -178,7 +185,13 @@ function PriorityMicrolocation() {
         throw new Error("Failed to update priority order.");
       }
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       // Handle error (e.g., show an error message to the user)
     }
   };

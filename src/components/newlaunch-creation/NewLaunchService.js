@@ -1,12 +1,13 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 
 export const saveUrls = async (data) => {
     try {
       return await axios.post(`${BASE_URL}/api/admin/newlaunch/create`, data)
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   }
   
@@ -14,7 +15,7 @@ export const saveUrls = async (data) => {
     try {
       return await axios.put(`${BASE_URL}/api/admin/newlaunch/update/${id}`, data)
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   }
 
@@ -25,7 +26,7 @@ export const saveUrls = async (data) => {
         );
         return data.data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   };
   export const getProjectData = async (params, url) => {
@@ -43,7 +44,7 @@ export const saveUrls = async (data) => {
         return data;
       }
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   };
   export const getAllUrls = async (params) => {
@@ -53,7 +54,7 @@ export const saveUrls = async (data) => {
           );
           return data;
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   };
 
@@ -69,7 +70,7 @@ export const saveUrls = async (data) => {
         );
   
     } catch (error) {
-      console.log(error)
+      throw createUserFriendlyError(error, "Failed to update new launch status. Please try again.");
     }
   };
 
@@ -77,6 +78,6 @@ export const saveUrls = async (data) => {
     try {
         return await axios.delete(`${BASE_URL}/api/admin/newlaunch/delete/${id}`);
     } catch (error) {
-      console.log(error)
+      throw createUserFriendlyError(error, "Failed to update new launch status. Please try again.");
     }
   };

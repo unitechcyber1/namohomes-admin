@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const getMicrolocationWithPriority = async (
   setLoading,
@@ -15,7 +16,8 @@ export const getMicrolocationWithPriority = async (
     setPriorityMicrolocation(data);
     setLoading(false);
   } catch (error) {
-    console.log(error);
+    setLoading(false);
+    throw createUserFriendlyError(error, "Failed to load microlocations. Please try again.");
   }
 };
 
@@ -33,6 +35,7 @@ export const getMicrolocationByCity = async (
         setLoading(false);
       });
   } catch (error) {
-    console.log(error);
+    setLoading(false);
+    throw createUserFriendlyError(error, "Failed to load microlocations. Please try again.");
   }
 };

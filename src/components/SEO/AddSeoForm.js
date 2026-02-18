@@ -140,9 +140,9 @@ function AddSeoForm() {
     e.preventDefault();
     try {
       if (isEditable) {
-        await updateSeo({ id, payload: seo, type: seoType });
+        await updateSeo({ id, payload: seo });
       } else {
-        await createSeo({ payload: seo, type: seoType });
+        await createSeo({ payload: seo });
       }
 
       toast({

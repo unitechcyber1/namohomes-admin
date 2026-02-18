@@ -144,7 +144,6 @@ function Country() {
 
   const nextPage = () =>
     curPage < totalPages && setCurPage(p => p + 1);
-console.log(pageData)
 
 
   const goToPage = (page) => {
