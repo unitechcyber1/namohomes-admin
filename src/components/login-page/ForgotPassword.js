@@ -28,7 +28,7 @@ const ForgotPassword = () => {
     const data = await res.json();
 
     if (data.status == 201) {
-      console.log("user valid");
+      // User validated successfully
     } else {
       navigate("/");
     }

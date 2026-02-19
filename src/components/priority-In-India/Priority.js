@@ -11,6 +11,7 @@ import {
   Td,
   TableContainer,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 
 import axios from "axios";
@@ -19,6 +20,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { getProjectData, searchedProjects  } from "../builder-projects/ProjectService";
 import {getTopProjectsIndia} from "./PriorityService"
 function Priority() {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [projects, setprojects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -131,7 +133,13 @@ const getSearchProjects = async() => {
       getTopIndiaProjects()
       setprojects([...projects]);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const onDragEnd = async (result) => {
@@ -158,7 +166,13 @@ const getSearchProjects = async() => {
         updatedOrderPayload
       );
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

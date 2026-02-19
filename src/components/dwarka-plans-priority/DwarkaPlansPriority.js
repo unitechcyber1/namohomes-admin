@@ -55,7 +55,6 @@ function BuilderPriority() {
     setPriorityprojects(data)
     setLoadingTable(false)
   };
-  console.log(priorityprojects)
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
       case "PlanType":
@@ -165,7 +164,13 @@ const filteredPlanType = planTypes.filter(item => {
       setprojects([...projects]);
       handleFetchTopProjects(selectedPlanTypeId,selectedCity?.value);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
  
@@ -194,7 +199,13 @@ const filteredPlanType = planTypes.filter(item => {
         updatedOrderPayload
       );
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

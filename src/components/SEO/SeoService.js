@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const getSeoDataById = async (
   id, url
@@ -13,7 +14,7 @@ export const getSeoDataById = async (
     return data;
    }
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load SEO data. Please try again.");
   }
 };
 
@@ -33,6 +34,7 @@ export const getSeoData = async (setLoading, setSeos, url) => {
     setLoading(false);
    }
   } catch (error) {
-    console.log(error);
+    setLoading(false);
+    throw createUserFriendlyError(error, "Failed to load SEO data. Please try again.");
   }
 };

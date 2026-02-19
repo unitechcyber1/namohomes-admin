@@ -46,7 +46,7 @@ const EditCountry = ({ countries, setUpdateTable }) => {
         position: "bottom",
       });
     } catch (error) {
-      console.log(error);
+      // Error handled by service function
     }
   };
   return (

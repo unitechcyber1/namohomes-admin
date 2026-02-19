@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 
 
@@ -10,6 +11,6 @@ export const getTopProjectsIndia = async () => {
     );
    return data;
   } catch (error) {
-    console.log(error);
+    throw createUserFriendlyError(error, "Failed to load projects. Please try again.");
   }
 };

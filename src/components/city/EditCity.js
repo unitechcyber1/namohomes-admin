@@ -53,7 +53,7 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
         position: "bottom",
       });
     } catch (error) {
-      console.log(error);
+      // Error handled by service function
     }
   };
   const handleFetchStates = async (countryId) => {
@@ -69,7 +69,7 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const handleFetchCountry = async () => {
     const data = await getCountries();
     setCountry(data);
-        const initialCountry = countryOptions.find(
+    const initialCountry = countryOptions.find(
       (option) => option.value === cities.country._id
     );
     if (initialCountry) {

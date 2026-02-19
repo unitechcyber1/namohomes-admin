@@ -48,7 +48,6 @@ export const uploadImageFile = async (files, options) => {
     
     return data;
   } catch (error) {
-    console.log(error);
     throw error; // Rethrow the error for the caller to handle
   }
 };
@@ -61,7 +60,7 @@ export const uploadFile = async (
 ) => {
   const formData = new FormData();
   setProgress(0);
-  console.log(files)
+  
   if(files[0].type === "video/mp4" || files[0].type === "video/webm" || files[0].type === "video/ogg"){
     files.forEach((file) => {
       formData.append("files", file, file.name);
@@ -78,8 +77,9 @@ export const uploadFile = async (
       formData.append("files", file, file.name);
     });
   }
-  await axios
-    .post(`${BASE_URL}/api/admin/dwarkaProject/upload`, formData, {
+  
+  try {
+    const res = await axios.post(`${BASE_URL}/api/admin/dwarkaProject/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -88,18 +88,16 @@ export const uploadFile = async (
           parseInt((progressEvent.loaded * 100) / progressEvent.total)
         );
       },
-    })
-    .then((res) => {
-      console.log(res.data)
-      // previewFile(res.data);
-      setTimeout(() => {
-        setProgress(0);
-      }, 3000);
-      setIsUploaded(true);
-    })
-    .catch((err) => {
-      console.log(err);
-      console.log('yeah')
     });
+    
+    setTimeout(() => {
+      setProgress(0);
+    }, 3000);
+    setIsUploaded(true);
+    return res.data;
+  } catch (error) {
+    setProgress(0);
+    throw new Error("Failed to upload file. Please check the file format and size, then try again.");
+  }
 };
 

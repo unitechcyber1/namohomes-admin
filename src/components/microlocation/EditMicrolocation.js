@@ -76,7 +76,7 @@ const EditMicrolocation = ({
         position: "bottom",
       });
     } catch (error) {
-      console.log(error);
+      // Error handled by service function
     }
   };
   const handleFetchCity = async (stateId) => {

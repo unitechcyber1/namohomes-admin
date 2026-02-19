@@ -11,6 +11,7 @@ import {
   Td,
   TableContainer,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Select from "react-select";
@@ -22,6 +23,7 @@ import {
 } from "./BuilderPriorityService";
 import { getBuilderData } from "../builder-projects/ProjectService";
 function BuilderPriority() {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [projects, setprojects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -140,7 +142,13 @@ function BuilderPriority() {
       setprojects([...projects]);
       handleFetchTopProjects(selectedBuilder?.value);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const onDragEnd = async (result) => {
@@ -167,7 +175,13 @@ function BuilderPriority() {
         updatedOrderPayload
       );
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

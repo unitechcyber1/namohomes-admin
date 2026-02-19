@@ -15,6 +15,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Delete from "../../delete/Delete";
 import { deleteImage } from "services/projectService";
 import { useToast } from "@chakra-ui/react";
+import { uploadFiles } from "services/mediaService";
 const ProjectImage = () => {
   const [progress, setProgress] = useState(0);
   const { projects, setProjects } = GpState();
@@ -22,59 +23,103 @@ const ProjectImage = () => {
   const [checkUrl, setCheckUrl] = useState(false)
   const toast = useToast();
   const route = window.location.href
-   const handleInputByClick =async  (e) => {
-     const files = Array.from(e.target.files);
-   const data = await uploadImageFile(files, {setProgress, setIsUploaded, checkUrl});
-   if(!data){
-    toast({
-      title: "Error Occured!",
-      description: "Check your file extension",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom-left",
-    });
-    return
-  }
-   const lastOrder = projects.images.length > 0 ? projects.images[projects.images.length - 1].order : 0;
-     const previewData = data?.map((url, index) => ({
-       image: url,
-       name: files[index].name,
-       alt: files[index].name,
-       order: lastOrder + index + 1,  
-     }));
+  const handleInputByClick = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      const data = await uploadFiles(files, {
+        compressImages: true,
+        onProgress: (percent) => {
+          setProgress(percent);
+        },
+      });
+      if (!data || data.length === 0) {
+        toast({
+          title: "Error Occured!",
+          description: "Check your file extension",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+        return;
+      }
+      const lastOrder =
+        projects.images.length > 0
+          ? projects.images[projects.images.length - 1].order
+          : 0;
+
+      const previewData = data.map((fileData, index) => ({
+        image: fileData,  // depends on backend response
+        name: files[index].name,
+        alt: files[index].name,
+        order: lastOrder + index + 1,
+      }));
       setProjects((prevProjects) => ({
         ...prevProjects,
         images: [...prevProjects.images, ...previewData],
       }));
-   };
-  const handleUploadPdf = async (e) => {
-    const files = Array.from(e.target.files);
-   const data  = await uploadImageFile(files,  {setProgress: () => {}, setIsUploaded: () => {}, checkUrl});
-   setProjects((prev) => ({
-    ...prev, 
-    brochure: data[0]
-   }))
+    } catch (error) {
+      toast({
+        title: "Upload Failed!",
+        description: error?.message || "Something went wrong",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    } finally {
+      setIsUploaded(true);
+    }
   };
+  const handleUploadPdf = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      const data = await uploadFiles(files, {
+        compressImages: false,   // ✅ Important for PDF
+        onProgress: (percent) => {
+          // Upload progress tracking
+        },
+      });
+      if (!data || data.length === 0) return;
+      setProjects((prev) => ({
+        ...prev,
+        brochure: data[0] // depending on backend response
+      }));
+
+    } catch (error) {
+      // Error handled by uploadFiles function
+    }
+  };
+
   const handleUploadMap = async (e) => {
-    const files = Array.from(e.target.files);
-   const data  = await uploadImageFile(files, {setProgress: () => {}, setIsUploaded: () => {}, checkUrl});
-   setProjects((prev) => ({
-    ...prev, 
-    location_map: data[0]
-   }))
+    try {
+      const files = Array.from(e.target.files);
+      const data = await uploadFiles(files, {
+        compressImages: true,
+        onProgress: (percent) => {
+          // Upload progress tracking
+        },
+      });
+      if (!data || data.length === 0) return;
+      setProjects((prev) => ({
+        ...prev,
+        location_map: data[0] // depending on backend response
+      }));
+    } catch (error) {
+      // Error handled by uploadFiles function
+    }
   };
   const handleAltChange = (event, order) => {
-     const {name, value} = event.target;
-     setProjects((prev) => ({
+    const { name, value } = event.target;
+    setProjects((prev) => ({
       ...prev,
       images: prev.images.map((img) => {
-        if(img.order === order){
+        if (img.order === order) {
           return { ...img, [name]: value };
         }
         return img
       })
-     })) 
+    }))
   };
   const onDragEnd = async (result) => {
     const { destination, source } = result;
@@ -86,45 +131,45 @@ const ProjectImage = () => {
     recordedimage.splice(destination.index, 0, movedSpace);
     const updatedOrderPayload = recordedimage.map((image, index) => ({
       _id: image._id,
-       order: index + 1,
-       image: image.image,
-       alt: image.alt,
-       name: image.name
+      order: index + 1,
+      image: image.image,
+      alt: image.alt,
+      name: image.name
     }));
     setProjects((prev) => ({
       ...prev,
       images: [...updatedOrderPayload]
     }))
-    };
-    const handleDelete = async (imageId, order, name, id) => {
-      const data = { projectId: projects?._id, imageId, name, id}
-      try {
-       await deleteImage(data, route)
-        setProjects((prevProjects) => ({
-          ...prevProjects,
-          images: prevProjects.images.filter((image) => image.order !== order),
-        }));
-      } catch (error) {
-        console.error('Error deleting image:', error.message);
-      }
-    };
-    useEffect(() => {
-        if(route.includes('dwarkaexpressway')){
-   setCheckUrl(true)
-  }else{
-    setCheckUrl(false)
-  }
-    },[checkUrl])
-    return (
-      <>
-        <div className="project-card">
+  };
+  const handleDelete = async (imageId, order, name, id) => {
+    const data = { projectId: projects?._id, imageId, name, id }
+    try {
+      await deleteImage(data, route)
+      setProjects((prevProjects) => ({
+        ...prevProjects,
+        images: prevProjects.images.filter((image) => image.order !== order),
+      }));
+    } catch (error) {
+      // Error handled by deleteImage service function
+    }
+  };
+  useEffect(() => {
+    if (route.includes('dwarkaexpressway')) {
+      setCheckUrl(true)
+    } else {
+      setCheckUrl(false)
+    }
+  }, [checkUrl])
+  return (
+    <>
+      <div className="project-card">
         <div className="row image-border">
           <h4 className="property_form_h4">Project Images</h4>
           <div className="container">
-         
+
             <label className="file file_label">
-            <FaUpload className="upload_icon" />
-             <span className="upload_text">Upload</span>
+              <FaUpload className="upload_icon" />
+              <span className="upload_text">Upload</span>
               <input
                 type="file"
                 id="file-input"
@@ -213,7 +258,7 @@ const ProjectImage = () => {
                                         type="text"
                                         className="form-control"
                                         style={{ color: "#000" }}
-                                        value={img.name}  
+                                        value={img.name}
                                         name="name"
                                         onChange={(event) =>
                                           handleAltChange(event, img.order)
@@ -260,9 +305,9 @@ const ProjectImage = () => {
         <div className="row mt-5">
           <h4 className="property_form_h4">Upload Brochure</h4>
           <label className="file file_label">
-          <FaUpload className="upload_icon" />
+            <FaUpload className="upload_icon" />
             <span className="upload_text">Upload</span>
-          <input type="file" accept=".pdf" onChange={handleUploadPdf} className="file_hide"/>
+            <input type="file" accept=".pdf" onChange={handleUploadPdf} className="file_hide" />
           </label>
           {(projects?.brochure || projects?.brochure?.s3_link) && (
             <a href={projects?.brochure?.s3_link} download>
@@ -273,17 +318,17 @@ const ProjectImage = () => {
         <div className="row mt-5">
           <h4 className="property_form_h4">Upload Location Map</h4>
           <label className="file file_label">
-          <FaUpload className="upload_icon" />
+            <FaUpload className="upload_icon" />
             <span className="upload_text">Upload</span>
-          <input type="file" onChange={handleUploadMap} className="file_hide"/>
+            <input type="file" onChange={handleUploadMap} className="file_hide" />
           </label>
           {(projects.location_map || projects.location_map?.s3_link) && <Fragment>
-                      <img src={projects.location_map?.s3_link} alt="media" style={{ width: "25%" }} />
-                    </Fragment>}
+            <img src={projects.location_map?.s3_link} alt="media" style={{ width: "25%" }} />
+          </Fragment>}
         </div>
-        </div>
-      </>
-    );
+      </div>
+    </>
+  );
 };
 
 export default ProjectImage;

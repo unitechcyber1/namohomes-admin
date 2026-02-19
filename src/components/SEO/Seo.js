@@ -46,9 +46,9 @@ function Seo() {
       const data = await getSeoList();
       setSeos([...data].reverse());
     } catch (err) {
-      console.error(err);
       toast({
         title: "Failed to load SEO data",
+        description: err.message || "Unable to load SEO data. Please try again.",
         status: "error",
         duration: 4000,
         isClosable: true,
@@ -66,8 +66,7 @@ function Seo() {
   const handleDeleteSeo = async (id) => {
     try {
       await deleteSeoById({
-        id,
-        type: isDwarka ? "dwarka" : "default",
+        id
       });
 
       toast({

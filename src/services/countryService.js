@@ -3,7 +3,7 @@ import axiosInstance from "./axiosInstance";
 /**
  * Fetch all cities
  */
-export const getCountries= async () => {
+export const getCountries = async () => {
   try {
     const { data } = await axiosInstance.get("/api/admin/countries");
     return data.country;

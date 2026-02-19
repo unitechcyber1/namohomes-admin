@@ -11,11 +11,13 @@ import {
   Td,
   TableContainer,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { getAllbuildersData, getCity } from "../builders/BuilderService";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { changeOrderOfBuilder, changeOrderOfBuildersByDrag, getTopBuilders } from "./TopBuilderService";
 function TopBuilders() {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [projects, setprojects] = useState([]);
   const [totalCount, setTotalCount] = useState(0)
@@ -97,7 +99,13 @@ function TopBuilders() {
       setprojects([...projects]);
       handleFetchTopProjects();
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update builder. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const onDragEnd = async (result) => {
@@ -117,7 +125,13 @@ function TopBuilders() {
     try {
      await changeOrderOfBuildersByDrag(updatedOrderPayload)
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

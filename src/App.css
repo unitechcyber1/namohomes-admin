@@ -187,24 +187,22 @@ input[type="file"]::file-selector-button:active {
 }
 .border_field input,
 .border_field select {
-  padding: 20px 0px 10px 0px !important;
   margin: 0px;
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
-  border-radius: 0px !important;
+  border-radius: 5px !important;
   height: auto !important;
   box-shadow: none !important;
 }
 .border_field textarea {
-  padding: 20px 0px 10px 0px !important;
   margin: 0px;
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
-  border-radius: 0px !important;
+  border-radius: 5px !important;
   /* height: auto !important; */
   box-shadow: none !important;
 }

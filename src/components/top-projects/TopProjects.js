@@ -11,6 +11,7 @@ import {
   Td,
   TableContainer,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import "./TopProjects.css";
 import axios from "axios";
@@ -26,6 +27,7 @@ import {
 } from "./TopProjectService";
 import { getProjectData } from "../builder-projects/ProjectService";
 function Popularproject() {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [projects, setprojects] = useState([]);
   const [cities, setCities] = useState([]);
@@ -129,7 +131,6 @@ function Popularproject() {
   const getLastPage = () => {
     setQuery({...query, page: nPage});
   };  
-  console.log(priorityprojects.length)
   const handleCheckboxChange = async (event, project) => {
     const { checked } = event.target;
     try {
@@ -142,11 +143,16 @@ function Popularproject() {
       };
       await changeOrderOfProjects(updatedproject, project._id, url)
       project.is_popular.status = checked;
-      console.log(projects)
       setprojects([...projects]);
       handleFetchTopProjects(selectedCity?.value);
     } catch (error) {
-      console.error("An error occurred:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update project. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   const onDragEnd = async (result) => {
@@ -166,7 +172,13 @@ function Popularproject() {
     try {
      await changeOrderOfProjectsByDrag(updatedOrderPayload, url)
     } catch (error) {
-      console.error("Error updating priority order:", error);
+      toast({
+        title: "Error Updating Order",
+        description: error.message || "Failed to update priority order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
   return (

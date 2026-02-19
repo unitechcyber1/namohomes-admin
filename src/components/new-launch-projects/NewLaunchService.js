@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
+import { createUserFriendlyError } from "../../utils/errorHandler";
 
 export const changeOrderOfProjects = async (data, id, url) => {
     try {
@@ -9,7 +10,7 @@ export const changeOrderOfProjects = async (data, id, url) => {
         );
       }
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
     }
   };
   
@@ -22,7 +23,7 @@ export const changeOrderOfProjects = async (data, id, url) => {
         return data;
       }
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
     }
   };
 
@@ -34,7 +35,7 @@ export const changeOrderOfProjects = async (data, id, url) => {
         );
       }
     } catch (error) {
-      console.log(error);
+      throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
     }
   };
   
