@@ -40,3 +40,9 @@ Thumbs.db
 # Build artifacts
 *.log
 .cache
+
+# SSH Keys
+namo
+namo.pub
+*.pem
+*.key
