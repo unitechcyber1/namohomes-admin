@@ -19,6 +19,8 @@ PROJECT_DIR="/home/ubuntu/namohomes-admin"
 cd $PROJECT_DIR
 
 echo -e "${YELLOW}📦 Installing dependencies...${NC}"
+# Clean install to avoid conflicts
+rm -rf node_modules package-lock.json
 npm install
 
 echo -e "${YELLOW}🔨 Building production bundle...${NC}"
