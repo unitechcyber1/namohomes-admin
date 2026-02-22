@@ -13,9 +13,9 @@ import {
 import { GpState } from "../../../context/context";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Delete from "../../delete/Delete";
-import { deleteImage } from "services/projectService";
+import { deleteImage } from "../../../services/projectService";
 import { useToast } from "@chakra-ui/react";
-import { uploadFiles } from "services/mediaService";
+import { uploadFiles } from "../../../services/mediaService";
 const ProjectImage = () => {
   const [progress, setProgress] = useState(0);
   const { projects, setProjects } = GpState();

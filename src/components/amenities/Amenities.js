@@ -27,7 +27,7 @@ import {
 import Delete from "../delete/Delete";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
-import { getAmenityById, getAmenities, updateAmenity, createAmenity, deleteAmenityById } from "services/amenityService";
+import { getAmenityById, getAmenities, updateAmenity, createAmenity, deleteAmenityById } from "../../services/amenityService";
 
 function Amenities() {
   const { isOpen, onOpen, onClose } = useDisclosure();

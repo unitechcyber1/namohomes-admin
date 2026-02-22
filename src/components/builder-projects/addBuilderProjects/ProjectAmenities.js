@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAmenities } from "services/projectService";
+import { getAmenities } from "../../../services/projectService";
 import { GpState } from "../../../context/context";
 const ProjectAmenities = () => {
   const { setProjects, projects } =

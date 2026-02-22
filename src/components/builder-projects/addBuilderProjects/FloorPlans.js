@@ -1,11 +1,11 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { IoIosAddCircle } from "react-icons/io";
 import { AiFillDelete } from "react-icons/ai";
-import { getCategories } from "services/projectService";
+import { getCategories } from "../../../services/projectService";
 import { uploadImageFile } from "../../../services/Services";
 import { GpState } from "../../../context/context";
 import { FaUpload } from "react-icons/fa";
-import { uploadFiles } from "services/mediaService";
+import { uploadFiles } from "../../../services/mediaService";
 const FloorPlans = () => {
   const { projects, setProjects } = GpState();
   const [categories, setCategories] = useState([]);

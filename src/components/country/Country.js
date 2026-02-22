@@ -19,7 +19,7 @@ import {
   getCountries,
   createCountry,
   deleteCountryById
-} from "services/countryService";
+} from "../../services/countryService";
 
 function Country() {
   const toast = useToast();

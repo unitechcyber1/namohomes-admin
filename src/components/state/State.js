@@ -16,9 +16,9 @@ import {
   getStates,
   createState,
   deleteStateById
-} from "services/stateService";
+} from "../../services/stateService";
 
-import { getCountries } from "services/countryService";
+import { getCountries } from "../../services/countryService";
 
 function State() {
   const toast = useToast();

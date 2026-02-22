@@ -20,7 +20,7 @@ import {
   createMedia,
   deleteMediaById,
   uploadFiles
-} from "services/mediaService";
+} from "../../services/mediaService";
 
 function Media() {
   const toast = useToast();

@@ -16,7 +16,7 @@ import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import {
   getBuilders,
   deleteBuilderById
-} from "services/builderService";
+} from "../../services/builderService";
 
 const Builder = () => {
   const toast = useToast();

@@ -18,7 +18,7 @@ import {
   getBuilderById,
   createBuilder,
   updateBuilder
-} from "services/builderService";
+} from "../../../services/builderService";
 
 import { builders as builderModel } from "../../../models/builderModel";
 
