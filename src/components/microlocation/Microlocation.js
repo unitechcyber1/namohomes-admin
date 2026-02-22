@@ -12,8 +12,8 @@ import {
   getMicrolocations,
   createMicrolocation,
   deleteMicrolocationById
-} from "services/microlocationService";
-import { getCountries } from "services/countryService";
+} from "../../services/microlocationService";
+import { getCountries } from "../../services/countryService";
 
 import {
   Button, Spinner, Table, Thead, Tbody,

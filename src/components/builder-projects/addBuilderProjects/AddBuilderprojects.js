@@ -14,10 +14,10 @@ import { GpState } from "../../../context/context";
 import ImageUpload from "../../../ImageUpload";
 import { uploadImageFile } from "../../../services/Services";
 import { Link, useParams } from "react-router-dom";
-import { getProjectById, createProject, updateProject } from "services/projectService";
+import { getProjectById, createProject, updateProject } from "../../../services/projectService";
 import Loader from "../../loader/Loader";
 import { project } from "../../../models/builderProjectModel";
-import { uploadFiles } from "services/mediaService";
+import { uploadFiles } from "../../../services/mediaService";
 function AddBuilderprojects() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [progress, setProgress] = useState(0);

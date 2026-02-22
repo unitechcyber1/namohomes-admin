@@ -19,8 +19,8 @@ import BASE_URL from "../../apiConfig";
 import Select from "react-select";
 import {
   getStatesByCountry,
-} from "services/microlocationService";
-import { getCountries } from "services/countryService";
+} from "../../services/microlocationService";
+import { getCountries } from "../../services/countryService";
 const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState(cities.name);

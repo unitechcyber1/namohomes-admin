@@ -21,7 +21,7 @@ import { AiFillEdit } from "react-icons/ai";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 
-import { getSeoList, deleteSeoById } from "services/seoService";
+import { getSeoList, deleteSeoById } from "../../services/seoService";
 
 function Seo() {
   const toast = useToast();

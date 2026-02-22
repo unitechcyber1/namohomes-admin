@@ -21,7 +21,7 @@ import {
   getClients,
   createClient,
   deleteClientById
-} from "services/clientService";
+} from "../../services/clientService";
 
 function OurClient() {
   const toast = useToast();

@@ -22,8 +22,8 @@ import {
   getCityByState,
   getStateByCountry,
 } from "./MicrolocationService";
-import { getCountries } from "services/countryService";
-import { getStatesByCountry, getCitiesByState } from "services/microlocationService";
+import { getCountries } from "../../services/countryService";
+import { getStatesByCountry, getCitiesByState } from "../../services/microlocationService";
 import ImageUpload from "../../ImageUpload";
 import { uploadFile } from "../../services/Services";
 const EditMicrolocation = ({

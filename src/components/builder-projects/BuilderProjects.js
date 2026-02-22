@@ -28,9 +28,9 @@ import {
   changeProjectStatus,
   deleteProject,
   getProjects,
-} from "services/projectService";
-import { getCities } from "services/cityService";
-import { getMicrolocations } from "services/microlocationService";
+} from "../../services/projectService";
+import { getCities } from "../../services/cityService";
+import { getMicrolocations } from "../../services/microlocationService";
 
 /* -------------------------------------------------------------------------- */
 /*                                CONSTANTS                                   */

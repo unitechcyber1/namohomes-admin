@@ -4,7 +4,7 @@ import {
   getCountries,
   getMicrolocationsByCity,
   getStatesByCountry,
-} from "services/projectService";
+} from "../../../services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
 const Location = () => {

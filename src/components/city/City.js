@@ -31,11 +31,11 @@ import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
 import BASE_URL from "../../apiConfig";
 import Select from "react-select";
-import { deleteCityById, getCities } from "services/cityService";
+import { deleteCityById, getCities } from "../../services/cityService";
 import {
   getCountries,
-} from "services/countryService";
-import {getStatesByCountry} from 'services/microlocationService'
+} from "../../services/countryService";
+import {getStatesByCountry} from '../../services/microlocationService'
 import EditCity from "./EditCity";
 
 function City() {

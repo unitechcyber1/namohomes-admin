@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getBuilders } from "services/projectService";
+import { getBuilders } from "../../../services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
-import { getPropertyTypes } from "services/propertyTypeService";
+import { getPropertyTypes } from "../../../services/propertyTypeService";
 const ProjectDetails = () => {
   const {
     projects,

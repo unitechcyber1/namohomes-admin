@@ -23,7 +23,7 @@ import {
   getSeoById,
   createSeo,
   updateSeo,
-} from "services/seoService";
+} from "../../services/seoService";
 
 function AddSeoForm() {
   const toast = useToast();
