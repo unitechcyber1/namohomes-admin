@@ -1,5 +1,44 @@
 import api from "./axiosInstance";
 
+/* ---------- HELPERS ---------- */
+
+const cleanParams = (params) => {
+  const cleaned = { ...params };
+  Object.keys(cleaned).forEach((key) => {
+    const val = cleaned[key];
+    if (val === "" || val == null) {
+      delete cleaned[key];
+    } else if (typeof val === "string") {
+      const trimmed = val.trim();
+      if (trimmed === "") {
+        delete cleaned[key];
+      } else {
+        cleaned[key] = trimmed;
+      }
+    }
+  });
+  return cleaned;
+};
+
+const toApiParams = (params) => cleanParams(params);
+
+const toSearchParams = (params) => {
+  const cleaned = cleanParams(params);
+  const searchParams = { ...cleaned };
+  if (cleaned.location) {
+    searchParams.microlocation = cleaned.location;
+    delete searchParams.location;
+  }
+  return searchParams;
+};
+
+const parseProjectsResponse = (data) => {
+  const projects = data?.projects ?? data?.data ?? [];
+  const totalCount =
+    data?.totalCount ?? data?.total_count ?? data?.total ?? projects.length;
+  return { projects: Array.isArray(projects) ? projects : [], totalCount };
+};
+
 /* ---------- LOCATION ---------- */
 
 export const getCountries = async () => {
@@ -49,13 +88,19 @@ export const getCategories = async () => {
 /* ---------- PROJECTS ---------- */
 
 export const getProjects = async (params = {}) => {
-  const { data } = await api.get("/api/admin/projects-page", { params });
-  return data;
+  const apiParams = toApiParams(params);
+  const { data } = await api.get("/api/admin/projects-page", {
+    params: apiParams,
+  });
+  return parseProjectsResponse(data);
 };
 
 export const searchProjects = async (params = {}) => {
-  const { data } = await api.get("/api/admin/search-projects", { params });
-  return data;
+  const apiParams = toSearchParams(params);
+  const { data } = await api.get("/api/admin/search-projects", {
+    params: apiParams,
+  });
+  return parseProjectsResponse(data);
 };
 
 export const getProjectById = async (id) => {

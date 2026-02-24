@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./BuilderProject.css";
 import { Link } from "react-router-dom";
 import Select from "react-select";
@@ -28,6 +28,7 @@ import {
   changeProjectStatus,
   deleteProject,
   getProjects,
+  searchProjects,
 } from "../../services/projectService";
 import { getCities } from "../../services/cityService";
 import { getMicrolocations } from "../../services/microlocationService";
@@ -45,6 +46,19 @@ const INITIAL_QUERY = {
   limit: 10,
   project_type: "",
 };
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+const SEARCH_DEBOUNCE_MS = 400;
+
+const hasActiveFilters = (q) =>
+  Boolean(
+    (q.name && q.name.trim()) ||
+      q.city ||
+      q.location ||
+      q.status ||
+      q.project_type
+  );
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
@@ -75,8 +89,10 @@ function BuilderProjects() {
   const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState(INITIAL_QUERY);
+  const [debouncedQuery, setDebouncedQuery] = useState(INITIAL_QUERY);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedMicroLocation, setSelectedMicroLocation] = useState(null);
+  const debounceTimerRef = useRef(null);
 
   /* ----------------------------- DERIVED DATA ------------------------------ */
   const firstIndex = useMemo(
@@ -104,36 +120,52 @@ function BuilderProjects() {
   const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getProjects(query, url);
+      const apiParams = {
+        ...debouncedQuery,
+        page: debouncedQuery.page,
+        limit: debouncedQuery.limit,
+      };
+      const data = hasActiveFilters(debouncedQuery)
+        ? await searchProjects(apiParams)
+        : await getProjects(apiParams);
       setProjects(data?.projects || []);
-      setTotalCount(data?.totalCount || 0);
+      setTotalCount(data?.totalCount ?? 0);
+    } catch (err) {
+      toast({
+        title: "Failed to load projects",
+        description: err?.response?.data?.message || "Please try again later.",
+        status: "error",
+        isClosable: true,
+      });
+      setProjects([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
-  }, [query, url]);
+  }, [debouncedQuery, toast]);
 
   const fetchInitialData = useCallback(async () => {
     try {
-      setLoading(true);
-
       const [citiesData, microData] = await Promise.all([
         getCities(),
         getMicrolocations(),
       ]);
-
-      setCities(citiesData);
-      setMicrolocations(microData);
+      setCities(Array.isArray(citiesData) ? citiesData : citiesData?.cities ?? citiesData?.data ?? []);
+      setMicrolocations(Array.isArray(microData) ? microData : microData?.locations ?? microData?.data ?? []);
     } catch (error) {
-      // Error handled by service function
-    } finally {
-      setLoading(false);
+      toast({
+        title: "Failed to load filters",
+        description: "City and location filters may be unavailable.",
+        status: "warning",
+        isClosable: true,
+      });
     }
-  }, []);
+  }, [toast]);
 
 
   const handleDelete = async (id) => {
     try {
-      await deleteProject(id, url);
+      await deleteProject(id);
       toast({ title: "Deleted Successfully", status: "success" });
       fetchProjects();
     } catch (err) {
@@ -147,7 +179,7 @@ function BuilderProjects() {
 
   const handleStatusChange = async (id, status) => {
     try {
-      await changeProjectStatus(id, status, url);
+      await changeProjectStatus(id, status);
       toast({ title: "Updated Successfully", status: "success" });
       fetchProjects();
     } catch (err) {
@@ -183,12 +215,35 @@ function BuilderProjects() {
     setSelectedMicroLocation(null);
   };
 
+  const clearSearch = () => {
+    setQuery((q) => ({ ...q, name: "", page: 1 }));
+  };
+
   /* ------------------------------ PAGINATION ------------------------------- */
 
   const goToPage = (page) =>
-    setQuery((q) => ({ ...q, page: Math.min(Math.max(page, 1), totalPages) }));
+    setQuery((q) => ({
+      ...q,
+      page: Math.min(Math.max(page, 1), totalPages || 1),
+    }));
+
+  const handlePageSizeChange = (e) => {
+    const limit = Number(e.target.value) || 10;
+    setQuery((q) => ({ ...q, limit, page: 1 }));
+  };
 
   /* ------------------------------- EFFECTS --------------------------------- */
+
+  useEffect(() => {
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [query]);
 
   useEffect(() => {
     fetchProjects();
@@ -217,14 +272,25 @@ function BuilderProjects() {
       </div>
       {/* ------------------------------ FILTERS ----------------------------- */}
       <div className="  project-card2 mt-4 row  filter_row">
-        <div className="col-md-2">
+        <div className="col-md-2 position-relative">
           <input
             className="uniform-select2"
             placeholder="Search by name"
             name="name"
             value={query.name}
             onChange={handleInputChange}
+            aria-label="Search projects by name"
           />
+          {query.name?.trim() && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="search-clear-btn"
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         <div className="col-md-2">
@@ -336,8 +402,7 @@ function BuilderProjects() {
                         <Link
                           to={`https://propularity.in/${generateSlug(
                             project?.builder?.name
-                          )}/${project?.location?.city?.name?.toLowerCase()}/$${project.slug
-                            }`}
+                          )}/${project?.location?.city?.name?.toLowerCase()}/${project?.slug || ""}`}
                           target="_blank"
                         >
                           <AiOutlineEye />
@@ -378,30 +443,51 @@ function BuilderProjects() {
           </Table>
         </TableContainer>
 
-        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
-
+        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar flex-wrap gap-2">
           {/* LEFT SIDE */}
-          <div className="page-info">
-            Showing Page  <strong>{query.page}</strong> Out of <strong>{totalPages}</strong>
+          <div className="d-flex align-items-center gap-3 flex-wrap">
+            <div className="page-info">
+              Showing{" "}
+              <strong>
+                {totalCount > 0 ? firstIndex + 1 : 0}-
+                {Math.min(firstIndex + projects.length, totalCount)}
+              </strong>{" "}
+              of <strong>{totalCount}</strong> projects
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <label className="mb-0 small">Per page:</label>
+              <select
+                className="uniform-select2"
+                style={{ width: "auto", minWidth: "70px" }}
+                value={query.limit}
+                onChange={handlePageSizeChange}
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* RIGHT SIDE */}
           <div className="d-flex align-items-center gap-2 pagination-controls">
             <button
               className="page-btn"
-              disabled={query.page === 1}
+              disabled={query.page <= 1 || totalPages === 0}
               onClick={() => goToPage(query.page - 1)}
             >
               Previous
             </button>
 
             <span className="current-page">
-              {query.page}
+              Page {query.page} of {totalPages || 1}
             </span>
 
             <button
               className="page-btn"
-              disabled={query.page === totalPages}
+              disabled={query.page >= totalPages || totalPages === 0}
               onClick={() => goToPage(query.page + 1)}
             >
               Next
