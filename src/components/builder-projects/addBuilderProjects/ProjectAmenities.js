@@ -67,12 +67,12 @@ const ProjectAmenities = () => {
                 className="form-check-input"
                 type="checkbox"
                 value={amenity._id}
-                id="flexCheckDefault"
+                id={`amenity_${amenity._id}`}
                 name="amenity"
                 onChange={handleCheckboxChange}
                 checked={projects.project_type === 'residential' ? projects.allAmenities.residential.includes(amenity._id) : projects.allAmenities.commercial.includes(amenity._id)}
               />
-              <label className="form-check-label" htmlFor="flexCheckDefault">
+              <label className="form-check-label" htmlFor={`amenity_${amenity._id}`}>
                 {amenity.name}
               </label>
             </div>

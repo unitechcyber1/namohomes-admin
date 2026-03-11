@@ -148,9 +148,9 @@ function AddBuilderprojects() {
   };
   const handleSaveAndUpdateProject = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
-    if (!projects.name || !projects.slug) {
+    if (!projects || !projects.name || !projects.slug) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields (Name and Slug).",
@@ -162,13 +162,40 @@ function AddBuilderprojects() {
       return;
     }
 
-    const updatedProjectsData = { ...projects };
-    updatedProjectsData.images = _setImagesForServer();
-    updatedProjectsData.plans = _setPlanImagesForServer();
-    updatedProjectsData.master_plan = updatedProjectsData.master_plan?._id;
-    updatedProjectsData.brochure = updatedProjectsData.brochure?._id;
-    updatedProjectsData.location_map = updatedProjectsData.location_map?._id;
-    
+    let updatedProjectsData;
+    try {
+      updatedProjectsData = { ...projects };
+      updatedProjectsData.images = _setImagesForServer();
+      updatedProjectsData.plans = _setPlanImagesForServer();
+
+      // Normalize master_plan / brochure / location_map to IDs or URLs if objects are present.
+      if (updatedProjectsData.master_plan && typeof updatedProjectsData.master_plan === "object") {
+        updatedProjectsData.master_plan =
+          updatedProjectsData.master_plan._id ||
+          updatedProjectsData.master_plan.s3_link ||
+          "";
+      }
+      if (updatedProjectsData.brochure && typeof updatedProjectsData.brochure === "object") {
+        updatedProjectsData.brochure = updatedProjectsData.brochure._id || "";
+      }
+      if (updatedProjectsData.location_map && typeof updatedProjectsData.location_map === "object") {
+        updatedProjectsData.location_map =
+          updatedProjectsData.location_map._id ||
+          updatedProjectsData.location_map.s3_link ||
+          "";
+      }
+    } catch (error) {
+      toast({
+        title: "Data Error",
+        description: "There was an issue preparing the project data. Please review the form and try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
     try {
       if (isEditable) {
         await updateProject(id, updatedProjectsData);
@@ -198,9 +225,14 @@ function AddBuilderprojects() {
         });
       }
     } catch (error) {
+      const apiMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message;
+
       toast({
         title: "Error Occurred!",
-        description: error.message || "Failed to save project. Please check all required fields and try again.",
+        description: apiMessage || "Failed to save project. Please check all required fields and try again.",
         status: "error",
         duration: 5000,
         isClosable: true,

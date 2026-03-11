@@ -315,12 +315,12 @@ const ProjectDetails = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              id="flexCheckDefault"
+              id="for_sale_checkbox"
               name="for_sale"
               checked={projects.for_sale}
               onChange={handleCheckboxChange}
             />
-            <label className="form-check-label " htmlFor="flexCheckDefault">
+            <label className="form-check-label " htmlFor="for_sale_checkbox">
               For Sale
             </label>
           </div>
@@ -330,12 +330,12 @@ const ProjectDetails = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              id="flexCheckDefault"
+              id="for_rent_checkbox"
               name="for_rent"
               checked={projects.for_rent}
               onChange={handleCheckboxChange}
             />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
+            <label className="form-check-label" htmlFor="for_rent_checkbox">
               For Rent
             </label>
           </div>
@@ -345,12 +345,12 @@ const ProjectDetails = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              id="flexCheckDefault"
+              id="rera_approved_checkbox"
               name="is_rera_approved"
               checked={projects.is_rera_approved}
               onChange={handleCheckboxChange}
             />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
+            <label className="form-check-label" htmlFor="rera_approved_checkbox">
              RERA Approved!
             </label>
           </div>
@@ -360,12 +360,12 @@ const ProjectDetails = () => {
             <input
               className="form-check-input"
               type="checkbox"
-              id="flexCheckDefault"
+              id="zero_brokerage_checkbox"
               name="is_zero_brokerage"
               checked={projects.is_zero_brokerage}
               onChange={handleCheckboxChange}
             />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
+            <label className="form-check-label" htmlFor="zero_brokerage_checkbox">
             Brokerage!
             </label>
           </div>

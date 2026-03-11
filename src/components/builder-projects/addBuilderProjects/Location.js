@@ -296,7 +296,6 @@ const Location = () => {
                   name="latitude"
                   value={projects?.location?.latitude || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
-                  required
                 />
                 <label className="custompadd" htmlFor="floatingInputLatti">Latitude</label>
               </div>
@@ -313,7 +312,6 @@ const Location = () => {
                   name="longitude"
                   value={projects?.location?.longitude || ""}
                   onChange={(e) => handleInputChange(e, 'location')}
-                  required
                 />
                 <label className="custompadd" htmlFor="floatingInputLongi">Longitude</label>
               </div>
@@ -369,12 +367,12 @@ const Location = () => {
               <input
                 className="form-check-input"
                 type="checkbox"
-                id="flexCheckDefault"
+              id="metro_near_checkbox"
                 name="is_near_metro"
                 checked={projects?.location?.metro_detail?.is_near_metro}
                 onChange={(e) => handleInputChange(e, 'location', 'metro_detail')}
               />
-              <label className="form-check-label" htmlFor="flexCheckDefault">
+            <label className="form-check-label" htmlFor="metro_near_checkbox">
                 Is Metro Near
               </label>
             </div>
