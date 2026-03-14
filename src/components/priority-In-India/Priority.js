@@ -40,7 +40,7 @@ function Priority() {
   const getProjectDataWithPagination = async() => {
     setIsLoading(true)
     const query = {page: curPage, limit: selectItemNum}
-    const data = await getProjectData(query, url)
+    const data = await getProjectData(query)
     setprojects(data?.projects)
     setTotalCount(data?.totalCount)
     setShowAll(false)

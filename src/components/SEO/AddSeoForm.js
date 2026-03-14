@@ -30,9 +30,8 @@ function AddSeoForm() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const isDwarka = window.location.href.includes("dwarkaexpressway");
-  const seoType = isDwarka ? "dwarka" : "default";
-  const baseSeoPath = isDwarka ? "/dwarkaexpressway/seo" : "/seo";
+  const seoType = "default";
+  const baseSeoPath = "/seo";
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [seo, setSeo] = useState(seoModel);

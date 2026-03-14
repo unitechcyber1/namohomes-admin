@@ -118,8 +118,6 @@ const ProjectEditor = () => {
     }
   }, [editorState, editorState2, editorState3, editorState4, editorState5]);
 
-  const url = window.location.href
-
   return (
     <>
      <div className="project-card">
@@ -183,21 +181,6 @@ const ProjectEditor = () => {
           />
         </div>
       </div> */}
-      {url.includes("dwarkaexpressway") && <div className="row top-margin">
-        <div className="col-md-12">
-          <h4 className="property_form_h4">Banner Bullets</h4>
-        </div>
-        <div className="col-md-12">
-          <Editor
-            editorState={editorState5}
-            toolbarClassName="toolbarClassName"
-            wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
-            handlePastedText={(text) => handlePastedText(text, editorState5, setEditorState5)}
-            onEditorStateChange={setEditorState5}
-          />
-        </div>
-      </div>}
       </div>
     </>
   );

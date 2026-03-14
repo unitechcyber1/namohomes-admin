@@ -33,20 +33,19 @@ function Affordable() {
   const [loadingTable, setLoadingTable] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState({ name: "", city: "", location: "", status: "approve", page: 1, limit: 10, project_type: "" })
-  const url = window.location.href;
   const handleFetchCity = async () => {
     await getCity(setCities);
   };
   const getProjectDataWithPagination = async () => {
     setLoading(true)
-    const data = await getProjectData(query, url)
+    const data = await getProjectData(query)
     setprojects(data?.projects)
     setTotalCount(data?.totalCount)
     setLoading(false)
   }
   const handleFetchTopProjects = async (cityId) => {
     setLoadingTable(true)
-    const data = await getTopProjectsByCity(cityId, url)
+    const data = await getTopProjectsByCity(cityId)
     setPriorityprojects(data)
     setLoadingTable(false)
   };
@@ -86,7 +85,7 @@ function Affordable() {
    setSelectedCity({value: "", label: "City*"})
    setQuery({ name: "", city: "", location: "", status: "approve", page: 1, limit: 10 })
    handleFetchCity();
-  }, [url]);
+  }, []);
   const cityOptions = cities?.map((city) => ({
     value: city._id,
     label: city.name,
@@ -135,7 +134,7 @@ function Affordable() {
         status: checked,
         cityId: selectedCity?.value,
       };
-      await changeOrderOfProjects(updatedproject, project._id, url)
+      await changeOrderOfProjects(updatedproject, project._id)
       project.affordable.status = checked;
       setprojects([...projects]);
       handleFetchTopProjects(selectedCity?.value);
@@ -164,7 +163,7 @@ function Affordable() {
     }));
     setPriorityprojects(reorderedprojects);
     try {
-      await changeOrderOfProjectsByDrag(updatedOrderPayload, url)
+      await changeOrderOfProjectsByDrag(updatedOrderPayload)
     } catch (error) {
       toast({
         title: "Error Updating Order",

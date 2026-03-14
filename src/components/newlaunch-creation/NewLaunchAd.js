@@ -28,7 +28,6 @@ function NewLaunchAd() {
   const [loading, setLoading] = useState(false)
   const [query, setQuery] = useState({ name: "", status: "", page: 1, limit: 10 })
   const toast = useToast()
-  const url = window.location.href;
   const lastIndex = query.page * query.limit;
   const firstIndex = lastIndex - query.limit;
   const nPage = Math.ceil(
@@ -99,7 +98,7 @@ function NewLaunchAd() {
 
   const handleApprove = async (id) => {
     try {
-      await changeUrlStatus(id, "approve", url);
+      await changeUrlStatus(id, "approve");
       toast({
         title: "Update Successfully!",
         status: "success",
@@ -122,7 +121,7 @@ function NewLaunchAd() {
   };
   const handleReject = async (id) => {
     try {
-      await changeUrlStatus(id, "reject", url);
+      await changeUrlStatus(id, "reject");
       toast({
         title: "Update Successfully!",
         status: "success",
@@ -168,11 +167,11 @@ function NewLaunchAd() {
   }, [query.status, query.slug, query.limit, query.page]);
   useEffect(() => {
     getProjectDataWithPagination();
-  }, [query.page, query.limit, url]);
+  }, [query.page, query.limit]);
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-      <Link to={"/dwarkaexpressway/add-newlaunch"} className="btnLink mt-2">
+      <Link to={"/add-newlaunch"} className="btnLink mt-2">
         <Addpropertybtn buttonText={"ADD NEW"} />
       </Link>
       <div className="table-box space-table-box">
@@ -257,7 +256,7 @@ function NewLaunchAd() {
                             </Td>
                             <Td className="edit_heading">
                               <Link
-                                to={url.includes('dwarkaexpressway') && `/dwarkaexpressway/edit-newlaunch/${project._id}`}
+                                to={`/edit-newlaunch/${project._id}`}
                                 target="_blank"
                               >
                                 <AiFillEdit

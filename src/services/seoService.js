@@ -1,11 +1,26 @@
 import api from "./axiosInstance";
 
 /**
- * Get SEO list
+ * Get SEO list (all, no pagination - for backward compatibility)
  */
 export const getSeoList = async () => {
   try {
     const { data } = await api.get("/api/admin/seos");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get SEO list with pagination and search
+ * GET /api/admin/seos?page=1&limit=20&search=footer
+ * @param {Object} params - { page, limit, search }
+ * @returns {Promise<{ data: Array, totalCount: number }>}
+ */
+export const getSeoListPaginated = async (params = {}) => {
+  try {
+    const { data } = await api.get("/api/admin/seos", { params });
     return data;
   } catch (error) {
     throw error;

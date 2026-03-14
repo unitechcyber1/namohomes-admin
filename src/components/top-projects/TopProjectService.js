@@ -20,54 +20,32 @@ export const getProjectsDataByCity = async (
   }
 };
 
-export const changeOrderOfProjects = async (data, id, url) => {
+export const changeOrderOfProjects = async (data, id) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-      return await axios.put(
-        `${BASE_URL}/api/admin/dwarkaProject/top-projects/${id}`, data
-      );
-    }
-    if (!url.includes("dwarkaexpressway")) {
-      return await axios.put(
-        `${BASE_URL}/api/admin/project/best-projects/${id}`, data
-        );
-    }
+    return await axios.put(
+      `${BASE_URL}/api/admin/project/best-projects/${id}`, data
+    );
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
   }
 };
-export const changeOrderOfProjectsByDrag = async (data, url) => {
+export const changeOrderOfProjectsByDrag = async (data) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-      return await axios.put(
-        `${BASE_URL}/api/admin/dwarkaProject/update-top-projects`, data
-      );
-    }
-    if (!url.includes("dwarkaexpressway")) {
-      return await axios.put(
-        `${BASE_URL}/api/admin/project/update-top-projects`,
-        data
-      );
-    }
+    return await axios.put(
+      `${BASE_URL}/api/admin/project/update-top-projects`,
+      data
+    );
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to update project order. Please try again.");
   }
 };
 
-export const getTopProjectsByCity = async (cityId, url) => {
+export const getTopProjectsByCity = async (cityId) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/dwarkaProject/projects-by-order/${cityId}`
-      );
-      return data;
-    }
-    if (!url.includes("dwarkaexpressway")) {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/project/projects-by-order/${cityId}`
-      );
-      return data;
-    }
+    const { data } = await axios.get(
+      `${BASE_URL}/api/admin/project/projects-by-order/${cityId}`
+    );
+    return data;
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to load top projects. Please try again.");
   }

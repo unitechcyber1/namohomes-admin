@@ -33,11 +33,10 @@ function AddUrls() {
         city: "650028ee87a793abe11b8a98"
     })
     const toast = useToast();
-    const url = window.location.href
     const { id } = useParams()
     const getProjectDataWithPagination = async () => {
         setIsLoading(true)
-        const data = await getProjectData(query, url)
+        const data = await getProjectData(query)
         setprojects(data?.projects)
         setTotalCount(data?.totalCount)
         setIsLoading(false)
@@ -175,13 +174,9 @@ function AddUrls() {
         urls.DwarkaProjects = _setProjectIdForServer()
         try {
             if (isEditable) {
-                if (url.includes('dwarkaexpressway')) {
-                    await updatedUrls(id, urls)
-                }
+                await updatedUrls(id, urls)
             } else {
-                if (url.includes('dwarkaexpressway')) {
-                    await saveUrls(urls)
-                }
+                await saveUrls(urls)
             }
             toast({
                 title: isEditable ? "Update Successfully!" : "Saved Successfully!",

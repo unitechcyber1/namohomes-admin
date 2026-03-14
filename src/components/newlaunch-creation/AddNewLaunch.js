@@ -15,7 +15,6 @@ function AddNewLaunch() {
         tagline: ""
     })
     const toast = useToast();
-    const url = window.location.href
     const { id } = useParams()
     const fetchUrlById = async () => {
         setLoadingTable(true)
@@ -54,13 +53,9 @@ function AddNewLaunch() {
         e.preventDefault();
         try {
             if (isEditable) {
-                if (url.includes('dwarkaexpressway')) {
-                    await updatedUrls(id, newlaunch)
-                }
+                await updatedUrls(id, newlaunch)
             } else {
-                if (url.includes('dwarkaexpressway')) {
-                    await saveUrls(newlaunch)
-                }
+                await saveUrls(newlaunch)
             }
             toast({
                 title: isEditable ? "Update Successfully!" : "Saved Successfully!",

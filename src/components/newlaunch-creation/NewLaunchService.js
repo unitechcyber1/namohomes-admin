@@ -29,20 +29,12 @@ export const saveUrls = async (data) => {
       throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
   };
-  export const getProjectData = async (params, url) => {
+  export const getProjectData = async (params) => {
     try {
-      if (url.includes("dwarkaexpressway")) {
-        const { data } = await axios.get(
-          `${BASE_URL}/api/admin/dwarkaProject/projects-page`, {params}
-        );
-        return data;
-      }
-      if (!url.includes("dwarkaexpressway")) {
-        const { data } = await axios.get(
-          `${BASE_URL}/api/admin/project/projects-page`, {params}
-        );
-        return data;
-      }
+      const { data } = await axios.get(
+        `${BASE_URL}/api/admin/project/projects-page`, { params }
+      );
+      return data;
     } catch (error) {
       throw createUserFriendlyError(error, "Failed to save new launch. Please check all fields and try again.");
     }
@@ -58,11 +50,7 @@ export const saveUrls = async (data) => {
     }
   };
 
-  export const changeUrlStatus = async (
-    id,
-    action,
-    url
-  ) => {
+  export const changeUrlStatus = async (id, action) => {
     try {
         return await axios.put(
           `${BASE_URL}/api/admin/newlaunch/changeStatus/${id}`,
