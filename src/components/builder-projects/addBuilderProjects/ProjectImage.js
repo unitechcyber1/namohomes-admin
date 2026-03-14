@@ -20,9 +20,7 @@ const ProjectImage = () => {
   const [progress, setProgress] = useState(0);
   const { projects, setProjects } = GpState();
   const [isUploaded, setIsUploaded] = useState(false);
-  const [checkUrl, setCheckUrl] = useState(false)
   const toast = useToast();
-  const route = window.location.href
   const handleInputByClick = async (e) => {
     try {
       const files = Array.from(e.target.files);
@@ -144,7 +142,7 @@ const ProjectImage = () => {
   const handleDelete = async (imageId, order, name, id) => {
     const data = { projectId: projects?._id, imageId, name, id }
     try {
-      await deleteImage(data, route)
+      await deleteImage(data)
       setProjects((prevProjects) => ({
         ...prevProjects,
         images: prevProjects.images.filter((image) => image.order !== order),
@@ -153,13 +151,6 @@ const ProjectImage = () => {
       // Error handled by deleteImage service function
     }
   };
-  useEffect(() => {
-    if (route.includes('dwarkaexpressway')) {
-      setCheckUrl(true)
-    } else {
-      setCheckUrl(false)
-    }
-  }, [checkUrl])
   return (
     <>
       <div className="project-card">

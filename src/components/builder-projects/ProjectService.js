@@ -77,20 +77,12 @@ export const getCategory = async (setCategories) => {
   }
 };
 
-export const getProjectData = async (params, url) => {
+export const getProjectData = async (params) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/projects-page`, {params}
-      );
-      return data;
-    }
-    if (!url.includes("dwarkaexpressway")) {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/projects-page`, {params}
-      );
-      return data;
-    }
+    const { data } = await axios.get(
+      `${BASE_URL}/api/admin/projects-page`, { params }
+    );
+    return data;
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to load projects. Please try again.");
   }
@@ -103,41 +95,30 @@ export const searchedProjects = async (name, city, microlocation, status, page, 
     throw createUserFriendlyError(error, "Failed to search projects. Please try again.");
   }
 };
-export const changeProjectStatus = async (
-  id,
-  action,
-  url
-) => {
+export const changeProjectStatus = async (id, action) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-      return await axios.put(
-        `${BASE_URL}/api/admin/changeStatus/${id}`,
-        { status: action }
-      );
-     } else {
-       return await axios.put(
-        `${BASE_URL}/api/admin/changeStatus/${id}`,
-        { status: action }
-      );
-     }
+    return await axios.put(
+      `${BASE_URL}/api/admin/changeStatus/${id}`,
+      { status: action }
+    );
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to update project status. Please try again.");
   }
 };
 
-export const deleteprojects = async (id, url) => {
+export const deleteprojects = async (id) => {
   try {
-      return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
+    return await axios.delete(`${BASE_URL}/api/admin/delete/${id}`);
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to delete project. Please try again.");
   }
 };
-export const getProjectsById = async (id, url) => {
+export const getProjectsById = async (id) => {
   try {
-      const { data } = await axios.get(
-        `${BASE_URL}/api/admin/projects/${id}`
-      );
-      return data;
+    const { data } = await axios.get(
+      `${BASE_URL}/api/admin/projects/${id}`
+    );
+    return data;
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to load project details. Please try again.");
   }
@@ -173,17 +154,11 @@ export const updatedDwarkaProjects = async (id, data) => {
   }
 }
 
-export const deleteImage = async (data, url) => {
+export const deleteImage = async (data) => {
   try {
-    if (url.includes("dwarkaexpressway")) {
-     return await axios.post(
-        `${BASE_URL}/api/admin/file/delete`, data
-      );
-    } else {
-      return await axios.post(
-        `${BASE_URL}/api/admin/file/delete`, data
-      );
-    }
+    return await axios.post(
+      `${BASE_URL}/api/admin/file/delete`, data
+    );
   } catch (error) {
     throw createUserFriendlyError(error, "Failed to delete image. Please try again.");
   }

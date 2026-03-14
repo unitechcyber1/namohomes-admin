@@ -42,7 +42,6 @@ function BuilderPriority() {
   const [totalCount, setTotalCount] = useState(0)
   const [query, setQuery] = useState({ name: "", city: "", status: "approve", page: 1, limit: 10, plans_type: "" })
   const [cities, setCities] = useState([]);
-  const url = window.location.href;
   const [mounted, setMounted] = useState(false);
   const handleFetchTypes = async () => {
   const data =  await getPropertyTypes();
@@ -53,14 +52,14 @@ function BuilderPriority() {
   };
   const getProjectDataWithPagination = async () => {
     setLoading(true)
-    const data = await getProjectData(query, url)
+    const data = await getProjectData(query)
     setprojects(data?.projects)
     setTotalCount(data?.totalCount)
     setLoading(false)
   }
   const handleFetchTopProjects = async (planTypeId, cityId) => {
     setLoadingTable(true)
-    const data = await getTopProjectsByPlanType(planTypeId, cityId, url)
+    const data = await getTopProjectsByPlanType(planTypeId, cityId)
     setPriorityprojects(data)
     setLoadingTable(false)
   };
@@ -119,7 +118,7 @@ const filteredPlanType = planTypes.filter(item => {
     setQuery({ name: "", city: "", location: "", status: "approve", page: 1, limit: 10, plans_type: "" })
     handleFetchCity();
     handleFetchTypes();
-   }, [url]);
+   }, []);
    const lastIndex = query.page * query.limit;
    const firstIndex = lastIndex - query.limit;
    const nPage = Math.ceil(
@@ -167,7 +166,7 @@ const filteredPlanType = planTypes.filter(item => {
         is_active: checked,
         cityId: selectedCity?.value,
       };
-      await changePlanOrderOfProjects(updatedproject, project._id, url)
+      await changePlanOrderOfProjects(updatedproject, project._id)
       project.plans_priority.is_active = checked;
       setprojects([...projects]);
       handleFetchTopProjects(selectedPlanTypeId,selectedCity?.value);
@@ -197,7 +196,7 @@ const filteredPlanType = planTypes.filter(item => {
     }));
     setPriorityprojects(reorderedprojects);
     try {
-     await changePlanOrderOfProjectsByDrag(updatedOrderPayload, url)
+     await changePlanOrderOfProjectsByDrag(updatedOrderPayload)
     } catch (error) {
       toast({
         title: "Error Updating Order",

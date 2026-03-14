@@ -23,7 +23,6 @@ function AddBuilderprojects() {
   const [progress, setProgress] = useState(0);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [checkUrl, setCheckUrl] = useState(false)
   const { projects,
     selectedPlanId,
     setProjects,
@@ -31,12 +30,11 @@ function AddBuilderprojects() {
     setIsEditable, editProject, setEditProject } = GpState();
   const toast = useToast();
   const { id } = useParams();
-  const url = window.location.href
   const handleFetchDatabyId = async () => {
     try {
       setLoading(true);
       setIsEditable(true);
-      const data = await getProjectById(id, url);
+      const data = await getProjectById(id);
       setEditProject(data);
     } catch (error) {
       toast({
@@ -261,13 +259,6 @@ function AddBuilderprojects() {
       position: "bottom",
     });
   }
-  useEffect(() => {
-    if (url.includes('dwarkaexpressway')) {
-      setCheckUrl(true);
-    } else {
-      setCheckUrl(false);
-    }
-  }, [url])
   if (loading && isEditable) {
     return <Loader />;
   }

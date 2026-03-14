@@ -11,8 +11,6 @@ const FloorPlans = () => {
   const [categories, setCategories] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [checkUrl, setCheckUrl] = useState(false)
-  const url = window.location.href
   const handleFetchCategory = async () => {
     const data = await getCategories();
     setCategories(data);
@@ -166,13 +164,8 @@ const FloorPlans = () => {
     handleUploadFile(files, rowId, planId, isFloorPlan);
   };
   useEffect(() => {
-    if (url.includes('dwarkaexpressway')) {
-      setCheckUrl(true)
-    } else {
-      setCheckUrl(false)
-    }
     handleFetchCategory();
-  }, [checkUrl])
+  }, [])
   return (
     <>
       <div className="d-flex w-50 justify-content-between align-items-center top-margin">

@@ -24,14 +24,8 @@ export const getProjectsDataByPlanAndCity = async (plansId, city) => {
     }
   };
   
-  export const getTopProjectsByPlanType = async (plansId, city, url) => {
+  export const getTopProjectsByPlanType = async (plansId, city) => {
     try {
-      if (url.includes("dwarkaexpressway")) {
-        const { data } = await axios.get(
-          `${BASE_URL}/api/admin/dwarkaProject/plans-projects/${plansId}/${city}`
-        );
-        return data;
-      }
       const { data } = await axios.get(
         `${BASE_URL}/api/admin/project/plans-projects/${plansId}/${city}`
       );
@@ -40,15 +34,9 @@ export const getProjectsDataByPlanAndCity = async (plansId, city) => {
       throw createUserFriendlyError(error, "Failed to load projects. Please try again.");
     }
   };
-  
-  export const changePlanOrderOfProjectsByDrag = async (data, url) => {
+
+  export const changePlanOrderOfProjectsByDrag = async (data) => {
     try {
-      if (url.includes("dwarkaexpressway")) {
-        return  await axios.put(
-          `${BASE_URL}/api/admin/dwarkaProject/plans-priority`,
-          data
-        );
-      }
       return await axios.put(
         `${BASE_URL}/api/admin/project/plans-priority`,
         data
@@ -58,13 +46,8 @@ export const getProjectsDataByPlanAndCity = async (plansId, city) => {
     }
   };
 
-  export const changePlanOrderOfProjects = async (data, id, url) => {
+  export const changePlanOrderOfProjects = async (data, id) => {
     try {
-      if (url.includes("dwarkaexpressway")) {
-        return await axios.put(
-          `${BASE_URL}/api/admin/dwarkaProject/plans-order/${id}`, data
-        );
-      }
       return await axios.put(
         `${BASE_URL}/api/admin/project/plans-order/${id}`, data
       );

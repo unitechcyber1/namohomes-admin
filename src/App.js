@@ -47,6 +47,13 @@ function App() {
         <div className={isLogin ? "col-md-9 table-aria" : "col-md-12"}>
           <div>
             <Routes>
+              {/* Explicit login route so /login also shows the Login page */}
+              <Route
+                path="/login"
+                element={
+                  !isLogin ? <Login /> : <Navigate to="/builder-projects" />
+                }
+              />
               <Route
                 path="/listing-space"
                 element={isLogin ? <ListingSpace /> : <Navigate to="/" />}
@@ -61,10 +68,6 @@ function App() {
               />
               <Route
                 path="/media"
-                element={isLogin ? <Media /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/media"
                 element={isLogin ? <Media /> : <Navigate to="/" />}
               />
               <Route
@@ -98,19 +101,11 @@ function App() {
                 element={isLogin ? <Seo /> : <Navigate to="/" />}
               />
               <Route
-                path="/dwarkaexpressway/seo"
-                element={isLogin ? <Seo /> : <Navigate to="/" />}
-              />
-              <Route
                 path="/builder-projects/add-builder-projects"
                 element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
               />
               <Route
                 path="/seo/add-seo"
-                element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/seo/add-seo"
                 element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
               />
               <Route
@@ -120,14 +115,6 @@ function App() {
               <Route
                 path="/seo/editseo/:id"
                 element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/seo/editseo/:id"
-                element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/top-builders"
-                element={isLogin ? <TopBuilders /> : <Navigate to="/" />}
               />
               <Route
                 path="/builder/add-builder"
@@ -140,20 +127,6 @@ function App() {
               <Route
                 path="/builder-projects/edit-project/:id"
                 element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/builder-projects"
-                element={isLogin ? <BuilderProjects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/builder-projects/edit-project/:id"
-                element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/builder-projects/add-builder-projects"
-                element={
-                  isLogin ? <AddBuilderprojects /> : <Navigate to="/" />
-                }
               />
               <Route
                 path="/image"
@@ -178,28 +151,48 @@ function App() {
                 element={isLogin ? <TopProjects /> : <Navigate to="/" />}
               />
               <Route
-                path="/dwarkaexpressway/top-projects"
-                element={isLogin ? <TopProjects /> : <Navigate to="/" />}
+                path="/top-builders"
+                element={isLogin ? <TopBuilders /> : <Navigate to="/" />}
               />
               <Route
-                path="/dwarkaexpressway/affordable-housing"
+                path="/affordable-housing"
                 element={isLogin ? <Affordable /> : <Navigate to="/" />}
               />
               <Route
-                path="/dwarkaexpressway/new-launch-projects"
+                path="/new-launch-projects"
                 element={isLogin ? <NewLaunch /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/resi-comm-priority"
+                element={isLogin ? <ResCommercial /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/all-urls"
+                element={isLogin ? <Urls /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/create-url"
+                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/edit-url/:id"
+                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/all-newlaunch"
+                element={isLogin ? <NewLaunchAd /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/add-newlaunch"
+                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/edit-newlaunch/:id"
+                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
               />
               <Route
                 path="/builder-priority"
                 element={isLogin ? <BuilderPriority /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/plans-priority"
-                element={isLogin ? <PlansPriority /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/resi-comm-priority"
-                element={isLogin ? <ResCommercial /> : <Navigate to="/" />}
               />
               <Route
                 path="/plans-priority"
@@ -208,30 +201,6 @@ function App() {
               <Route
                 path="/priority-india"
                 element={isLogin ? <Priority /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/all-urls"
-                element={isLogin ? <Urls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/create-url"
-                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/edit-url/:id"
-                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/all-newlaunch"
-                element={isLogin ? <NewLaunchAd /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/add-newlaunch"
-                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/dwarkaexpressway/edit-newlaunch/:id"
-                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
               />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route

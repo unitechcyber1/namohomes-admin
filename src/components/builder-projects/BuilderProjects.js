@@ -13,11 +13,6 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import {
-  GrFormPrevious,
-  GrFormNext,
-} from "react-icons/gr";
-import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { AiOutlineEye, AiFillEdit } from "react-icons/ai";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
@@ -28,7 +23,6 @@ import {
   changeProjectStatus,
   deleteProject,
   getProjects,
-  searchProjects,
 } from "../../services/projectService";
 import { getCities } from "../../services/cityService";
 import { getMicrolocations } from "../../services/microlocationService";
@@ -79,7 +73,6 @@ const generateSlug = (value) =>
 
 function BuilderProjects() {
   const toast = useToast();
-  const url = window.location.href;
 
   /* ------------------------------- STATE ---------------------------------- */
   const [projects, setProjects] = useState([]);
@@ -125,9 +118,7 @@ function BuilderProjects() {
         page: debouncedQuery.page,
         limit: debouncedQuery.limit,
       };
-      const data = hasActiveFilters(debouncedQuery)
-        ? await searchProjects(apiParams)
-        : await getProjects(apiParams);
+      const data = await getProjects(apiParams);
       setProjects(data?.projects || []);
       setTotalCount(data?.totalCount ?? 0);
     } catch (err) {
@@ -261,11 +252,7 @@ function BuilderProjects() {
       <div className="d-flex my-3 align-items-center justify-content-between">
         <h2 className=" mb-0">Projects Module</h2>
         <Link
-          to={
-            url.includes("dwarkaexpressway")
-              ? "/dwarkaexpressway/builder-projects/add-builder-projects"
-              : "/builder-projects/add-builder-projects"
-          }
+          to="/builder-projects/add-builder-projects"
           className="btnLink mt-2">
           <Addpropertybtn buttonText="ADD Project" />
         </Link>

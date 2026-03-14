@@ -34,20 +34,19 @@ function ResCommercial() {
   const [mounted, setMounted] = useState(false);
   const [selectedPlanType, setSelectedPlanType] = useState(null);
   const [query, setQuery] = useState({ name: "", city: "", location: "", status: "approve", page: 1, limit: 10, project_type: "" })
-  const url = window.location.href;
   const handleFetchCity = async () => {
     await getCity(setCities);
   };
   const getProjectDataWithPagination = async () => {
     setLoading(true)
-    const data = await getProjectData(query, url)
+    const data = await getProjectData(query)
     setprojects(data?.projects)
     setTotalCount(data?.totalCount)
     setLoading(false)
   }
   const handleFetchTopProjects = async (cityId) => {
     setLoadingTable(true)
-    const data = await getTopProjectsByCity(query, cityId, url)
+    const data = await getTopProjectsByCity(query, cityId)
     setPriorityprojects(data)
     setLoadingTable(false)
   };
@@ -93,7 +92,7 @@ function ResCommercial() {
    setSelectedCity({value: "", label: "City*"})
    setQuery({ name: "", city: "", location: "", status: "approve", page: 1, limit: 10, project_type: "" })
    handleFetchCity();
-  }, [url]);
+  }, []);
   const cityOptions = cities?.map((city) => ({
     value: city._id,
     label: city.name,
@@ -142,7 +141,7 @@ function ResCommercial() {
         is_active: checked,
         cityId: selectedCity?.value,
       };
-      await changeOrderOfProjects(updatedproject, project._id, url)
+      await changeOrderOfProjects(updatedproject, project._id)
       project.rescomm_priority.is_active = checked;
       setprojects([...projects]);
       handleFetchTopProjects(selectedCity?.value);
@@ -171,7 +170,7 @@ function ResCommercial() {
     }));
     setPriorityprojects(reorderedprojects);
     try {
-      await changeOrderOfProjectsByDrag(updatedOrderPayload, url)
+      await changeOrderOfProjectsByDrag(updatedOrderPayload)
     } catch (error) {
       toast({
         title: "Error Updating Order",
