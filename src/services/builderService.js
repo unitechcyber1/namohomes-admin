@@ -76,7 +76,7 @@ export const createBuilder = async (payload) => {
  */
 export const updateBuilder = async (id, payload) => {
   const { data } = await api.put(
-    `/api/admin/builder/edit-builder/${id}`,
+    `/api/admin/edit-builder/${id}`,
     payload
   );
   return data;

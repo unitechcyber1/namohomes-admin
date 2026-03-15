@@ -33,6 +33,7 @@ const FloorPlans = () => {
           rent_price: "",
           sale_price: "",
           image: "",
+          is_sold: false,
         },
       ],
     };
@@ -54,6 +55,7 @@ const FloorPlans = () => {
             rent_price: "",
             sale_price: "",
             image: "",
+            is_sold: false,
           };
           return {
             ...plan,
@@ -96,7 +98,8 @@ const FloorPlans = () => {
     }));
   };
   const handleInputPlanChange = (e, rowId, planId, isFloorPlan) => {
-    const { name, value } = e.target;
+    const { name, type } = e.target;
+    const value = type === "checkbox" ? e.target.checked : e.target.value;
     setProjects((prevProjects) => ({
       ...prevProjects,
       plans: (prevProjects.plans || []).map((row) => {
@@ -365,6 +368,18 @@ const FloorPlans = () => {
                       />
                       <label className="custompadd" htmlFor="floatingInputPrice">Sale Price*</label>
                     </div>
+                  </div>
+                  <div className="col-md-2 d-flex align-items-center" style={{ marginTop: "6px" }}>
+                    <label className="d-flex align-items-center gap-2 mb-0" style={{ cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        name="is_sold"
+                        checked={Boolean(plan.is_sold)}
+                        onChange={(e) => handleInputPlanChange(e, row.id, plan.id, true)}
+                        className="form-check-input"
+                      />
+                      <span>Sold</span>
+                    </label>
                   </div>
                   <div className="col-md-2"
                     style={{

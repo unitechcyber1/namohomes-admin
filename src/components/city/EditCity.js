@@ -12,14 +12,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import "./City.css";
-import axios from "axios";
 import { GpState } from "../../context/context";
 import { AiFillEdit } from "react-icons/ai";
-import BASE_URL from "../../apiConfig";
 import Select from "react-select";
-import {
-  getStatesByCountry,
-} from "../../services/microlocationService";
+import { updateCityById } from "../../services/cityService";
+import { getStatesByCountry } from "../../services/microlocationService";
 import { getCountries } from "../../services/countryService";
 const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -31,17 +28,25 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
   const [cityId, setCityId] = useState(cities._id);
   const toast = useToast();
   const handleEditCity = async () => {
+    if (!selectedCountry?.value || !selectedState?.value) {
+      toast({
+        title: "Validation",
+        description: "Please select country and state.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
     try {
-      const { data } = await axios.put(
-        `${BASE_URL}/api/admin/city-by-id/${cityId}`,
-        {
-          name: name,
-          description: description,
-          country: selectedCountry.value,
-          state: selectedState.value,
-          active: isChecked,
-        }
-      );
+      await updateCityById(cityId, {
+        name,
+        description,
+        country: selectedCountry.value,
+        state: selectedState.value,
+        active: isChecked,
+      });
       setUpdateTable((prev) => !prev);
       setSearchTerm("");
       onClose();
@@ -53,27 +58,62 @@ const EditCity = ({ cities, setUpdateTable, setSearchTerm }) => {
         position: "bottom",
       });
     } catch (error) {
-      // Error handled by service function
+      toast({
+        title: "Update failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update city. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   const handleFetchStates = async (countryId) => {
-    const data = await getStatesByCountry(countryId);
-    setStates(data);
-    const initialState = stateOptions.find(
-      (option) => option.value === cities.state._id
-    );
-    if (initialState) {
-      setSelectedState(initialState);
+    try {
+      const data = await getStatesByCountry(countryId);
+      const list = Array.isArray(data) ? data : [];
+      setStates(list);
+      const stateId = cities?.state?._id;
+      if (stateId && list.length) {
+        const s = list.find((st) => st._id === stateId);
+        if (s) setSelectedState({ value: s._id, label: s.name });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load states",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setStates([]);
     }
   };
   const handleFetchCountry = async () => {
-    const data = await getCountries();
-    setCountry(data);
-    const initialCountry = countryOptions.find(
-      (option) => option.value === cities.country._id
-    );
-    if (initialCountry) {
-      setSelectedCountry(initialCountry);
+    try {
+      const data = await getCountries();
+      const list = Array.isArray(data) ? data : [];
+      setCountry(list);
+      const countryId = cities?.country?._id;
+      if (countryId && list.length) {
+        const c = list.find((ct) => ct._id === countryId);
+        if (c) setSelectedCountry({ value: c._id, label: c.name });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load countries",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   const [selectedState, setSelectedState] = useState(null);

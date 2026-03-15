@@ -57,13 +57,30 @@ function Microlocation() {
 
   const loadAll = async () => {
     setLoading(true);
-    const [countryData, microData] = await Promise.all([
-      getCountries(),
-      getMicrolocations()
-    ]);
-    setCountries(countryData);
-    setMicrolocations(microData);
-    setLoading(false);
+    try {
+      const [countryData, microData] = await Promise.all([
+        getCountries(),
+        getMicrolocations(),
+      ]);
+      setCountries(Array.isArray(countryData) ? countryData : []);
+      setMicrolocations(Array.isArray(microData) ? microData : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load data",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setCountries([]);
+      setMicrolocations([]);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { loadAll(); }, []);
 
@@ -73,13 +90,49 @@ function Microlocation() {
     setSelectedCountry(opt);
     setSelectedState(null);
     setSelectedCity(null);
-    setStates(await getStatesByCountry(opt.value));
+    if (!opt?.value) {
+      setStates([]);
+      return;
+    }
+    try {
+      const data = await getStatesByCountry(opt.value);
+      setStates(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load states",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setStates([]);
+    }
   };
 
   const handleState = async (opt) => {
     setSelectedState(opt);
     setSelectedCity(null);
-    setCities(await getCitiesByState(opt.value));
+    if (!opt?.value) {
+      setCities([]);
+      return;
+    }
+    try {
+      const data = await getCitiesByState(opt.value);
+      setCities(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load cities",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setCities([]);
+    }
   };
 
   /* ---------- Upload ---------- */
@@ -93,33 +146,80 @@ function Microlocation() {
   /* ---------- Save ---------- */
 
   const handleSave = async () => {
-    if (!form.name || !selectedCountry || !selectedState || !selectedCity) {
-      toast({ title: "Fill required fields", status: "warning" });
+    if (!form.name || !selectedCountry?.value || !selectedState?.value || !selectedCity?.value) {
+      toast({
+        title: "Validation",
+        description: "Please fill name, country, state and city.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
       return;
     }
-
-    await createMicrolocation({
-      ...form,
-      image: images[0],
-      country: selectedCountry.value,
-      state: selectedState.value,
-      city: selectedCity.value,
-    });
-
-    toast({ title: "Saved", status: "success" });
-
-    setForm({ name:"", description:"" });
-    setImages([]);
-    onClose();
-    loadAll();
+    try {
+      await createMicrolocation({
+        ...form,
+        image: images[0],
+        country: selectedCountry.value,
+        state: selectedState.value,
+        city: selectedCity.value,
+      });
+      toast({
+        title: "Saved",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setForm({ name: "", description: "" });
+      setImages([]);
+      setSelectedCountry(null);
+      setSelectedState(null);
+      setSelectedCity(null);
+      onClose();
+      loadAll();
+    } catch (error) {
+      toast({
+        title: "Save failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to save microlocation. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
 
   /* ---------- Delete ---------- */
 
   const handleDelete = async (id) => {
-    await deleteMicrolocationById(id);
-    toast({ title:"Deleted", status:"success" });
-    loadAll();
+    try {
+      await deleteMicrolocationById(id);
+      toast({
+        title: "Deleted",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      loadAll();
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to delete microlocation. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
 
   /* ---------- Derived ---------- */
@@ -149,7 +249,7 @@ function Microlocation() {
     <div className="mx-5 mt-3">
       <Mainpanelnav />
       <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">SEO Module</h2>
+        <h2 className=" mb-0">Location Module</h2>
       <Button  className="addnew-btn"  onClick={onOpen}>ADD NEW</Button>
       </div>
       {/* Modal */}
@@ -244,6 +344,7 @@ function Microlocation() {
                   <EditMicrolocation
                     id={m._id}
                     microlocations={m}
+                    onSuccess={loadAll}
                   />
                 </Td>
                 <Td>

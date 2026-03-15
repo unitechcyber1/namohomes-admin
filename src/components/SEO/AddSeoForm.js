@@ -151,8 +151,7 @@ function AddSeoForm() {
         isClosable: true,
       });
 
-      if (!isEditable) navigate(baseSeoPath);
-
+      navigate(baseSeoPath);
     } catch (error) {
       toast({
         title: "Error Occurred!",

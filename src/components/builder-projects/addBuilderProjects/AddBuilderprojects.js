@@ -13,7 +13,7 @@ import ContactDetails from "./ContactDetails";
 import { GpState } from "../../../context/context";
 import ImageUpload from "../../../ImageUpload";
 import { uploadImageFile } from "../../../services/Services";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { getProjectById, createProject, updateProject } from "../../../services/projectService";
 import Loader from "../../loader/Loader";
 import { project } from "../../../models/builderProjectModel";
@@ -29,6 +29,7 @@ function AddBuilderprojects() {
     isEditable,
     setIsEditable, editProject, setEditProject } = GpState();
   const toast = useToast();
+  const navigate = useNavigate();
   const { id } = useParams();
   const handleFetchDatabyId = async () => {
     try {
@@ -205,6 +206,7 @@ function AddBuilderprojects() {
           isClosable: true,
           position: "bottom",
         });
+        navigate("/builder-projects");
       } else {
         await createProject(updatedProjectsData);
         toast({
@@ -215,12 +217,12 @@ function AddBuilderprojects() {
           isClosable: true,
           position: "bottom",
         });
-        // Reset form after successful creation
         setProjects({
           ...project,
           images: [],
           contact_details: []
         });
+        navigate("/builder-projects");
       }
     } catch (error) {
       const apiMessage =
@@ -240,7 +242,6 @@ function AddBuilderprojects() {
   };
   const handleCancel = (e) => {
     e.preventDefault();
-    // Reset form to initial state
     if (isEditable) {
       setProjects({ ...editProject });
     } else {
@@ -258,7 +259,8 @@ function AddBuilderprojects() {
       isClosable: true,
       position: "bottom",
     });
-  }
+    navigate("/builder-projects");
+  };
   if (loading && isEditable) {
     return <Loader />;
   }
