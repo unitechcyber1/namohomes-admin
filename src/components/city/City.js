@@ -26,16 +26,16 @@ import {
   useDisclosure,
   Spinner,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
-import BASE_URL from "../../apiConfig";
 import Select from "react-select";
-import { deleteCityById, getCities } from "../../services/cityService";
 import {
-  getCountries,
-} from "../../services/countryService";
-import {getStatesByCountry} from '../../services/microlocationService'
+  createCity,
+  deleteCityById,
+  getCities,
+} from "../../services/cityService";
+import { getCountries } from "../../services/countryService";
+import { getStatesByCountry } from "../../services/microlocationService";
 import EditCity from "./EditCity";
 
 function City() {
@@ -78,8 +78,19 @@ function City() {
   };
 
   const handleSaveCity = async () => {
+    if (!selectedCountry?.value || !selectedState?.value) {
+      toast({
+        title: "Validation",
+        description: "Please select country and state.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/admin/cities`, {
+      await createCity({
         name: cityfield.name,
         description: cityfield.description,
         country: selectedCountry.value,
@@ -91,6 +102,8 @@ function City() {
         country: "",
         state: "",
       });
+      setSelectedCountry(null);
+      setSelectedState(null);
       setUpdateTable((prev) => !prev);
       onClose();
       toast({
@@ -102,12 +115,15 @@ function City() {
       });
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: "Failed to Load the Search Results",
+        title: "Save failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to save city. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "bottom-left",
+        position: "bottom",
       });
     }
   };
@@ -129,43 +145,89 @@ function City() {
     setShowAll(searchTerm === "");
   }, [updateTable, searchTerm]);
   const handleFetchStates = async (countryId) => {
-    const data = await getStatesByCountry(countryId);
-    setStates(data)
+    try {
+      const data = await getStatesByCountry(countryId);
+      setStates(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load states",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setStates([]);
+    }
   };
+
   const handleFetchCountry = async () => {
-   const data =  await getCountries();
-   setCountry(data)
+    try {
+      const data = await getCountries();
+      setCountry(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load countries",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
+
   const handleFetchCity = async () => {
     setLoading(true);
-    let data =await getCities();
-    setCities(data);
-    setLoading(false);
+    try {
+      const data = await getCities();
+      setCities(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast({
+        title: "Failed to load cities",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setCities([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteCity = async (id) => {
-   
-     try {
-    await deleteCityById(id);
-    setUpdateTable((prev) => !prev);
-    toast({
-      title: "Deleted Successfully!",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom",
-    });
-  } catch (error) {
-    toast({
-      title: "Error Occured!",
-      description: error.response.data.message,
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-      position: "bottom-left",
-    });
-  }
+    try {
+      await deleteCityById(id);
+      setUpdateTable((prev) => !prev);
+      toast({
+        title: "Deleted Successfully!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to delete city. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
+
   useEffect(() => {
     handleFetchCountry();
     handleFetchCity();

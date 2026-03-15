@@ -12,25 +12,19 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import "./Microlocation.css";
-import axios from "axios";
 import { GpState } from "../../context/context";
 import { AiFillEdit } from "react-icons/ai";
-import BASE_URL from "../../apiConfig";
 import Select from "react-select";
-import {
-  getCountry,
-  getCityByState,
-  getStateByCountry,
-} from "./MicrolocationService";
 import { getCountries } from "../../services/countryService";
-import { getStatesByCountry, getCitiesByState } from "../../services/microlocationService";
+import {
+  getStatesByCountry,
+  getCitiesByState,
+  updateMicrolocationById,
+} from "../../services/microlocationService";
 import ImageUpload from "../../ImageUpload";
 import { uploadFile } from "../../services/Services";
-const EditMicrolocation = ({
-  microlocations,
-  setUpdateTable,
-  setSearchTerm,
-}) => {
+
+const EditMicrolocation = ({ microlocations, onSuccess }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState(microlocations.name);
   const [description, setDiscription] = useState(microlocations.description);
@@ -52,21 +46,27 @@ const EditMicrolocation = ({
     await uploadFile(files, setProgress, setIsUploaded, previewFile);
   };
   const handleEditMicrolocation = async () => {
+    if (!selectedCountry?.value || !selectedState?.value || !selectedCity?.value) {
+      toast({
+        title: "Validation",
+        description: "Please select country, state and city.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
     try {
-      const { data } = await axios.put(
-        `${BASE_URL}/api/admin/microlocation/micro-by-id/${microId}`,
-        {
-          name: name,
-          description: description,
-          image: images[0],
-          country: selectedCountry.value,
-          state: selectedState.value,
-          city: selectedCity.value,
-          active: isChecked,
-        }
-      );
-      setUpdateTable((prev) => !prev);
-      setSearchTerm("");
+      await updateMicrolocationById(microId, {
+        name,
+        description,
+        image: images[0],
+        country: selectedCountry.value,
+        state: selectedState.value,
+        city: selectedCity.value,
+        active: isChecked,
+      });
       onClose();
       toast({
         title: "Update Successfully!",
@@ -75,38 +75,90 @@ const EditMicrolocation = ({
         isClosable: true,
         position: "bottom",
       });
+      onSuccess?.();
     } catch (error) {
-      // Error handled by service function
+      toast({
+        title: "Update failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update microlocation. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
+
   const handleFetchCity = async (stateId) => {
-    const data = await getCitiesByState(stateId);
-    setCities(data);
-    const initialCity = cityOptions.find(
-      (option) => option.value === microlocations.city._id
-    );
-    if (initialCity) {
-      setSelectedCity(initialCity);
+    try {
+      const data = await getCitiesByState(stateId);
+      const list = Array.isArray(data) ? data : [];
+      setCities(list);
+      const cityId = microlocations?.city?._id;
+      if (cityId && list.length) {
+        const c = list.find((x) => x._id === cityId);
+        if (c) setSelectedCity({ value: c._id, label: c.name });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load cities",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setCities([]);
     }
   };
+
   const handleFetchStates = async (countryId) => {
-    const data = await getStatesByCountry(countryId);
-    setStates(data);
-    const initialState = stateOptions.find(
-      (option) => option.value === microlocations.state._id
-    );
-    if (initialState) {
-      setSelectedState(initialState);
+    try {
+      const data = await getStatesByCountry(countryId);
+      const list = Array.isArray(data) ? data : [];
+      setStates(list);
+      const stateId = microlocations?.state?._id;
+      if (stateId && list.length) {
+        const s = list.find((x) => x._id === stateId);
+        if (s) setSelectedState({ value: s._id, label: s.name });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load states",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setStates([]);
     }
   };
+
   const handleFetchCountry = async () => {
-    const data = await getCountries();
-    setCountry(data);
-    const initialCountry = countryOptions.find(
-      (option) => option.value === microlocations.country._id
-    );
-    if (initialCountry) {
-      setSelectedCountry(initialCountry);
+    try {
+      const data = await getCountries();
+      const list = Array.isArray(data) ? data : [];
+      setCountry(list);
+      const countryId = microlocations?.country?._id;
+      if (countryId && list.length) {
+        const c = list.find((x) => x._id === countryId);
+        if (c) setSelectedCountry({ value: c._id, label: c.name });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load countries",
+        description:
+          error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   const [selectedState, setSelectedState] = useState(null);

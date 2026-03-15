@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -11,30 +11,28 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { GpState } from "../../context/context";
 import { AiFillEdit } from "react-icons/ai";
-import BASE_URL from "../../apiConfig";
+import { updateCountryById } from "../../services/countryService";
+
 const EditCountry = ({ countries, setUpdateTable }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState(countries.name);
   const [isoCode, setIsoCode] = useState(countries.iso_code);
   const [dialCode, setDialCode] = useState(countries.dial_code);
-  const [countryId, setCountryId] = useState(countries._id);
+  const [countryId] = useState(countries._id);
   const [description, setDiscription] = useState(countries.description);
-  const { country, setCountry } = GpState();
+  const { setCountry } = GpState();
   const toast = useToast();
 
   const handleEditCountry = async () => {
     try {
-      const { data } = await axios.put(
-        `${BASE_URL}/api/admin/allCountry/country/${countryId}`,
-        {
-          countryId: countryId,
-          name: name,
-          dial_code: dialCode,
-        }
-      );
+      const data = await updateCountryById(countryId, {
+        name,
+        dial_code: dialCode,
+        description,
+        iso_code: isoCode,
+      });
       setCountry(data.country);
       setUpdateTable((prev) => !prev);
       onClose();
@@ -46,7 +44,14 @@ const EditCountry = ({ countries, setUpdateTable }) => {
         position: "bottom",
       });
     } catch (error) {
-      // Error handled by service function
+      toast({
+        title: "Update failed",
+        description: error?.response?.data?.message || error?.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
   };
   return (

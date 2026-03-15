@@ -7,7 +7,7 @@ import ImageUpload from "../../../ImageUpload";
 
 import Select from "react-select";
 import { useToast } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { uploadFile } from "../../../services/Services";
 import { GpState } from "../../../context/context";
@@ -24,6 +24,7 @@ import { builders as builderModel } from "../../../models/builderModel";
 
 const AddBuilder = () => {
   const toast = useToast();
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const {
@@ -142,6 +143,7 @@ const AddBuilder = () => {
         status: "success",
       });
 
+      navigate("/builder");
     } catch (e) {
       toast({
         title: "Save failed",
@@ -163,6 +165,7 @@ const AddBuilder = () => {
         status: "success",
       });
 
+      navigate("/builder");
     } catch (e) {
       toast({
         title: "Update failed",
@@ -235,7 +238,11 @@ const AddBuilder = () => {
               {isBuilderEditable ? "EDIT" : "SAVE"}
             </button>
 
-            <button type="button" className="cancel-btn">
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => navigate("/builder")}
+            >
               Cancel
             </button>
           </div>

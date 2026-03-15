@@ -18,7 +18,7 @@ export const getCountries = async () => {
 export const deleteCountryById = async (id) => {
   try {
     const { data } = await axiosInstance.delete(
-      `/api/admin/country/delete/${id}`
+      `/api/admin/country/${id}`
     );
     return data;
   } catch (error) {
@@ -31,6 +31,21 @@ export const createCountry = async (payload) => {
     const { data } = await axiosInstance.post(
       "/api/admin/country",
       payload
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update country by ID
+ */
+export const updateCountryById = async (id, payload) => {
+  try {
+    const { data } = await axiosInstance.put(
+      `/api/admin/country/${id}`,
+      { countryId: id, ...payload }
     );
     return data;
   } catch (error) {

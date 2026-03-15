@@ -187,7 +187,7 @@ const ProjectDetails = () => {
         <div className="col-md-4">
           <div className="form-floating border_field">
             <input
-              type="text"
+              type="number"
               className="form-control"
               id="floatingInputAddress"
               placeholder="Starting Prices*"

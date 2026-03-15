@@ -387,9 +387,7 @@ function BuilderProjects() {
                     <Td>
                       {project.status === "approve" ? (
                         <Link
-                          to={`https://propularity.in/${generateSlug(
-                            project?.builder?.name
-                          )}/${project?.location?.city?.name?.toLowerCase()}/${project?.slug || ""}`}
+                          to={`https://namohomesindia.com/property-details?id=${project._id}`}
                           target="_blank"
                         >
                           <AiOutlineEye />

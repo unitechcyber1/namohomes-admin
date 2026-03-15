@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { AiFillDelete } from "react-icons/ai";
-import { uploadFile } from "../../../services/Services";
-
+import { FaUpload } from "react-icons/fa";
 import {
   Table,
   Thead,
@@ -10,68 +9,98 @@ import {
   Th,
   Td,
   TableContainer,
+  useToast,
 } from "@chakra-ui/react";
 import { GpState } from "../../../context/context";
+import { uploadFiles } from "../../../services/mediaService";
+
 const BuiderImage = () => {
-  const [fileName, setFileName] = useState([]);
   const [progress, setProgress] = useState(0);
-  const [images, setImages] = useState([]);
   const { builderImage, setBuilderImage, editBuilder, isBuilderEditable } =
     GpState();
   const [isUploaded, setIsUploaded] = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (isBuilderEditable && editBuilder?.images?.length && !(builderImage?.length)) {
+      setBuilderImage(editBuilder.images);
+    }
+  }, [isBuilderEditable, editBuilder?.images, builderImage?.length, setBuilderImage]);
+
   const removePreviewImage = (index) => {
-    const updatedImages = [...builderImage];
+    const updatedImages = [...(builderImage || [])];
     updatedImages.splice(index, 1);
     setBuilderImage(updatedImages);
   };
-  const handleUploadFile = async (files) => {
-    await uploadFile(files, setProgress, setIsUploaded, previewFile);
-  };
-  const handleInputByClick = (e) => {
-    const files = Array.from(e.target.files);
-    handleUploadFile(files);
-    const fileNames = files.map((file) => file.name);
-    setFileName(fileNames);
-  };
-  const handleAltChange = (event, index) => {
-    const updatedArray = [...builderImage]; // Create a copy of the mergedArray
-    updatedArray[index].alt = event.target.value; // Update the alt value at the specified index
 
-    setBuilderImage(updatedArray);
-  };
-  useEffect(() => {
-    if (editBuilder?.images && isBuilderEditable) {
-      const combinedArray = images.map((image, index) => ({
-        image,
-        name: fileName[index],
-        alt: fileName[index],
+  const handleInputByClick = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+
+      const data = await uploadFiles(files, {
+        compressImages: true,
+        onProgress: (percent) => setProgress(percent),
+      });
+
+      if (!data || data.length === 0) {
+        toast({
+          title: "Upload failed",
+          description: "Check your file format and try again.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        return;
+      }
+
+      const previewData = data.map((fileData, index) => ({
+        image: fileData,
+        name: files[index]?.name ?? "",
+        alt: files[index]?.name ?? "",
       }));
-      setBuilderImage([...editBuilder?.images, ...combinedArray]);
-    } else {
-      const combinedArray = images.map((image, index) => ({
-        image,
-        name: fileName[index],
-        alt: fileName[index],
-      }));
-      setBuilderImage([...combinedArray]);
+
+      setBuilderImage((prev) => [...(prev || []), ...previewData]);
+      setIsUploaded(true);
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: error?.response?.data?.message || error?.message || "Something went wrong",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } finally {
+      setProgress(0);
     }
-  }, [images, fileName, editBuilder?.images]);
+  };
 
-  const previewFile = (data) => {
-    setImages((prevImages) => [...prevImages, ...data]);
+  const handleAltChange = (event, index) => {
+    const value = event.target.value;
+    setBuilderImage((prev) => {
+      const arr = [...(prev || [])];
+      if (arr[index]) arr[index] = { ...arr[index], alt: value };
+      return arr;
+    });
   };
   return (
     <>
       <div className="row mt-4">
         <h4 className="property_form_h4">Project Images</h4>
         <div className="container">
-          <label className="file">
+          <label className="file file_label">
+            <FaUpload className="upload_icon" />
+            <span className="upload_text">Upload</span>
             <input
               type="file"
               id="file-input"
               multiple
+              accept="image/*"
               aria-label="File browser example"
               onChange={handleInputByClick}
+              className="file_hide"
             />
           </label>
 
@@ -122,13 +151,13 @@ const BuiderImage = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {builderImage?.map((img, index) => (
+                    {(builderImage || []).map((img, index) => (
                       <Fragment key={index}>
                         <Tr>
                           <Td>{index + 1}</Td>
                           <Td>
                             <img
-                              src={img.image}
+                              src={img.image?.s3_link ?? img.image}
                               alt="media"
                               width="500px"
                               height="250px"
@@ -139,7 +168,8 @@ const BuiderImage = () => {
                               type="text"
                               className="form-control"
                               style={{ color: "#000" }}
-                              value={img.name}
+                              value={img.name ?? ""}
+                              readOnly
                             />
                           </Td>
                           <Td>
@@ -147,7 +177,7 @@ const BuiderImage = () => {
                               type="text"
                               className="form-control"
                               style={{ color: "#000", minWidth: "200px" }}
-                              value={img.alt.split(".")[0]}
+                              value={(img.alt ?? "").split(".")[0]}
                               onChange={(event) =>
                                 handleAltChange(event, index)
                               }
