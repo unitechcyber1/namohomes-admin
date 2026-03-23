@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import loginbg from "./login-bg.jpg";
 import "./Login.css";
 import logo from "./adminloginpage.png";
@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import Cookies from "js-cookie";
 import BASE_URL from "../../apiConfig";
+import { clearAuthLogoutLock } from "../../services/axiosInstance";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -26,6 +27,10 @@ function Login() {
   const navigate = useNavigate();
   const toast = useToast();
   const { userInfo, login, token } = GpState();
+
+  useEffect(() => {
+    clearAuthLogoutLock();
+  }, []);
 
   const handleClick = () => {
     setShow(!show);
@@ -68,6 +73,7 @@ function Login() {
       });
 
       login(data, data.token);
+      clearAuthLogoutLock();
       navigate("/builder-projects", { replace: true });
       setLoading(false);
     } catch (error) {

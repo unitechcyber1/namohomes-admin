@@ -3,6 +3,27 @@ import { getBuilders } from "../../../services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
 import { getPropertyTypes } from "../../../services/propertyTypeService";
+
+const formatIndianPriceShort = (value) => {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return "";
+
+  const abs = Math.abs(num);
+  if (abs >= 10000000) {
+    const crore = (num / 10000000).toFixed(2).replace(/\.?0+$/, "");
+    return `${crore} crore`;
+  }
+  if (abs >= 100000) {
+    const lakh = (num / 100000).toFixed(2).replace(/\.?0+$/, "");
+    return `${lakh} lakh`;
+  }
+  if (abs >= 1000) {
+    const thousand = (num / 1000).toFixed(2).replace(/\.?0+$/, "");
+    return `${thousand} thousand`;
+  }
+  return `${num}`;
+};
+
 const ProjectDetails = () => {
   const {
     projects,
@@ -14,6 +35,7 @@ const ProjectDetails = () => {
   const [planType, setPlanType] = useState([])
   const [selectedBuilder, setSelectedBuilder] = useState(null);
   const [selectedPlanName, setSelectedPlanName] = useState('');
+  const startingPriceInWords = formatIndianPriceShort(projects?.starting_price);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProjects({
@@ -185,6 +207,11 @@ const ProjectDetails = () => {
           </div>
         </div>
         <div className="col-md-4">
+          {startingPriceInWords && (
+            <p className="mb-1 text-muted" style={{ fontSize: "12px" }}>
+              {startingPriceInWords}
+            </p>
+          )}
           <div className="form-floating border_field">
             <input
               type="number"

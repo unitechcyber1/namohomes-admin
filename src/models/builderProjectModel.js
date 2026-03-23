@@ -46,7 +46,28 @@ export const project = {
       metro_detail: {
         name: "",
         is_near_metro: false,
-      }
+        distance: "",
+      },
+      school_detail: {
+        name: "",
+        is_near_school: false,
+        distance: "",
+      },
+      college_detail: {
+        name: "",
+        is_near_college: false,
+        distance: "",
+      },
+      market_detail: {
+        name: "",
+        is_near_market: false,
+        distance: "",
+      },
+      hospital_detail: {
+        name: "",
+        is_near_hospital: false,
+        distance: "",
+      },
     },
     plans:[{
       id: 1,
