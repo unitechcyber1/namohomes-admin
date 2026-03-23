@@ -96,7 +96,7 @@ function AddBuilderprojects() {
       // Ensure location and plans objects exist when loading edit project
       const projectWithDefaults = {
         ...editProject,
-        location: editProject.location || {
+        location: {
           address: "",
           country: "",
           state: "",
@@ -109,7 +109,59 @@ function AddBuilderprojects() {
           metro_detail: {
             name: "",
             is_near_metro: false,
-          }
+            distance: "",
+          },
+          school_detail: {
+            name: "",
+            is_near_school: false,
+            distance: "",
+          },
+          college_detail: {
+            name: "",
+            is_near_college: false,
+            distance: "",
+          },
+          market_detail: {
+            name: "",
+            is_near_market: false,
+            distance: "",
+          },
+          hospital_detail: {
+            name: "",
+            is_near_hospital: false,
+            distance: "",
+          },
+          ...(editProject.location || {}),
+          metro_detail: {
+            name: "",
+            is_near_metro: false,
+            distance: "",
+            ...(editProject.location?.metro_detail || {}),
+          },
+          school_detail: {
+            name: "",
+            is_near_school: false,
+            distance: "",
+            ...(editProject.location?.school_detail || {}),
+          },
+          college_detail: {
+            name: "",
+            is_near_college: false,
+            distance: "",
+            ...(editProject.location?.college_detail || {}),
+          },
+          market_detail: {
+            name: "",
+            is_near_market: false,
+            distance: "",
+            ...(editProject.location?.market_detail || {}),
+          },
+          hospital_detail: {
+            name: "",
+            is_near_hospital: false,
+            distance: "",
+            ...(editProject.location?.hospital_detail || {}),
+          },
         },
         plans: editProject.plans || [],
         images: editProject.images || [],

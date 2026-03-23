@@ -90,7 +90,15 @@ const ImageUpload = ({
         <div id="preview" className="mt-3 d-flex align-items-center">
           {images?.map((img, index) => (
             <Fragment key={index}>
-              <img src={img} alt="media" width="50%" />
+              <img
+                src={
+                  typeof img === "string"
+                    ? img
+                    : img?.s3_link || img?.url || ""
+                }
+                alt="media"
+                width="50%"
+              />
               <div className="w-50 text-center">
                 <AiFillDelete
                   onClick={removePreviewImage}
