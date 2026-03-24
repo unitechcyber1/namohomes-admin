@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { Link } from "react-router-dom";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
@@ -10,8 +10,6 @@ import {
 
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
-import { GrFormPrevious, GrFormNext } from "react-icons/gr";
-import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 
 import {
   getBuilders,
@@ -23,98 +21,141 @@ const Builder = () => {
 
   const [loading, setLoading] = useState(false);
   const [builders, setBuilders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [perPage, setPerPage] = useState(10);
   const [curPage, setCurPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  // ---------- Fetch ----------
-  const fetchBuilders = async () => {
-    try {
-      setLoading(true);
-      const data = await getBuilders();
-      setBuilders(data);
-    } catch (e) {
-      toast({
-        title: "Failed to load builders",
-        status: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filterRef = useRef({ search: "", limit: 10 });
 
   useEffect(() => {
-    fetchBuilders();
-  }, []);
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  // ---------- Fetch (server pagination: page, limit, optional search) ----------
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      const prev = filterRef.current;
+      const filtersChanged =
+        prev.search !== debouncedSearch || prev.limit !== perPage;
+
+      if (filtersChanged) {
+        filterRef.current = { search: debouncedSearch, limit: perPage };
+      }
+
+      const pageToRequest = filtersChanged ? 1 : curPage;
+      if (filtersChanged && curPage !== 1) {
+        setCurPage(1);
+      }
+
+      try {
+        setLoading(true);
+        const res = await getBuilders({
+          page: pageToRequest,
+          limit: perPage,
+          search: debouncedSearch || undefined,
+        });
+        if (cancelled) return;
+        setBuilders(res.builders);
+        setTotalCount(res.totalCount ?? 0);
+        setTotalPages(res.totalPages ?? 0);
+      } catch (e) {
+        if (!cancelled) {
+          toast({
+            title: "Failed to load builders",
+            description: e?.response?.data?.message || e?.message,
+            status: "error",
+          });
+          setBuilders([]);
+          setTotalCount(0);
+          setTotalPages(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [curPage, perPage, debouncedSearch]);
 
   // ---------- Delete ----------
   const handleDelete = async (id) => {
     try {
       await deleteBuilderById(id);
       toast({ title: "Deleted", status: "success" });
-      fetchBuilders();
+      // Refetch current page; if empty, user can go previous
+      const res = await getBuilders({
+        page: curPage,
+        limit: perPage,
+        search: debouncedSearch || undefined,
+      });
+      setBuilders(res.builders);
+      setTotalCount(res.totalCount ?? 0);
+      setTotalPages(res.totalPages ?? 0);
+      if (res.builders.length === 0 && curPage > 1) {
+        setCurPage((p) => Math.max(1, p - 1));
+      }
     } catch (e) {
       toast({
         title: "Delete failed",
-        description: e.response?.data?.message,
+        description: e?.response?.data?.message || e?.message,
         status: "error",
       });
     }
   };
 
-  // ---------- Derived Search ----------
-  const filteredBuilders = useMemo(() => {
-    if (!searchTerm) return builders;
-    return builders.filter(b =>
-      b.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [builders, searchTerm]);
+  const pageData = builders;
+  const safeTotalPages = totalCount > 0 ? Math.max(totalPages, 1) : 0;
 
-  // ---------- Pagination ----------
-  const totalPages = Math.ceil(filteredBuilders.length / perPage);
-  const firstIndex = (curPage - 1) * perPage;
-  const pageData = filteredBuilders.slice(
-    firstIndex,
-    firstIndex + perPage
-  );
-   const goToPage = (page) => {
-    if (page < 1 || page > totalPages) return;
+  const goToPage = (page) => {
+    if (page < 1) return;
+    if (totalPages > 0 && page > totalPages) return;
     setCurPage(page);
   };
 
-  const prePage = () =>
-    curPage > 1 && setCurPage(p => p - 1);
-
-  const nextPage = () =>
-    curPage < totalPages && setCurPage(p => p + 1);
-
-  // ---------- UI ----------
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
       <div className="d-flex my-3 align-items-center justify-content-between">
         <h2 className=" mb-0">Builder Module</h2>
       
-      <Link to="/builder/add-builder" className="btnLink mt-2">
-        <Addpropertybtn buttonText="ADD NEW" />
-      </Link>
+        <Link to="/builder/add-builder" className="btnLink mt-2">
+          <Addpropertybtn buttonText="ADD NEW" />
+        </Link>
       </div>
 
-       {/* Search */}
-       <div className="row mt-2 project-card2">
+      <div className="row mt-2 project-card2 align-items-end g-2">
         <div className="col-md-4 px-4">
           <input
-            className="uniform-select-seo filter_row"
+            className="uniform-select-seo filter_row w-100"
             placeholder="Search by name"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurPage(1);
-            }}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
+        <div className="col-md-2">
+          <label className="form-label small text-muted mb-1">Per page</label>
+          <select
+            className="form-control custom-input-height w-100"
+            value={perPage}
+            onChange={(e) => setPerPage(Number(e.target.value))}
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
         </div>
+      </div>
+
       <div className="table-box ">
         
         <TableContainer overflowX="hidden">
@@ -174,19 +215,25 @@ const Builder = () => {
           </Table>
         </TableContainer>
 
-        {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
 
-          {/* LEFT SIDE */}
           <div className="page-info">
-            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
+            {totalCount > 0 ? (
+              <>
+                Page <strong>{curPage}</strong> of <strong>{safeTotalPages}</strong>
+                {" · "}
+                <strong>{totalCount}</strong> total
+              </>
+            ) : (
+              <>No builders found</>
+            )}
           </div>
 
-          {/* RIGHT SIDE */}
           <div className="d-flex align-items-center gap-2 pagination-controls">
             <button
+              type="button"
               className="page-btn"
-              disabled={curPage === 1}
+              disabled={curPage <= 1 || loading}
               onClick={() => goToPage(curPage - 1)}
             >
               Previous
@@ -197,8 +244,13 @@ const Builder = () => {
             </span>
 
             <button
+              type="button"
               className="page-btn"
-              disabled={curPage === totalPages}
+              disabled={
+                loading ||
+                totalPages === 0 ||
+                (totalPages > 0 && curPage >= totalPages)
+              }
               onClick={() => goToPage(curPage + 1)}
             >
               Next

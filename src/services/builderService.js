@@ -1,58 +1,79 @@
 import api from "./axiosInstance";
 
 /**
- * Get builders (simple list)
+ * @typedef {Object} GetBuildersParams
+ * @property {number} [page=1]
+ * @property {number} [limit=10]
+ * @property {string} [search]
  */
-export const getBuilders = async () => {
-  try {
-    const { data } = await api.get("/api/admin/builders");
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 /**
- * Get all builders (paginated/filterable)
+ * @typedef {Object} BuildersListResult
+ * @property {Array} builders
+ * @property {number} totalCount
+ * @property {number} totalPages
+ * @property {string} [message]
  */
-export const getAllBuilders = async (params = {}) => {
-  try {
-    const { data } = await api.get(
-      "/api/admin/allbuilders",
-      { params }
-    );
-    return data;
-  } catch (error) {
-    throw error;
+
+/**
+ * GET /api/admin/allbuilders
+ * Response shape: { message, data: builders[], totalCount, totalPages? }
+ *
+ * @param {GetBuildersParams} params
+ * @returns {Promise<BuildersListResult>}
+ */
+export const getBuilders = async (params = {}) => {
+  const page = Number(params.page) > 0 ? Number(params.page) : 1;
+  const limit = Number(params.limit) > 0 ? Number(params.limit) : 10;
+
+  const query = { page, limit };
+  if (params.search != null && String(params.search).trim() !== "") {
+    query.search = String(params.search).trim();
   }
+
+  const { data } = await api.get("/api/admin/allbuilders", { params: query });
+
+  if (Array.isArray(data)) {
+    return {
+      builders: data,
+      totalCount: data.length,
+      totalPages: Math.max(1, Math.ceil(data.length / limit) || 1),
+      message: "",
+    };
+  }
+
+  const builders = Array.isArray(data?.data) ? data.data : [];
+  const totalCount = Number(data?.totalCount) ?? builders.length;
+  const totalPagesRaw =
+    data?.totalPages != null
+      ? Number(data.totalPages)
+      : Math.ceil(totalCount / limit) || (totalCount > 0 ? 1 : 0);
+
+  return {
+    builders,
+    totalCount,
+    totalPages: Math.max(0, totalPagesRaw),
+    message: data?.message ?? "",
+  };
 };
+
+/** @deprecated Use getBuilders with params — same endpoint */
+export const getAllBuilders = async (params = {}) => getBuilders(params);
 
 /**
  * Get builder by id
  */
 export const getBuilderById = async (id) => {
-  try {
-    const { data } = await api.get(
-      `/api/admin/builders/${id}`
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await api.get(`/api/admin/builders/${id}`);
+  return data;
 };
 
 /**
  * Delete builder
  */
 export const deleteBuilderById = async (id) => {
-  try {
-    const { data } = await api.delete(
-      `/api/admin/builder/delete/${id}`
-    );
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await api.delete(`/api/admin/builder/delete/${id}`);
+  return data;
 };
 
 /**
@@ -64,10 +85,7 @@ export const getCities = async () => {
 };
 
 export const createBuilder = async (payload) => {
-  const { data } = await api.post(
-    "/api/admin/builder",
-    payload
-  );
+  const { data } = await api.post("/api/admin/builder", payload);
   return data;
 };
 
@@ -75,9 +93,6 @@ export const createBuilder = async (payload) => {
  * Update builder
  */
 export const updateBuilder = async (id, payload) => {
-  const { data } = await api.put(
-    `/api/admin/edit-builder/${id}`,
-    payload
-  );
+  const { data } = await api.put(`/api/admin/edit-builder/${id}`, payload);
   return data;
 };

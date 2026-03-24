@@ -12,6 +12,7 @@ import { IoLocationOutline } from "react-icons/io5";
 const Sidebar = () => {
   const propularityTabs = [
     { link: "/builder-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "Builder Projects" },
+    // { link: "/new-launch-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "New Launch Projects" },
     // { link: "/priority", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects Priority" },
     // { link: "/priority-india", icon: <HiOutlineBuildingOffice className="icon" />, label: "Projects India" },
     // { link: "/top-projects", icon: <HiOutlineBuildingOffice className="icon" />, label: "Top Projects" },
