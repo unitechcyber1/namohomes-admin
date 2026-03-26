@@ -147,6 +147,68 @@ input[type="file"]::file-selector-button:active {
   top: -26px;
   box-shadow: rgba(0, 0, 0, 0.45) 0px 17px 20px -20px;
 }
+
+/* ---------- New Launch split tables ---------- */
+.newlaunch-split {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 55px;
+}
+
+.newlaunch-split .table-box {
+  margin: 0;
+}
+
+.newlaunch-split__left {
+  flex: 1 1 62%;
+  min-width: 520px;
+}
+
+.newlaunch-split__right {
+  flex: 1 1 38%;
+  min-width: 360px;
+}
+
+.newlaunch-split__table {
+  margin-top: 18px;
+}
+
+.newlaunch-priority-scroll .data_table {
+  /* ~15 rows visible, then scroll */
+  max-height: 720px;
+  overflow-y: auto;
+}
+
+.newlaunch-priority-scroll .data_table::-webkit-scrollbar {
+  width: 8px;
+}
+
+.newlaunch-priority-scroll .data_table::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+}
+
+.newlaunch-priority-scroll .data_table::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.newlaunch-pagination {
+  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 992px) {
+  .newlaunch-split {
+    flex-direction: column;
+  }
+  .newlaunch-split__left,
+  .newlaunch-split__right {
+    min-width: 0;
+    width: 100%;
+  }
+}
 .page-item {
   font-size: 26px;
   color: gray;

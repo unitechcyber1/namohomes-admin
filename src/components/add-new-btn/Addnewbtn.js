@@ -1,14 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { BsBookmarkPlus } from "react-icons/bs";
 import "./Addnewbtn.css";
 import { Modal, Button } from "react-bootstrap";
 import { GpState } from "../../context/context";
 
 function Addnewbtn() {
-  // const [showModal, setShow] = useState(false);
-
-  // // const handleClose = () => setShow(false);
-  // const handleShow = () => setShow(true);
   const { handleShow } = GpState();
 
   return (
