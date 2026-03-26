@@ -10,7 +10,7 @@ import City from "./components/city/City";
 import Microlocation from "./components/microlocation/Microlocation";
 import Amenities from "./components/amenities/Amenities";
 import Login from "./components/login-page/Login";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { GpState } from "./context/context";
 import AddBuilderprojects from "./components/builder-projects/addBuilderProjects/AddBuilderprojects";
 import BuilderProjects from "./components/builder-projects/BuilderProjects";
@@ -18,24 +18,10 @@ import Builder from "./components/builders/Builder";
 import Seo from "./components/SEO/Seo";
 import AddSeoForm from "./components/SEO/AddSeoForm";
 import ImageUpload from "./ImageUpload";
-import OurClient from "./components/ourClients/OurClient";
-import PriorityProjects from "./components/priorityProjects/PriorityProjects"
-import PriorityMicrolocation from "./components/priorityMicrolocation/PriorityMicrolocation";
-import TopProjects from "./components/top-projects/TopProjects";
 import ForgotPassword from "./components/login-page/ForgotPassword";
 import PasswordReset from "./components/login-page/PasswordReset";
-import AddBuilder from "./components/builders/addbuilders/AddBuilder";
-import BuilderPriority from "./components/builder-priority/BuilderPriority";
-import PlansPriority from "./components/plans-priority/PlansPriority"
-import Priority from "./components/priority-In-India/Priority";
-import Urls from "./components/urls-creation/Urls";
-import AddUrls from "./components/urls-creation/AddUrls";
-import Affordable from "./components/affordable-housing/Affordable";
-import TopBuilders from "./components/top-builders/TopBuilders";
+import AddBuilder from "./components/builders/addbuilders/AddBuilder";      
 import NewLaunch from "./components/new-launch-projects/NewLaunch";
-import AddNewLaunch from "./components/newlaunch-creation/AddNewLaunch";
-import NewLaunchAd from "./components/newlaunch-creation/NewLaunchAd";
-import ResCommercial from "./components/rescomm-projects-priority/ResCommercial";
 function App() {
   const { isLogin } = GpState();
   return (
@@ -133,74 +119,8 @@ function App() {
                 element={isLogin ? <ImageUpload /> : <Navigate to="/" />}
               />
               <Route
-                path="/clients"
-                element={isLogin ? <OurClient /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/priority"
-                element={isLogin ? <PriorityProjects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/priority-microlocation"
-                element={
-                  isLogin ? <PriorityMicrolocation /> : <Navigate to="/" />
-                }
-              />
-              <Route
-                path="/top-projects"
-                element={isLogin ? <TopProjects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/top-builders"
-                element={isLogin ? <TopBuilders /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/affordable-housing"
-                element={isLogin ? <Affordable /> : <Navigate to="/" />}
-              />
-              <Route
                 path="/new-launch-projects"
                 element={isLogin ? <NewLaunch /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/resi-comm-priority"
-                element={isLogin ? <ResCommercial /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/all-urls"
-                element={isLogin ? <Urls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/create-url"
-                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/edit-url/:id"
-                element={isLogin ? <AddUrls /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/all-newlaunch"
-                element={isLogin ? <NewLaunchAd /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/add-newlaunch"
-                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/edit-newlaunch/:id"
-                element={isLogin ? <AddNewLaunch /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder-priority"
-                element={isLogin ? <BuilderPriority /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/plans-priority"
-                element={isLogin ? <PlansPriority /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/priority-india"
-                element={isLogin ? <Priority /> : <Navigate to="/" />}
               />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route

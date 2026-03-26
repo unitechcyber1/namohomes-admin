@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 
 import Delete from "../delete/Delete";
-import { uploadImageFile } from "../../services/Services";
 
 import {
   getAllMedia,
@@ -55,25 +54,6 @@ function Media() {
   }, [updateTable]);
 
   // ---------- Upload ----------
-  // const handleUploadFile = async (e) => {
-  //   const files = Array.from(e.target.files);
-
-  //   const data = await uploadImageFile(files, {
-  //     setProgress: () => { },
-  //     setIsUploaded: () => { },
-  //     checkUrl: true,
-  //   });
-
-  //   if (!data) {
-  //     toast({
-  //       title: "Invalid file type",
-  //       status: "error",
-  //     });
-  //     return;
-  //   }
-
-  //   setMedia((p) => ({ ...p, image: data[0] }));
-  // };
   const handleUploadFile = async (e) => {
   const files = Array.from(e.target.files);
 

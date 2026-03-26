@@ -13,11 +13,11 @@ import { uploadFile } from "../../../services/Services";
 import { GpState } from "../../../context/context";
 import Loader from "../../loader/Loader";
 
+import { getCities } from "../../../services/cityService";
 import {
-  getCities,
   getBuilderById,
   createBuilder,
-  updateBuilder
+  updateBuilder,
 } from "../../../services/builderService";
 
 import { builders as builderModel } from "../../../models/builderModel";
@@ -59,7 +59,7 @@ const AddBuilder = () => {
   const fetchCities = async () => {
     try {
       const data = await getCities();
-      setCities(data);
+      setCities(Array.isArray(data) ? data : []);
     } catch {
       toast({ title: "City load failed", status: "error" });
     }

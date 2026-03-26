@@ -57,9 +57,6 @@ export const getBuilders = async (params = {}) => {
   };
 };
 
-/** @deprecated Use getBuilders with params — same endpoint */
-export const getAllBuilders = async (params = {}) => getBuilders(params);
-
 /**
  * Get builder by id
  */
@@ -73,14 +70,6 @@ export const getBuilderById = async (id) => {
  */
 export const deleteBuilderById = async (id) => {
   const { data } = await api.delete(`/api/admin/builder/delete/${id}`);
-  return data;
-};
-
-/**
- * Get cities (shared helper — reusable)
- */
-export const getCities = async () => {
-  const { data } = await api.get("/api/admin/cities");
   return data;
 };
 
