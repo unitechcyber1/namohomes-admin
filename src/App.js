@@ -1,6 +1,5 @@
 import { Route, Routes, Navigate } from "react-router";
 import "./App.css";
-import Sidebar from "./components/sidebar/Sidebar";
 import ListingSpace from "./components/listing-space/ListingSpace";
 import BuilderPlan from "./components/builder-plan/BuilderPlan";
 import Media from "./components/media/Media";
@@ -22,116 +21,48 @@ import ForgotPassword from "./components/login-page/ForgotPassword";
 import PasswordReset from "./components/login-page/PasswordReset";
 import AddBuilder from "./components/builders/addbuilders/AddBuilder";      
 import NewLaunch from "./components/new-launch-projects/NewLaunch";
+import DashboardLayout from "./components/layout/DashboardLayout";
 function App() {
   const { isLogin } = GpState();
   return (
-    <div style={{ overflowX: "hidden" }}>
-      <div className="row admin_main">
-        <div className={isLogin ? "col-md-3" : "d-none"}>
-          <Sidebar />
-        </div>
-        <div className={isLogin ? "col-md-9 table-aria" : "col-md-12"}>
-          <div>
-            <Routes>
-              {/* Explicit login route so /login also shows the Login page */}
-              <Route
-                path="/login"
-                element={
-                  !isLogin ? <Login /> : <Navigate to="/builder-projects" />
-                }
-              />
-              <Route
-                path="/listing-space"
-                element={isLogin ? <ListingSpace /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder-projects"
-                element={isLogin ? <BuilderProjects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder-plan"
-                element={isLogin ? <BuilderPlan /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/media"
-                element={isLogin ? <Media /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/"
-                element={
-                  !isLogin ? <Login /> : <Navigate to="/builder-projects" />
-                }
-              />
-              <Route
-                path="/country"
-                element={isLogin ? <Country /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/state"
-                element={isLogin ? <State /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/city"
-                element={isLogin ? <City /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/microlocation"
-                element={isLogin ? <Microlocation /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/amenities"
-                element={isLogin ? <Amenities /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/seo"
-                element={isLogin ? <Seo /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder-projects/add-builder-projects"
-                element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/seo/add-seo"
-                element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder"
-                element={isLogin ? <Builder /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/seo/editseo/:id"
-                element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder/add-builder"
-                element={isLogin ? <AddBuilder /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder/edit-builder/:id"
-                element={isLogin ? <AddBuilder /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/builder-projects/edit-project/:id"
-                element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/image"
-                element={isLogin ? <ImageUpload /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/new-launch-projects"
-                element={isLogin ? <NewLaunch /> : <Navigate to="/" />}
-              />
-              <Route path="/password-reset" element={<PasswordReset />} />
-              <Route
-                path="/forgotpassword/:id/:token"
-                element={<ForgotPassword />}
-              />
-            </Routes>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Routes>
+      {/* Public */}
+      <Route
+        path="/login"
+        element={!isLogin ? <Login /> : <Navigate to="/builder-projects" />}
+      />
+      <Route
+        path="/"
+        element={!isLogin ? <Login /> : <Navigate to="/builder-projects" />}
+      />
+      <Route path="/password-reset" element={<PasswordReset />} />
+      <Route path="/forgotpassword/:id/:token" element={<ForgotPassword />} />
+
+      {/* Protected */}
+      <Route
+        element={isLogin ? <DashboardLayout /> : <Navigate to="/" />}
+      >
+        <Route path="/listing-space" element={<ListingSpace />} />
+        <Route path="/builder-projects" element={<BuilderProjects />} />
+        <Route path="/builder-plan" element={<BuilderPlan />} />
+        <Route path="/media" element={<Media />} />
+        <Route path="/country" element={<Country />} />
+        <Route path="/state" element={<State />} />
+        <Route path="/city" element={<City />} />
+        <Route path="/microlocation" element={<Microlocation />} />
+        <Route path="/amenities" element={<Amenities />} />
+        <Route path="/seo" element={<Seo />} />
+        <Route path="/builder-projects/add-builder-projects" element={<AddBuilderprojects />} />
+        <Route path="/seo/add-seo" element={<AddSeoForm />} />
+        <Route path="/builder" element={<Builder />} />
+        <Route path="/seo/editseo/:id" element={<AddSeoForm />} />
+        <Route path="/builder/add-builder" element={<AddBuilder />} />
+        <Route path="/builder/edit-builder/:id" element={<AddBuilder />} />
+        <Route path="/builder-projects/edit-project/:id" element={<AddBuilderprojects />} />
+        <Route path="/image" element={<ImageUpload />} />
+        <Route path="/new-launch-projects" element={<NewLaunch />} />
+      </Route>
+    </Routes>
   );
 }
 

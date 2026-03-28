@@ -3,6 +3,7 @@ import { getBuilders } from "../../../services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
 import { getPropertyTypes } from "../../../services/propertyTypeService";
+import { projectFormSelectStyles } from "./projectFormSelectStyles";
 
 const formatIndianPriceShort = (value) => {
   const num = Number(value);
@@ -24,7 +25,7 @@ const formatIndianPriceShort = (value) => {
   return `${num}`;
 };
 
-const ProjectDetails = () => {
+const ProjectDetails = ({ showValidation = false, errors = {} }) => {
   const {
     projects,
     setProjects,
@@ -38,9 +39,15 @@ const ProjectDetails = () => {
   const startingPriceInWords = formatIndianPriceShort(projects?.starting_price);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const next =
+      name === "project_type"
+        ? String(value).trim().toLowerCase() === "commercial"
+          ? "commercial"
+          : "residential"
+        : value;
     setProjects({
       ...projects,
-      [name]: value,
+      [name]: next,
     });
   };
   const handleCheckboxChange = (event) => {
@@ -55,7 +62,10 @@ const ProjectDetails = () => {
     switch (dropdownIdentifier) {
       case "builder":
         setSelectedBuilder(selectedOption);
-        projects.builder = selectedOption.value
+        setProjects((prev) => ({
+          ...prev,
+          builder: selectedOption?.value ?? "",
+        }));
         break;
       default:
         break;
@@ -120,52 +130,96 @@ const ProjectDetails = () => {
       setSelectedBuilder(null);
     }
   }, [builders]);
+  const nameInvalid = showValidation && !projects?.name;
+  const slugInvalid = showValidation && !projects?.slug;
+
   return (
-    <>
-      {" "}
-       <div className="project-card">
-      <div className="row top-margin">
-     
-        <div className="col-md-12">
-          <h4>Projects Details</h4>
-      </div>
-      </div>
-      <div className="col-md-4 my-4 ">
-          <div className="form-floating border_field ">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInput"
-              placeholder="Name*"
-              name="name"
-              value={projects.name}
-              onChange={handleInputChange}
-              required
-            />
-            <label className="custompadd" htmlFor="floatingInput">Name of Project</label>
+    <div className="saas-card add-project-form-shell">
+      <div className="saas-card-header">
+        <div>
+          <div className="saas-card-title">Project details</div>
+          <div className="saas-card-subtitle">
+            Name, slug, builder, type, pricing, and listing options.
           </div>
         </div>
-      <div className="row d-flex align-items-baseline">
-        <div className="col-md-4">
-          <div>
+      </div>
+
+      <div className="saas-card-body space-y-6">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div
+            className={`project-field-block lg:col-span-2 ${nameInvalid ? "rounded-xl ring-2 ring-rose-200 ring-offset-2" : ""}`}
+          >
+            <label className="saas-label" htmlFor="project-name-input">
+              Name of project <span className="text-rose-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="project-name-input"
+              name="name"
+              value={projects.name ?? ""}
+              onChange={handleInputChange}
+              placeholder="e.g. Skyline Residences"
+              className="saas-input"
+              required
+              aria-invalid={nameInvalid ? "true" : "false"}
+            />
+            {nameInvalid && (
+              <span className="mt-1 block text-xs font-medium text-rose-600">
+                {errors?.name || "Required"}
+              </span>
+            )}
+          </div>
+
+          <div
+            className={`project-field-block ${slugInvalid ? "rounded-xl ring-2 ring-rose-200 ring-offset-2" : ""}`}
+          >
+            <label className="saas-label" htmlFor="project-slug-input">
+              Slug <span className="text-rose-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="project-slug-input"
+              name="slug"
+              value={projects.slug ?? ""}
+              onChange={handleInputChange}
+              placeholder="url-friendly-name"
+              className="saas-input font-mono text-[13px]"
+              required
+              aria-invalid={slugInvalid ? "true" : "false"}
+            />
+            {slugInvalid && (
+              <span className="mt-1 block text-xs font-medium text-rose-600">
+                {errors?.slug || "Required"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-builder-select">
+              Builder
+            </label>
             <Select
-              placeholder="Builder"
+              inputId="project-builder-select"
+              placeholder="Search builder…"
               value={selectedBuilder}
               options={builderOptions}
               onChange={(v) => onChangeOptionHandler(v, "builder")}
               isSearchable
-              className="react-select-container"
-              classNamePrefix="react-select"
+              isClearable
+              styles={projectFormSelectStyles}
             />
-
+            <p className="saas-help">Link this project to a builder profile.</p>
           </div>
-        </div>
-        
 
-        <div className="col-md-4">
-          <div>
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-type-select">
+              Project type
+            </label>
             <select
-              className="uniform-select"
+              id="project-type-select"
+              className="project-native-select"
               value={projects.project_type}
               name="project_type"
               onChange={handleInputChange}
@@ -174,13 +228,18 @@ const ProjectDetails = () => {
               <option value="commercial">Commercial</option>
             </select>
           </div>
-        </div>
-        <div className="col-md-4">
-          <div>
-            <select className="uniform-select" value={selectedPlanName} onChange={handleItemSelect}>
-              <option>
-                Select Plan
-              </option>
+
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-plan-select">
+              Plan type
+            </label>
+            <select
+              id="project-plan-select"
+              className="project-native-select"
+              value={selectedPlanName}
+              onChange={handleItemSelect}
+            >
+              <option value="">Select plan</option>
               {filteredPlanType?.map((item) => (
                 <option key={item._id} value={item.name}>
                   {item.name}
@@ -189,254 +248,164 @@ const ProjectDetails = () => {
             </select>
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-4">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputSlug"
-              placeholder="Slug*"
-              name="slug"
-              value={projects.slug}
-              onChange={handleInputChange}
-              required
-            />
-            <label className="custompadd" htmlFor="floatingInputSlug">Slug</label>
-          </div>
-        </div>
-        <div className="col-md-4">
-          {startingPriceInWords && (
-            <p className="mb-1 text-muted" style={{ fontSize: "12px" }}>
-              {startingPriceInWords}
-            </p>
-          )}
-          <div className="form-floating border_field">
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-starting-price">
+              Starting price <span className="text-rose-600">*</span>
+            </label>
             <input
               type="number"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Starting Prices*"
+              id="project-starting-price"
               name="starting_price"
-              value={projects.starting_price}
+              value={projects.starting_price ?? ""}
               onChange={handleInputChange}
+              placeholder="Amount in ₹"
+              className="saas-input"
+              min={0}
               required
             />
-            <label  className="custompadd" htmlFor="floatingInputAddress">Starting Price*</label>
+            {startingPriceInWords ? (
+              <p className="saas-help">{startingPriceInWords}</p>
+            ) : (
+              <p className="saas-help">Shown on the listing as a readable amount.</p>
+            )}
           </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-configuration">
+              Configuration <span className="text-rose-600">*</span>
+            </label>
             <input
               type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Configuration*"
+              id="project-configuration"
               name="configuration"
-              value={projects.configuration}
+              value={projects.configuration ?? ""}
               onChange={handleInputChange}
+              placeholder="e.g. 2, 3 & 4 BHK"
+              className="saas-input"
               required
             />
-            <label className="custompadd" htmlFor="floatingInputAddress">Configuration*</label>
           </div>
-        </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-4">
-          <div className="form-floating border_field ">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-status-select">
+              Project status <span className="text-rose-600">*</span>
+            </label>
             <select
-              className="uniform-select"
+              id="project-status-select"
+              className="project-native-select"
               name="project_status"
-              aria-label="Default select example"
-              value={projects.project_status}
+              value={projects.project_status ?? ""}
               onChange={handleInputChange}
               required
             >
-              <option>Project Status</option>
-              <option>Ready To Move</option>
-              <option>Under Construction</option>
-              <option>New Launch</option>
+              <option value="">Select status</option>
+              <option value="Ready To Move">Ready To Move</option>
+              <option value="Under Construction">Under Construction</option>
+              <option value="New Launch">New Launch</option>
             </select>
           </div>
         </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-size">
+              Project size
+            </label>
             <input
               type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Project Size"
+              id="project-size"
               name="project_size"
-              value={projects.project_size}
+              value={projects.project_size ?? ""}
               onChange={handleInputChange}
+              placeholder="e.g. 5 acres"
+              className="saas-input"
             />
-            <label className="custompadd" htmlFor="floatingInputAddress">Project Size*</label>
           </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-ratings">
+              Ratings
+            </label>
             <input
               type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Ratings"
+              id="project-ratings"
               name="ratings"
-              value={projects.ratings}
+              value={projects.ratings ?? ""}
               onChange={handleInputChange}
+              placeholder="e.g. 4.5"
+              className="saas-input"
             />
-            <label className="custompadd" htmlFor="floatingInputAddress">Ratings</label>
           </div>
-        </div>
-      </div>
-      <div className="row mt-4 d-flex align-items-baseline">
-        <div className="col-md-4">
-          <div className="form-floating border_field">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="project-tag">
+              Project tag
+            </label>
             <input
               type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Coming Soon"
-              name="coming_soon"
-              value={projects.coming_soon}
-              onChange={handleInputChange}
-
-            />
-            <label className="custompadd" htmlFor="floatingInputAddress">Coming Soon</label>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Tagline"
-              name="tagline"
-              value={projects.tagline}
-              onChange={handleInputChange}
-
-            />
-            <label className="custompadd" htmlFor="floatingInputAddress">Tagline</label>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Project Tag"
+              id="project-tag"
               name="project_tag"
-              value={projects.project_tag}
+              value={projects.project_tag ?? ""}
               onChange={handleInputChange}
-
+              placeholder="e.g. Luxury"
+              className="saas-input"
             />
-            <label className="custompadd" htmlFor="floatingInputAddress">Project Tag</label>
-          </div>
-        </div>
-      </div>
-      <div className="row mt-4 d-flex align-items-baseline">
-        <div className="col-md-3">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="for_sale_checkbox"
-              name="for_sale"
-              checked={projects.for_sale}
-              onChange={handleCheckboxChange}
-            />
-            <label className="form-check-label " htmlFor="for_sale_checkbox">
-              For Sale
-            </label>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="for_rent_checkbox"
-              name="for_rent"
-              checked={projects.for_rent}
-              onChange={handleCheckboxChange}
-            />
-            <label className="form-check-label" htmlFor="for_rent_checkbox">
-              For Rent
-            </label>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="rera_approved_checkbox"
-              name="is_rera_approved"
-              checked={projects.is_rera_approved}
-              onChange={handleCheckboxChange}
-            />
-            <label className="form-check-label" htmlFor="rera_approved_checkbox">
-             RERA Approved!
-            </label>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="zero_brokerage_checkbox"
-              name="is_zero_brokerage"
-              checked={projects.is_zero_brokerage}
-              onChange={handleCheckboxChange}
-            />
-            <label className="form-check-label" htmlFor="zero_brokerage_checkbox">
-            Brokerage!
-            </label>
           </div>
         </div>
 
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <div className="form-floating border_field">
-            <textarea
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Short Description About Project"
-              name="short_descrip"
-              value={projects.short_descrip}
-              onChange={handleInputChange}
-            ></textarea>
-            <label  className="custompadd" htmlFor="floatingInputAddress">
-              Short Description About Project
-            </label>
+        <div className="rounded-xl border border-slate-200/90 bg-slate-50/60 p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Listing options
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { id: "for_sale_checkbox", name: "for_sale", label: "For sale" },
+              { id: "for_rent_checkbox", name: "for_rent", label: "For rent" },
+              {
+                id: "rera_approved_checkbox",
+                name: "is_rera_approved",
+                label: "RERA approved",
+              },
+              {
+                id: "zero_brokerage_checkbox",
+                name: "is_zero_brokerage",
+                label: "Zero brokerage",
+              },
+            ].map(({ id, name, label }) => (
+              <label
+                key={id}
+                htmlFor={id}
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-3 py-2.5 shadow-sm transition hover:border-slate-300 hover:bg-slate-50/80"
+              >
+                <input
+                  id={id}
+                  className="h-4 w-4 shrink-0 rounded border-slate-300 text-rose-600 focus:ring-2 focus:ring-rose-500/35"
+                  type="checkbox"
+                  name={name}
+                  checked={!!projects[name]}
+                  onChange={handleCheckboxChange}
+                />
+                <span className="text-sm font-medium text-slate-800">{label}</span>
+              </label>
+            ))}
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <div className="form-floating border_field">
-            <textarea
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
-              placeholder="Video Link"
-              name="video"
-              value={projects?.video}
-              onChange={handleInputChange}
-            ></textarea>
-            <label  className="custompadd" htmlFor="floatingInputAddress">
-              Video Link
-            </label>
-          </div>
+
+        <div className="project-field-block">
+          <label className="saas-label" htmlFor="project-video">
+            Video link
+          </label>
+          <textarea
+            id="project-video"
+            name="video"
+            rows={4}
+            value={projects?.video ?? ""}
+            onChange={handleInputChange}
+            placeholder="YouTube or other embed / watch URL"
+            className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 hover:border-slate-300 focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+          />
+          <p className="saas-help">Optional. Paste a single link or short notes.</p>
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
 

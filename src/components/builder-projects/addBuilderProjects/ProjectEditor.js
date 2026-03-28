@@ -123,7 +123,7 @@ const ProjectEditor = () => {
      <div className="project-card">
       <div className="row top-margin">
         <div className="col-md-12">
-          <h4 className="property_form_h4">About Project</h4>
+          <h4 className="property_form_h4 mb-3">About Project</h4>
         </div>
         <div className="col-md-12">
           <Editor
@@ -138,7 +138,7 @@ const ProjectEditor = () => {
       </div>
       <div className="row top-margin">
         <div className="col-md-12">
-          <h4 className="property_form_h4">Project Highlights, Feature and Amenities</h4>
+          <h4 className="property_form_h4 mb-3">Project Highlights, Feature and Amenities</h4>
         </div>
         <div className="col-md-12">
           <Editor
@@ -153,7 +153,7 @@ const ProjectEditor = () => {
       </div>
       <div className="row top-margin">
         <div className="col-md-12">
-          <h4 className="property_form_h4">Project Advantages</h4>
+          <h4 className="property_form_h4 mb-3">Project Advantages</h4>
         </div>
         <div className="col-md-12">
           <Editor

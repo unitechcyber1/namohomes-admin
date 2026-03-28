@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { GpState } from "../../../context/context";
 
 const BuilderDetail = () => {
-  const { builder, setBuilder, editBuilder, isBuilderEditable } = GpState();
+  const { builder, setBuilder } = GpState();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -11,179 +11,153 @@ const BuilderDetail = () => {
       [name]: value,
     });
   };
+
   return (
-    <>
-      {" "}
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <h4>Builder Details</h4>
+    <div className="saas-card">
+      <div className="saas-card-header">
+        <div>
+          <div className="saas-card-title">Basic information</div>
+          <div className="saas-card-subtitle">
+            Name, slug, pricing, and key stats shown on the builder profile.
+          </div>
         </div>
       </div>
-      <div className="row d-flex align-items-baseline">
-        <div className="col-md-4">
+      <div className="saas-card-body space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInput"
+              id="builder-name"
               placeholder="Name*"
               name="name"
-              value={builder?.name}
+              value={builder?.name ?? ""}
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInput">Name of Builder</label>
+            <label htmlFor="builder-name">Name of builder</label>
           </div>
-        </div>
-        <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputSlug"
+              id="builder-slug"
               placeholder="Slug*"
               name="slug"
-              value={builder?.slug}
+              value={builder?.slug ?? ""}
               onChange={handleInputChange}
               required
             />
-            <label htmlFor="floatingInputSlug">Slug</label>
+            <label htmlFor="builder-slug">Slug</label>
           </div>
-        </div>
-        <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Starting Prices*"
+              id="builder-starting-price"
+              placeholder="Starting price"
               name="starting_price"
-              value={builder?.starting_price}
+              value={builder?.starting_price ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Starting Price*</label>
+            <label htmlFor="builder-starting-price">Starting price</label>
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-4">
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Configuration*"
+              id="builder-configuration"
+              placeholder="Configuration"
               name="configuration"
-              value={builder?.configuration}
+              value={builder?.configuration ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Configuration*</label>
+            <label htmlFor="builder-configuration">Configuration</label>
           </div>
-        </div>
-        {/* <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Project Size"
-              name="project_size"
-              value={builder.project_size}
-              onChange={handleInputChange}
-            />
-            <label htmlFor="floatingInputAddress">Project Size*</label>
-          </div>
-        </div> */}
-        <div className="col-md-4">
-          <div className="form-floating border_field">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingInputAddress"
+              id="builder-ratings"
               placeholder="Ratings"
               name="ratings"
-              value={builder?.ratings}
+              value={builder?.ratings ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Ratings</label>
+            <label htmlFor="builder-ratings">Ratings</label>
           </div>
-        </div>
-        <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputSlug"
-              placeholder="Dwarka Page Slug*"
+              id="builder-dwarka-slug"
+              placeholder="Dwarka page slug"
               name="dwarka_page_url"
-              value={builder?.dwarka_page_url}
+              value={builder?.dwarka_page_url ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputSlug">Dwarka Page Slug</label>
+            <label htmlFor="builder-dwarka-slug">Dwarka page slug</label>
           </div>
         </div>
-      </div>
-      <div className="row mt-4">
-        <div className="col-md-4">
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputSlug"
-              placeholder="Establish Year"
+              id="builder-estb-year"
+              placeholder="Establish year"
               name="estb_year"
-              value={builder?.estb_year}
+              value={builder?.estb_year ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputSlug">Establish Year</label>
+            <label htmlFor="builder-estb-year">Establish year</label>
           </div>
-        </div>
-        <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Residential Project"
+              id="builder-residential"
+              placeholder="Residential projects"
               name="residential_num"
-              value={builder?.residential_num}
+              value={builder?.residential_num ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Residential Project</label>
+            <label htmlFor="builder-residential">Residential projects</label>
           </div>
-        </div>
-        <div className="col-md-4">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Commertial Project"
+              id="builder-commercial"
+              placeholder="Commercial projects"
               name="commercial_num"
-              value={builder?.commercial_num}
+              value={builder?.commercial_num ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Commertial Project</label>
+            <label htmlFor="builder-commercial">Commercial projects</label>
           </div>
         </div>
-      </div>
-      <div className="row mt-4 d-flex align-items-baseline">
-        <div className="col-md-4">
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="form-floating border_field">
             <input
               type="text"
               className="form-control"
-              id="floatingInputAddress"
-              placeholder="Coming Soon"
+              id="builder-coming-soon"
+              placeholder="Coming soon"
               name="coming_soon"
-              value={builder?.coming_soon}
+              value={builder?.coming_soon ?? ""}
               onChange={handleInputChange}
             />
-            <label htmlFor="floatingInputAddress">Coming Soon</label>
+            <label htmlFor="builder-coming-soon">Coming soon</label>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

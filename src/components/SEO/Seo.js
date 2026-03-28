@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 import { Link } from "react-router-dom";
 import "./Seo.css";
@@ -20,6 +19,8 @@ import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
 
 import { getSeoListPaginated, deleteSeoById } from "../../services/seoService";
+import SaasTableShell from "../ui/SaasTableShell";
+import SaasPagination from "../ui/SaasPagination";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 const SEARCH_DEBOUNCE_MS = 400;
@@ -120,134 +121,137 @@ function Seo() {
 
 
   return (
-    <div className="mx-5 mt-3">
-      <Mainpanelnav />
-      <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">SEO Module</h2>
-        <Link to={`${baseSeoPath}/add-seo`} className="btnLink mt-2">
-          <Addpropertybtn buttonText="ADD NEW" />
-        </Link>
-      </div>
+    <div className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px]">
+        <SaasTableShell
+          title="SEO"
+          subtitle="Manage SEO pages and metadata."
+          actions={
+            <Link to={`${baseSeoPath}/add-seo`} className="w-fit">
+              <Addpropertybtn buttonText="ADD NEW" />
+            </Link>
+          }
+          toolbar={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="relative w-full sm:max-w-[420px]">
+                <label className="sr-only" htmlFor="seoSearch">
+                  Search SEO
+                </label>
+                <input
+                  id="seoSearch"
+                  type="text"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/40 px-3 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 hover:bg-white hover:border-slate-300 focus:bg-white focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  placeholder="Search by path…"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  aria-label="Search by path"
+                />
+              </div>
 
-      <div className="row mt-2 project-card2">
-        <div className="row ">
-          <div className="col-md-4 px-4">
-            <input
-              type="text"
-              className="uniform-select-seo"
-              placeholder="Search by Path"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search by path"
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-500">
+                  Per page
+                </span>
+                <select
+                  className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none hover:border-slate-300 focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  value={limit}
+                  onChange={handlePageSizeChange}
+                  aria-label="Items per page"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          }
+          footer={
+            <SaasPagination
+              page={curPage}
+              totalPages={totalPages}
+              onPrev={() => goToPage(curPage - 1)}
+              onNext={() => goToPage(curPage + 1)}
+              leftText={
+                <span>
+                  Showing{" "}
+                  <span className="font-semibold text-slate-900">
+                    {firstIndex}-{lastIndex}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-slate-900">
+                    {totalCount}
+                  </span>
+                </span>
+              }
             />
-          </div>
-        </div>
-
-      </div>
-
-      <div className="table-box ">
-        <TableContainer  overflowX="hidden">
-          {/* Table */}
-          <Table variant="simple" >
-            <Thead>
-              <Tr>
-                <Th>Path</Th>
-                <Th>Title</Th>
-                <Th>Edit</Th>
-                <Th>Delete</Th>
-              </Tr>
-            </Thead>
-
-            <Tbody>
-              {loading ? (
+          }
+        >
+          <TableContainer>
+            <Table className="min-w-[980px]">
+              <Thead className="bg-slate-50">
                 <Tr>
-                  <Td colSpan={4} textAlign="center">
-                    <Spinner size="xl" />
-                  </Td>
+                  <Th>Path</Th>
+                  <Th>Title</Th>
+                  <Th>Edit</Th>
+                  <Th textAlign="right">Actions</Th>
                 </Tr>
-              ) : seos.length > 0 ? (
-                seos.map((seo) => (
-                  <Tr key={seo._id}>
-                    <Td>{seo.path}</Td>
-                    <Td>
-                      {seo.title?.length > 35
-                        ? seo.title.substring(0, 35) + "..."
-                        : seo.title}
-                    </Td>
+              </Thead>
 
-                    <Td>
-                      <Link
-                        to={`${baseSeoPath}/editseo/${seo._id}`}
-                        target="_blank"
-                      >
-                        <AiFillEdit
-                          style={{ fontSize: 22, cursor: "pointer" }}
-                        />
-                      </Link>
-                    </Td>
-
-                    <Td>
-                      <Delete
-                        handleFunction={() =>
-                          handleDeleteSeo(seo._id)
-                        }
-                      />
+              <Tbody>
+                {loading ? (
+                  <Tr>
+                    <Td colSpan={4} textAlign="center">
+                      <div className="py-10">
+                        <Spinner />
+                        <div className="mt-3 text-sm text-slate-500">
+                          Loading SEO…
+                        </div>
+                      </div>
                     </Td>
                   </Tr>
-                ))
-              ) : (
-                <Tr>
-                  <Td colSpan={4}>No matching results found.</Td>
-                </Tr>
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
+                ) : seos.length > 0 ? (
+                  seos.map((seo) => (
+                    <Tr key={seo._id} className="hover:bg-slate-50/60">
+                      <Td className="tableDescription">{seo.path}</Td>
+                      <Td className="font-medium text-slate-900">
+                        {seo.title?.length > 35
+                          ? seo.title.substring(0, 35) + "..."
+                          : seo.title}
+                      </Td>
 
-        {/* Pagination */}
-        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar flex-wrap gap-2">
-          <div className="d-flex align-items-center gap-3 flex-wrap">
-            <div className="page-info">
-              Showing <strong>{firstIndex}-{lastIndex}</strong> of <strong>{totalCount}</strong> SEO entries
-            </div>
-            <div className="d-flex align-items-center gap-2">
-              <label className="mb-0 small">Per page:</label>
-              <select
-                className="uniform-select2"
-                style={{ width: "auto", minWidth: "70px" }}
-                value={limit}
-                onChange={handlePageSizeChange}
-                aria-label="Items per page"
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="d-flex align-items-center gap-2 pagination-controls">
-            <button
-              className="page-btn"
-              disabled={curPage <= 1 || totalPages === 0}
-              onClick={() => goToPage(curPage - 1)}
-            >
-              Previous
-            </button>
-            <span className="current-page">
-              Page {curPage} of {totalPages || 1}
-            </span>
-            <button
-              className="page-btn"
-              disabled={curPage >= totalPages || totalPages === 0}
-              onClick={() => goToPage(curPage + 1)}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+                      <Td>
+                        <Link to={`${baseSeoPath}/editseo/${seo._id}`} target="_blank">
+                          <AiFillEdit style={{ fontSize: 22, cursor: "pointer" }} />
+                        </Link>
+                      </Td>
 
+                      <Td>
+                        <div className="flex items-center justify-end">
+                          <Delete handleFunction={() => handleDeleteSeo(seo._id)} />
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td colSpan={4} textAlign="center">
+                      <div className="mx-auto max-w-md py-14">
+                        <div className="text-base font-semibold text-slate-900">
+                          No matching results found
+                        </div>
+                        <div className="mt-1 text-sm text-slate-500">
+                          Try a different search, or add a new SEO entry.
+                        </div>
+                      </div>
+                    </Td>
+                  </Tr>
+                )}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </SaasTableShell>
       </div>
     </div>
   );

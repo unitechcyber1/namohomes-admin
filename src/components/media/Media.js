@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, Fragment } from "react";
-import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { BsBookmarkPlus } from "react-icons/bs";
 import { FaUpload } from "react-icons/fa";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
@@ -13,6 +12,8 @@ import {
 } from "@chakra-ui/react";
 
 import Delete from "../delete/Delete";
+import SaasTableShell from "../ui/SaasTableShell";
+import SaasPagination from "../ui/SaasPagination";
 
 import {
   getAllMedia,
@@ -157,144 +158,197 @@ function Media() {
 
   // ---------- UI ----------
   return (
-    <div className="mx-5 mt-3">
-      <Mainpanelnav />
+    <div className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px]">
+        <SaasTableShell
+          title="Media"
+          subtitle="Upload and manage media assets."
+          actions={
+            <Button className="addnew-btn" onClick={onOpen}>
+              <BsBookmarkPlus />
+              ADD NEW
+            </Button>
+          }
+          toolbar={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="relative w-full sm:max-w-[420px]">
+                <label className="sr-only" htmlFor="mediaSearch">
+                  Search media
+                </label>
+                <input
+                  id="mediaSearch"
+                  type="text"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/40 px-3 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 hover:bg-white hover:border-slate-300 focus:bg-white focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  placeholder="Search media…"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurPage(1);
+                  }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-500">
+                  Per page
+                </span>
+                <select
+                  className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none hover:border-slate-300 focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  value={perPage}
+                  onChange={(e) => {
+                    setPerPage(Number(e.target.value) || 10);
+                    setCurPage(1);
+                  }}
+                >
+                  {[10, 25, 50, 100].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          }
+          footer={
+            <SaasPagination
+              page={curPage}
+              totalPages={totalPages || 1}
+              onPrev={() => goToPage(curPage - 1)}
+              onNext={() => goToPage(curPage + 1)}
+              leftText={
+                <span>
+                  Showing{" "}
+                  <span className="font-semibold text-slate-900">
+                    {Math.min(firstIndex + 1, filtered.length || 0)}-
+                    {Math.min(firstIndex + pageData.length, filtered.length || 0)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-slate-900">
+                    {filtered.length || 0}
+                  </span>
+                </span>
+              }
+            />
+          }
+        >
+          <TableContainer>
+            <Table className="min-w-[860px]">
+              <Thead className="bg-slate-50">
+                <Tr>
+                  <Th>Name</Th>
+                  <Th>Image Link</Th>
+                  <Th textAlign="right">Actions</Th>
+                </Tr>
+              </Thead>
 
-      <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">Media Module</h2>
-        <Button className="addnew-btn mt-2" onClick={onOpen}>
-          <BsBookmarkPlus /> ADD NEW
-        </Button>
+              <Tbody>
+                {loading ? (
+                  <Tr>
+                    <Td colSpan={3} textAlign="center">
+                      <div className="py-10">
+                        <Spinner />
+                        <div className="mt-3 text-sm text-slate-500">
+                          Loading media…
+                        </div>
+                      </div>
+                    </Td>
+                  </Tr>
+                ) : pageData.length ? (
+                  pageData.map((img) => (
+                    <Tr key={img._id} className="hover:bg-slate-50/60">
+                      <Td className="font-medium text-slate-900">{img.name}</Td>
+                      <Td className="tableDescription">{img.image?.s3_link}</Td>
+                      <Td>
+                        <div className="flex items-center justify-end">
+                          <Delete handleFunction={() => handleDelete(img._id)} />
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td colSpan={3} textAlign="center">
+                      <div className="mx-auto max-w-md py-14">
+                        <div className="text-base font-semibold text-slate-900">
+                          No media found
+                        </div>
+                        <div className="mt-1 text-sm text-slate-500">
+                          Upload a new asset to get started.
+                        </div>
+                      </div>
+                    </Td>
+                  </Tr>
+                )}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </SaasTableShell>
       </div>
 
       {/* Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Upload New Image</ModalHeader>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" motionPreset="slideInBottom">
+        <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(6px)" />
+        <ModalContent className="!m-4 overflow-hidden rounded-2xl border border-slate-200/90 !bg-white shadow-2xl shadow-slate-900/10">
+          <ModalHeader className="!border-b !border-slate-100 !bg-slate-50/80 !px-6 !pb-4 !pt-6">
+            <div className="pr-8">
+              <div className="text-lg font-semibold tracking-tight text-slate-900">Upload media</div>
+              <p className="mt-1 text-sm font-normal text-slate-500">
+                Add an asset name and upload one image file.
+              </p>
+            </div>
+          </ModalHeader>
           <ModalCloseButton />
 
-          <ModalBody>
-            <input
-              name="name"
-              value={media.name}
-              onChange={(e) =>
-                setMedia({ ...media, name: e.target.value })
-              }
-              placeholder="Name*"
-              className="property-input"
-            />
+          <ModalBody className="!px-6 !py-6">
+            <div className="space-y-5">
+              <div className="saas-field">
+                <label className="saas-label" htmlFor="media-name-input">
+                  Media name <span className="text-rose-600">*</span>
+                </label>
+                <input
+                  id="media-name-input"
+                  name="name"
+                  value={media.name}
+                  onChange={(e) => setMedia({ ...media, name: e.target.value })}
+                  placeholder="e.g. Hero banner"
+                  className="saas-input"
+                />
+              </div>
 
-            <label className="file file_label mt-3">
-              <span>Upload</span>
-              <FaUpload />
-              <input
-                type="file"
-                onChange={handleUploadFile}
-                className="file_hide"
-              />
-            </label>
+              <div className="rounded-xl border border-slate-200/90 bg-slate-50/50 p-4">
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  File upload
+                </div>
+                <label className="file file_label mt-2">
+                  <span>Choose file</span>
+                  <FaUpload />
+                  <input type="file" onChange={handleUploadFile} className="file_hide" />
+                </label>
+              </div>
 
-            {media.image?.s3_link && (
-              <img
-                src={media.image.s3_link}
-                alt="preview"
-                width="120"
-                className="mt-3"
-              />
-            )}
+              {media.image?.s3_link && (
+                <div className="rounded-xl border border-slate-200 bg-white p-3">
+                  <div className="mb-2 text-xs font-medium text-slate-500">Preview</div>
+                  <img
+                    src={media.image.s3_link}
+                    alt="preview"
+                    width="140"
+                    className="rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
           </ModalBody>
 
-          <ModalFooter>
-            <Button mr={3} onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSave}>Upload</Button>
+          <ModalFooter className="!gap-3 !border-t !border-slate-100 !bg-slate-50/60 !px-6 !py-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button className="!bg-rose-600 !text-white hover:!bg-rose-700" onClick={handleSave}>
+              Upload
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      <div className="row mt-2 project-card2">
-        <div className="col-md-4 px-4">
-          <input
-            type="text"
-            placeholder="Search by name"
-            className="uniform-select-seo filter_row"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurPage(1);
-            }}
-          />
-        </div>
-      </div>
-      
-      <div className="table-box ">
-              <TableContainer  overflowX="hidden">
-                {/* Table */}
-                <Table variant="simple" >
-    <Thead bg="white">
-      <Tr>
-        <Th>Name</Th>
-        <Th>Image Link</Th>
-        <Th>Delete</Th>
-      </Tr>
-    </Thead>
-
-    <Tbody>
-      {loading ? (
-        <Tr>
-          <Td colSpan={3} textAlign="center">
-            <Spinner size="xl" />
-          </Td>
-        </Tr>
-      ) : (
-        pageData.map((img) => (
-          <Tr key={img._id}>
-            <Td>{img.name}</Td>
-            <Td>{img.image?.s3_link}</Td>
-            <Td>
-              <Delete handleFunction={() => handleDelete(img._id)} />
-            </Td>
-          </Tr>
-        ))
-      )}
-    </Tbody>
-  </Table>
-</TableContainer>
-
-
-      {/* Pagination */}
-         <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
-
-          {/* LEFT SIDE */}
-          <div className="page-info">
-            Showing Page <strong>{curPage}</strong> out of <strong>{totalPages}</strong>
-          </div>
-
-          {/* RIGHT SIDE */}
-          <div className="d-flex align-items-center gap-2 pagination-controls">
-            <button
-              className="page-btn"
-              disabled={curPage === 1}
-              onClick={() => goToPage(curPage - 1)}
-            >
-              Previous
-            </button>
-
-            <span className="current-page">
-              {curPage}
-            </span>
-
-            <button
-              className="page-btn"
-              disabled={curPage === totalPages}
-              onClick={() => goToPage(curPage + 1)}
-            >
-              Next
-            </button>
-          </div>
-
-        </div>
-    </div>
     </div>
   );
 }

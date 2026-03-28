@@ -77,6 +77,31 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
 }
 
+/* ---- SaaS refresh overrides (reduce pink overload) ---- */
+.project-card,
+.project-card2 {
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important; /* slate-200 */
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.project-card2 {
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04),
+    0 12px 32px rgba(15, 23, 42, 0.07) !important;
+}
+
+.property_form_h4 {
+  font-size: 16px;
+  font-weight: 650;
+  color: #0f172a; /* slate-900 */
+}
+
+.form-box {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 /* Button Improvements */
 .saveproperty-btn {
   transition: all 0.3s ease;
@@ -209,5 +234,93 @@ textarea.form-control {
   font-size: 12px;
   margin-top: 4px;
   display: block;
+}
+
+/* ---------- Add project form shell (inputs + native selects) ---------- */
+.add-project-form-shell .border_field input.form-control,
+.add-project-form-shell .border_field select.form-control,
+.add-project-form-shell .border_field textarea.form-control {
+  border: 1px solid rgb(226 232 240) !important;
+  border-radius: 0.75rem !important;
+  border-bottom: 1px solid rgb(226 232 240) !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+}
+
+.add-project-form-shell .border_field input.form-control:focus,
+.add-project-form-shell .border_field select.form-control:focus,
+.add-project-form-shell .border_field textarea.form-control:focus {
+  border-color: rgb(251 113 133) !important;
+  border-bottom-color: rgb(251 113 133) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.12) !important;
+}
+
+.add-project-form-shell .border_field.form-floating > label {
+  color: rgb(71 85 105);
+}
+
+.add-project-form-shell .border_field.form-floating > .form-control:focus ~ label,
+.add-project-form-shell
+  .border_field.form-floating
+  > .form-control:not(:placeholder-shown)
+  ~ label {
+  color: rgb(71 85 105);
+  font-weight: 500;
+}
+
+/* Native selects (project type, plan, status) — label + field */
+.add-project-form-shell .project-field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.add-project-form-shell select.project-native-select {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: rgb(15 23 42);
+  background-color: #fff;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 24 24'%3E%3Cpath d='M12 15.5 6 9h12l-6 6.5Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  padding-right: 2rem;
+}
+
+.add-project-form-shell select.project-native-select:hover {
+  border-color: rgb(203 213 225);
+}
+
+.add-project-form-shell select.project-native-select:focus {
+  outline: none;
+  border-color: rgb(251 113 133);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.12);
+}
+
+/* Checkbox rows in project details */
+.add-project-form-shell .project-checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(241 245 249);
+  background: rgb(248 250 252 / 0.6);
+}
+
+.add-project-form-shell .project-checkbox-row .form-check {
+  margin: 0;
+  min-width: 7rem;
+}
+
+.add-project-form-shell .form-check-input:checked {
+  background-color: #e11d48;
+  border-color: #e11d48;
 }
 

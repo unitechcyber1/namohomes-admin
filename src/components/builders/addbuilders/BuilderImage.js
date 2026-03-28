@@ -22,10 +22,19 @@ const BuiderImage = () => {
   const toast = useToast();
 
   useEffect(() => {
-    if (isBuilderEditable && editBuilder?.images?.length && !(builderImage?.length)) {
+    if (
+      isBuilderEditable &&
+      editBuilder?.images?.length &&
+      !builderImage?.length
+    ) {
       setBuilderImage(editBuilder.images);
     }
-  }, [isBuilderEditable, editBuilder?.images, builderImage?.length, setBuilderImage]);
+  }, [
+    isBuilderEditable,
+    editBuilder?.images,
+    builderImage?.length,
+    setBuilderImage,
+  ]);
 
   const removePreviewImage = (index) => {
     const updatedImages = [...(builderImage || [])];
@@ -66,7 +75,10 @@ const BuiderImage = () => {
     } catch (error) {
       toast({
         title: "Upload failed",
-        description: error?.response?.data?.message || error?.message || "Something went wrong",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -85,123 +97,116 @@ const BuiderImage = () => {
       return arr;
     });
   };
+
   return (
-    <>
-      <div className="row mt-4">
-        <h4 className="property_form_h4">Project Images</h4>
-        <div className="container">
-          <label className="file file_label">
-            <FaUpload className="upload_icon" />
-            <span className="upload_text">Upload</span>
-            <input
-              type="file"
-              id="file-input"
-              multiple
-              accept="image/*"
-              aria-label="File browser example"
-              onChange={handleInputByClick}
-              className="file_hide"
-            />
-          </label>
-
-          {progress ? (
-            <div>
-              <p className="mx-auto">
-                <strong>Uploading Progress</strong>
-              </p>
-              <div className="progress mx-auto">
-                <div
-                  id="progress-bar"
-                  className="progress-bar progress-bar-striped bg-info"
-                  role="progressbar"
-                  aria-valuenow="40"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  style={{ width: `${progress}%` }}
-                >
-                  {progress}%
-                </div>
-              </div>
-            </div>
-          ) : isUploaded ? (
-            <h5>Uploaded</h5>
-          ) : (
-            ""
-          )}
-          <div id="preview" className="mt-3 d-flex align-items-center">
-            <div
-              className="table-box"
-              style={{
-                width: "100%",
-                marginTop: "0px",
-                marginBottom: "0px",
-              }}
-            >
-              <h3>Images</h3>
-              <TableContainer variant="striped" color="teal">
-                <Table variant="simple">
-                  <Thead>
-                    <Tr>
-                      <Th>No.</Th>
-                      <Th>Image</Th>
-                      <Th>Name</Th>
-                      <Th>Alt</Th>
-
-                      <Th>Delete</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {(builderImage || []).map((img, index) => (
-                      <Fragment key={index}>
-                        <Tr>
-                          <Td>{index + 1}</Td>
-                          <Td>
-                            <img
-                              src={img.image?.s3_link ?? img.image}
-                              alt="media"
-                              width="500px"
-                              height="250px"
-                            />
-                          </Td>
-                          <Td>
-                            <input
-                              type="text"
-                              className="form-control"
-                              style={{ color: "#000" }}
-                              value={img.name ?? ""}
-                              readOnly
-                            />
-                          </Td>
-                          <Td>
-                            <input
-                              type="text"
-                              className="form-control"
-                              style={{ color: "#000", minWidth: "200px" }}
-                              value={(img.alt ?? "").split(".")[0]}
-                              onChange={(event) =>
-                                handleAltChange(event, index)
-                              }
-                            />
-                          </Td>
-
-                          <Td>
-                            <AiFillDelete
-                              onClick={() => removePreviewImage(index)}
-                              className="icon"
-                              style={{ color: "red" }}
-                            />
-                          </Td>
-                        </Tr>
-                      </Fragment>
-                    ))}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            </div>
+    <div className="saas-card">
+      <div className="saas-card-header">
+        <div>
+          <div className="saas-card-title">Gallery images</div>
+          <div className="saas-card-subtitle">
+            Upload images used on the builder profile. Set alt text for
+            accessibility.
           </div>
         </div>
       </div>
-    </>
+      <div className="saas-card-body">
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/40 px-6 py-10 text-center transition hover:border-slate-300 hover:bg-slate-50">
+          <FaUpload className="mb-2 text-2xl text-slate-400" />
+          <span className="text-sm font-medium text-slate-700">
+            Click to upload images
+          </span>
+          <span className="mt-1 text-xs text-slate-500">PNG, JPG — multiple files</span>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            aria-label="Upload builder gallery images"
+            onChange={handleInputByClick}
+            className="sr-only"
+          />
+        </label>
+
+        {progress ? (
+          <div className="mt-4">
+            <p className="mb-2 text-sm font-medium text-slate-700">
+              Uploading… {progress}%
+            </p>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-rose-500 transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        ) : isUploaded ? (
+          <p className="mt-3 text-sm font-medium text-emerald-700">Upload complete</p>
+        ) : null}
+
+        <div className="mt-6 overflow-x-auto overscroll-x-contain">
+          <TableContainer>
+            <Table variant="simple" className="min-w-[720px]">
+              <Thead className="bg-slate-50">
+                <Tr>
+                  <Th w="12">#</Th>
+                  <Th>Preview</Th>
+                  <Th>Name</Th>
+                  <Th>Alt text</Th>
+                  <Th textAlign="right">Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {(builderImage || []).map((img, index) => (
+                  <Fragment key={index}>
+                    <Tr className="hover:bg-slate-50/60">
+                      <Td className="font-medium text-slate-700">{index + 1}</Td>
+                      <Td>
+                        <img
+                          src={img.image?.s3_link ?? img.image}
+                          alt=""
+                          className="h-24 w-40 rounded-lg border border-slate-200 object-cover"
+                        />
+                      </Td>
+                      <Td>
+                        <input
+                          type="text"
+                          className="form-control rounded-lg border border-slate-200 text-sm"
+                          readOnly
+                          value={img.name ?? ""}
+                        />
+                      </Td>
+                      <Td>
+                        <input
+                          type="text"
+                          className="form-control min-w-[180px] rounded-lg border border-slate-200 text-sm"
+                          value={(img.alt ?? "").split(".")[0]}
+                          onChange={(event) => handleAltChange(event, index)}
+                        />
+                      </Td>
+                      <Td textAlign="right">
+                        <button
+                          type="button"
+                          onClick={() => removePreviewImage(index)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-rose-600 shadow-sm hover:bg-rose-50"
+                          aria-label="Remove image"
+                        >
+                          <AiFillDelete className="text-lg" />
+                        </button>
+                      </Td>
+                    </Tr>
+                  </Fragment>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </div>
+
+        {(!builderImage || builderImage.length === 0) && (
+          <p className="mt-4 text-center text-sm text-slate-500">
+            No gallery images yet. Upload files above.
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 

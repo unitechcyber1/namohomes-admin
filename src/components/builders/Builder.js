@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { Link } from "react-router-dom";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 
@@ -10,6 +9,8 @@ import {
 
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
+import SaasTableShell from "../ui/SaasTableShell";
+import SaasPagination from "../ui/SaasPagination";
 
 import {
   getBuilders,
@@ -123,141 +124,138 @@ const Builder = () => {
   };
 
   return (
-    <div className="mx-5 mt-3">
-      <Mainpanelnav />
-      <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">Builder Module</h2>
-      
-        <Link to="/builder/add-builder" className="btnLink mt-2">
-          <Addpropertybtn buttonText="ADD NEW" />
-        </Link>
-      </div>
-
-      <div className="row mt-2 project-card2 align-items-end g-2">
-        <div className="col-md-4 px-4">
-          <input
-            className="uniform-select-seo filter_row w-100"
-            placeholder="Search by name"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-        <div className="col-md-2">
-          <label className="form-label small text-muted mb-1">Per page</label>
-          <select
-            className="form-control custom-input-height w-100"
-            value={perPage}
-            onChange={(e) => setPerPage(Number(e.target.value))}
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="table-box ">
-        
-        <TableContainer overflowX="hidden">
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>Name</Th>
-                <Th>Description</Th>
-                <Th>Edit</Th>
-                <Th>Delete</Th>
-              </Tr>
-            </Thead>
-
-            <Tbody>
-              {loading ? (
+    <div className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1400px]">
+        <SaasTableShell
+          title="Builders"
+          subtitle="Manage builders and their profiles."
+          actions={
+            <Link to="/builder/add-builder" className="w-fit">
+              <Addpropertybtn buttonText="ADD NEW" />
+            </Link>
+          }
+          toolbar={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="relative w-full sm:max-w-[420px]">
+                <label className="sr-only" htmlFor="builderSearch">
+                  Search builders
+                </label>
+                <input
+                  id="builderSearch"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/40 px-3 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 hover:bg-white hover:border-slate-300 focus:bg-white focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  placeholder="Search builders…"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-500">
+                  Per page
+                </span>
+                <select
+                  className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none hover:border-slate-300 focus:border-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                  value={perPage}
+                  onChange={(e) => setPerPage(Number(e.target.value) || 10)}
+                >
+                  {[10, 25, 50, 100].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          }
+          footer={
+            <SaasPagination
+              page={curPage}
+              totalPages={safeTotalPages || 1}
+              onPrev={() => goToPage(curPage - 1)}
+              onNext={() => goToPage(curPage + 1)}
+              leftText={
+                totalCount > 0 ? (
+                  <span>
+                    Page <span className="font-semibold text-slate-900">{curPage}</span> of{" "}
+                    <span className="font-semibold text-slate-900">{safeTotalPages}</span>
+                    {" · "}
+                    <span className="font-semibold text-slate-900">{totalCount}</span> total
+                  </span>
+                ) : (
+                  <span>No builders found</span>
+                )
+              }
+            />
+          }
+        >
+          <TableContainer>
+            <Table className="min-w-[920px]">
+              <Thead className="bg-slate-50">
                 <Tr>
-                  <Td colSpan={4} textAlign="center">
-                    <Spinner size="xl" />
-                  </Td>
+                  <Th>Name</Th>
+                  <Th>Description</Th>
+                  <Th>Edit</Th>
+                  <Th textAlign="right">Actions</Th>
                 </Tr>
-              ) : pageData.length > 0 ? (
-                pageData.map(b => (
-                  <Tr key={b._id}>
-                    <Td>{b.name?.toUpperCase()}</Td>
+              </Thead>
 
-                    <Td className="tableDescription">
-                      {b?.seo?.description
-                        ? b.seo.description.length > 50
-                          ? b.seo.description.slice(0, 50) + "..."
-                          : b.seo.description
-                        : "Empty"}
-                    </Td>
-
-                    <Td>
-                      <Link to={`/builder/edit-builder/${b._id}`}>
-                        <AiFillEdit style={{ fontSize: 22 }} />
-                      </Link>
-                    </Td>
-
-                    <Td>
-                      <Delete
-                        handleFunction={() =>
-                          handleDelete(b._id)
-                        }
-                      />
+              <Tbody>
+                {loading ? (
+                  <Tr>
+                    <Td colSpan={4} textAlign="center">
+                      <div className="py-10">
+                        <Spinner />
+                        <div className="mt-3 text-sm text-slate-500">
+                          Loading builders…
+                        </div>
+                      </div>
                     </Td>
                   </Tr>
-                ))
-              ) : (
-                <Tr>
-                  <Td colSpan={4}>
-                    No matching results found
-                  </Td>
-                </Tr>
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
+                ) : pageData.length > 0 ? (
+                  pageData.map((b) => (
+                    <Tr key={b._id} className="hover:bg-slate-50/60">
+                      <Td className="font-medium text-slate-900">
+                        {b.name?.toUpperCase()}
+                      </Td>
 
-        <div className="d-flex justify-content-between align-items-center mt-4 pagination-bar">
+                      <Td className="tableDescription">
+                        {b?.seo?.description
+                          ? b.seo.description.length > 50
+                            ? b.seo.description.slice(0, 50) + "..."
+                            : b.seo.description
+                          : "Empty"}
+                      </Td>
 
-          <div className="page-info">
-            {totalCount > 0 ? (
-              <>
-                Page <strong>{curPage}</strong> of <strong>{safeTotalPages}</strong>
-                {" · "}
-                <strong>{totalCount}</strong> total
-              </>
-            ) : (
-              <>No builders found</>
-            )}
-          </div>
+                      <Td>
+                        <Link to={`/builder/edit-builder/${b._id}`}>
+                          <AiFillEdit style={{ fontSize: 22 }} />
+                        </Link>
+                      </Td>
 
-          <div className="d-flex align-items-center gap-2 pagination-controls">
-            <button
-              type="button"
-              className="page-btn"
-              disabled={curPage <= 1 || loading}
-              onClick={() => goToPage(curPage - 1)}
-            >
-              Previous
-            </button>
-
-            <span className="current-page">
-              {curPage}
-            </span>
-
-            <button
-              type="button"
-              className="page-btn"
-              disabled={
-                loading ||
-                totalPages === 0 ||
-                (totalPages > 0 && curPage >= totalPages)
-              }
-              onClick={() => goToPage(curPage + 1)}
-            >
-              Next
-            </button>
-          </div>
-
-        </div>
+                      <Td>
+                        <div className="flex items-center justify-end">
+                          <Delete handleFunction={() => handleDelete(b._id)} />
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td colSpan={4} textAlign="center">
+                      <div className="mx-auto max-w-md py-14">
+                        <div className="text-base font-semibold text-slate-900">
+                          No matching results found
+                        </div>
+                        <div className="mt-1 text-sm text-slate-500">
+                          Try a different search, or add a builder.
+                        </div>
+                      </div>
+                    </Td>
+                  </Tr>
+                )}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </SaasTableShell>
       </div>
     </div>
   );
