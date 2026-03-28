@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { IoIosAddCircle } from "react-icons/io";
 import { AiFillDelete } from "react-icons/ai";
 import { GpState } from "../../../context/context";
@@ -32,97 +32,111 @@ const ContactDetails = () => {
   };
   return (
     <>
-      {" "}
-      <div className="row pt-4">
-        <div className="col-md-3 d-flex justify-content-between align-items-center">
-          <h4 className="property_form_h4">Contact Details</h4>
-          <IoIosAddCircle
-            onClick={createContact}
-            className="icon"
-            style={{ cursor: "pointer" }}
-          />
-        </div>
-      </div>
-      <div className="mb-5">
-        {projects.contact_details?.map((row, id) => (
-          <div className="row pt-3" key={row.id}>
-            <div className="col-md-3">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputUser"
-                  placeholder="User*"
-                  name="user"
-                  value={row.user}
-                  onChange={(e) => handleInputContactChange(e, row.id)}
-                />
-                <label htmlFor="floatingInputUser">Name</label>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputEmail"
-                  placeholder="Email*"
-                  name="email"
-                  value={row.email}
-                  onChange={(e) => handleInputContactChange(e, row.id)}
-                />
-                <label htmlFor="floatingInputEmail">Email</label>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputPhone"
-                  placeholder="Phone"
-                  name="phone"
-                  value={row.phone}
-                  onChange={(e) => handleInputContactChange(e, row.id)}
-                />
-                <label htmlFor="floatingInputPhone">Phone</label>
-              </div>
-            </div>
-            <div className="col-md-3 d-flex justify-content-between align-items-center">
-              <div
-                className="form-floating border_field"
-                style={{ marginTop: "6px" }}
-              >
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputDesignation"
-                  placeholder="Relation"
-                  name="designation"
-                  value={row.designation}
-                  onChange={(e) => handleInputContactChange(e, row.id)}
-                />
-                <label htmlFor="floatingInputDesignation">Relation</label>
-              </div>
-              <div className="d-flex align-items-center">
-                <AiFillDelete
-                  className="icon"
-                  style={{ cursor: "pointer", marginTop: "14px" }}
-                  onClick={() => removeContact(row.id)}
-                />
-              </div>
+      <div className="saas-card add-project-form-shell">
+        <div className="saas-card-header">
+          <div>
+            <div className="saas-card-title">Basic Info</div>
+            <div className="saas-card-subtitle">
+              Add the primary contact(s) for this project.
             </div>
           </div>
-        ))}
+          <button
+            type="button"
+            onClick={createContact}
+            className="inline-flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <IoIosAddCircle className="text-lg" />
+            Add contact
+          </button>
+        </div>
+
+        <div className="saas-card-body">
+          <div className="space-y-3">
+            {projects.contact_details?.map((row) => (
+              <div
+                key={row.id}
+                className="grid grid-cols-1 gap-3 rounded-xl border border-slate-100 bg-slate-50/40 p-3 md:grid-cols-12 md:items-end"
+              >
+                <div className="md:col-span-3">
+                  <div className="form-floating border_field">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`contactUser-${row.id}`}
+                      placeholder="Name"
+                      name="user"
+                      value={row.user}
+                      onChange={(e) => handleInputContactChange(e, row.id)}
+                    />
+                    <label htmlFor={`contactUser-${row.id}`}>Name</label>
+                  </div>
+                </div>
+
+                <div className="md:col-span-3">
+                  <div className="form-floating border_field">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`contactEmail-${row.id}`}
+                      placeholder="Email"
+                      name="email"
+                      value={row.email}
+                      onChange={(e) => handleInputContactChange(e, row.id)}
+                    />
+                    <label htmlFor={`contactEmail-${row.id}`}>Email</label>
+                  </div>
+                </div>
+
+                <div className="md:col-span-3">
+                  <div className="form-floating border_field">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`contactPhone-${row.id}`}
+                      placeholder="Phone"
+                      name="phone"
+                      value={row.phone}
+                      onChange={(e) => handleInputContactChange(e, row.id)}
+                    />
+                    <label htmlFor={`contactPhone-${row.id}`}>Phone</label>
+                  </div>
+                </div>
+
+                <div className="md:col-span-3">
+                  <div className="flex items-center gap-2">
+                    <div className="form-floating border_field flex-1">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id={`contactRelation-${row.id}`}
+                        placeholder="Relation"
+                        name="designation"
+                        value={row.designation}
+                        onChange={(e) => handleInputContactChange(e, row.id)}
+                      />
+                      <label htmlFor={`contactRelation-${row.id}`}>Relation</label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeContact(row.id)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+                      aria-label="Remove contact"
+                      title="Remove"
+                    >
+                      <AiFillDelete />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {(!projects.contact_details || projects.contact_details.length === 0) && (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-4 py-6 text-sm text-slate-600">
+              No contacts added yet. Click <span className="font-semibold">Add contact</span> to create one.
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

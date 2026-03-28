@@ -4,7 +4,8 @@ import api from "./axiosInstance";
  * @typedef {Object} GetBuildersParams
  * @property {number} [page=1]
  * @property {number} [limit=10]
- * @property {string} [search]
+ * @property {string} [search] UI search term — sent to API as `name`
+ * @property {string} [name] optional; same as search if passed explicitly
  */
 
 /**
@@ -27,8 +28,10 @@ export const getBuilders = async (params = {}) => {
   const limit = Number(params.limit) > 0 ? Number(params.limit) : 10;
 
   const query = { page, limit };
-  if (params.search != null && String(params.search).trim() !== "") {
-    query.search = String(params.search).trim();
+  // Backend filters by builder name using query param `name` (not `search`).
+  const nameTerm = params.name ?? params.search;
+  if (nameTerm != null && String(nameTerm).trim() !== "") {
+    query.name = String(nameTerm).trim();
   }
 
   const { data } = await api.get("/api/admin/allbuilders", { params: query });

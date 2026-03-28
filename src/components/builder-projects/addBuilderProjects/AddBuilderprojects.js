@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
-import Mainpanelnav from "../../mainpanel-header/Mainpanelnav";
 import "./AddBuilderProjects.css";
 import Location from "./Location";
 import FloorPlans from "./FloorPlans";
@@ -9,7 +8,6 @@ import ProjectSeo from "./ProjectSeo";
 import ProjectAmenities from "./ProjectAmenities";
 import ProjectDetails from "./ProjectDetails";
 import ProjectEditor from "./ProjectEditor";
-import ContactDetails from "./ContactDetails";
 import { GpState } from "../../../context/context";
 import ImageUpload from "../../../ImageUpload";
 import { uploadImageFile } from "../../../services/Services";
@@ -18,11 +16,46 @@ import { getProjectById, createProject, updateProject } from "../../../services/
 import Loader from "../../loader/Loader";
 import { project } from "../../../models/builderProjectModel";
 import { uploadFiles } from "../../../services/mediaService";
+
+/** Match Project details select values; API may return different casing. */
+const normalizeProjectType = (t) => {
+  const s = String(t ?? "").trim().toLowerCase();
+  return s === "commercial" ? "commercial" : "residential";
+};
+
+const mapAmenityEntryToId = (item) => {
+  if (item == null || item === false) return null;
+  if (typeof item === "string" || typeof item === "number") return String(item);
+  if (item._id != null) return String(item._id);
+  if (item.id != null) return String(item.id);
+  return null;
+};
+
+const mapAmenityIdList = (list) => {
+  if (!Array.isArray(list)) return [];
+  return list.map(mapAmenityEntryToId).filter(Boolean);
+};
+
+/** API may use allAmenities / all_amenities or populated amenity objects. */
+const normalizeAllAmenitiesFromApi = (raw) => {
+  if (!raw || typeof raw !== "object") {
+    return { residential: [], commercial: [] };
+  }
+  return {
+    residential: mapAmenityIdList(
+      raw.residential ?? raw.residential_amenities
+    ),
+    commercial: mapAmenityIdList(raw.commercial ?? raw.commercial_amenities),
+  };
+};
+
 function AddBuilderprojects() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [progress, setProgress] = useState(0);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const { projects,
     selectedPlanId,
     setProjects,
@@ -96,6 +129,10 @@ function AddBuilderprojects() {
       // Ensure location and plans objects exist when loading edit project
       const projectWithDefaults = {
         ...editProject,
+        project_type: normalizeProjectType(editProject.project_type),
+        allAmenities: normalizeAllAmenitiesFromApi(
+          editProject.allAmenities ?? editProject.all_amenities
+        ),
         location: {
           address: "",
           country: "",
@@ -199,9 +236,14 @@ function AddBuilderprojects() {
   };
   const handleSaveAndUpdateProject = async (e) => {
     e.preventDefault();
+    setSubmitAttempted(true);
 
     // Basic validation
     if (!projects || !projects.name || !projects.slug) {
+      setFormErrors({
+        name: !projects?.name ? "Project name is required." : "",
+        slug: !projects?.slug ? "Slug is required." : "",
+      });
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields (Name and Slug).",
@@ -212,6 +254,7 @@ function AddBuilderprojects() {
       });
       return;
     }
+    setFormErrors({});
 
     let updatedProjectsData;
     try {
@@ -318,51 +361,79 @@ function AddBuilderprojects() {
   }
 
   return (
-    <div className="mx-5 mt-3">
-      <Mainpanelnav />
-      <div className="container form-box">
+    <div className="px-4 pb-16 pt-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1100px]">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900">
+              {isEditable ? "Edit project" : "Add new project"}
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Fill the key details first, then add location, plans, media, and SEO.
+            </p>
+          </div>
+          <Link
+            to="/builder-projects"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            ← Back to projects
+          </Link>
+        </div>
+
+        {submitAttempted && (formErrors?.name || formErrors?.slug) && (
+          <div className="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            <div className="font-semibold">Fix the highlighted fields</div>
+            <div className="mt-1 text-rose-700">
+              {formErrors?.name ? `• ${formErrors.name} ` : ""}
+              {formErrors?.slug ? `• ${formErrors.slug}` : ""}
+            </div>
+          </div>
+        )}
+
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <form
-          style={{ textAlign: "left" }}
+          className="p-4 sm:p-6"
           onSubmit={handleSaveAndUpdateProject}
         >
-          <div className="container">
-            <ContactDetails />
-            <ProjectDetails />
+          <div className="space-y-6 add-project-form-shell">
+            <ProjectDetails showValidation={submitAttempted} errors={formErrors} />
             <Location />
             <FloorPlans />
-            <div className="project-card">
-              <div className="row top-margin">
-                <div className="col-md-12">
-                  <h4 className="property_form_h4">Master Plan</h4>
+            <div className="saas-card">
+              <div className="saas-card-header">
+                <div>
+                  <div className="saas-card-title">Master plan</div>
+                  <div className="saas-card-subtitle">
+                    Upload a single plan image; preview appears after upload.
+                  </div>
                 </div>
               </div>
-              <div className="row mt-4">
-                <div className="col-md-6">
-                  <ImageUpload
-                    images={images}
-                    setImages={setImages}
-                    progress={progress}
-                    setProgress={setProgress}
-                    uploadFile={handleUploadFile}
-                    isUploaded={isUploaded}
-                  />
-                </div>
-                <div className="col-md-6">
-                  {(projects?.master_plan?.s3_link || projects.master_plan) && (
-                    <div className="mt-3">
-                      <img 
-                        src={projects?.master_plan?.s3_link || projects.master_plan} 
-                        alt="Master Plan Preview" 
-                        style={{ 
-                          width: "100%", 
-                          maxWidth: "400px",
-                          height: "auto",
-                          borderRadius: "8px",
-                          border: "1px solid #ddd"
-                        }} 
-                      />
-                    </div>
-                  )}
+              <div className="saas-card-body">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+                  <div>
+                    <ImageUpload
+                      images={images}
+                      setImages={setImages}
+                      progress={progress}
+                      setProgress={setProgress}
+                      uploadFile={handleUploadFile}
+                      isUploaded={isUploaded}
+                    />
+                  </div>
+                  <div>
+                    {(projects?.master_plan?.s3_link || projects.master_plan) && (
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="mb-2 text-xs font-medium text-slate-500">
+                          Preview
+                        </p>
+                        <img
+                          src={projects?.master_plan?.s3_link || projects.master_plan}
+                          alt="Master plan preview"
+                          className="h-auto w-full max-w-md rounded-lg object-contain"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -372,14 +443,29 @@ function AddBuilderprojects() {
             <ProjectImage />
             <ProjectSeo />
           </div>
-          <div className="form-footer">
-            <button type="submit" className="saveproperty-btn">
-              {isEditable ? "UPDATE" : "SAVE"}
-            </button>
-            <button type="button" onClick={handleCancel} className="cancel-btn">CANCEL</button>
-          </div>
         </form>
       </div>
+
+      {/* Sticky actions */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/85 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-[1100px] items-center justify-end gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveAndUpdateProject}
+            className="h-10 rounded-xl bg-rose-600 px-5 text-sm font-semibold text-white shadow-sm hover:bg-rose-700"
+          >
+            {isEditable ? "Update project" : "Save project"}
+          </button>
+        </div>
+      </div>
+    </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import { BsBookmarkPlus } from "react-icons/bs";
 import {
   Table,
@@ -29,6 +28,7 @@ import {
   createPropertyType,
   deletePropertyTypeById,
 } from "../../services/propertyTypeService";
+import SaasTableShell from "../ui/SaasTableShell";
 
 function ResPropertyType() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -110,78 +110,113 @@ function ResPropertyType() {
   }, [fetchPropertyTypes, updateTable]);
 
   return (
-    <div className="mx-5 mt-3">
-      <Mainpanelnav />
-
-      <div className="d-flex my-3 align-items-center justify-content-between">
-        <h2 className=" mb-0">Property Types</h2>
-        <Button className="addnew-btn" onClick={onOpen}>
-          <BsBookmarkPlus /> ADD NEW
-        </Button>
+    <>
+      <div className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[1400px]">
+          <SaasTableShell
+            title="Project Types"
+            subtitle="Manage project/property type options used in project creation."
+            actions={
+              <Button className="addnew-btn" onClick={onOpen}>
+                <BsBookmarkPlus /> ADD NEW
+              </Button>
+            }
+          >
+            <TableContainer>
+              <Table className="min-w-[640px]">
+                <Thead className="bg-slate-50">
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th textAlign="right">Actions</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {loading ? (
+                    <Tr>
+                      <Td colSpan={2} textAlign="center">
+                        <div className="py-10">
+                          <Spinner />
+                          <div className="mt-3 text-sm text-slate-500">
+                            Loading types…
+                          </div>
+                        </div>
+                      </Td>
+                    </Tr>
+                  ) : propertyTypes.length ? (
+                    propertyTypes.map((type) => (
+                      <Tr key={type._id} className="hover:bg-slate-50/60">
+                        <Td className="font-medium text-slate-900">{type.name}</Td>
+                        <Td>
+                          <div className="flex items-center justify-end">
+                            <Delete
+                              handleFunction={() =>
+                                handleDeletePropertyType(type._id)
+                              }
+                            />
+                          </div>
+                        </Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan={2} textAlign="center">
+                        <div className="mx-auto max-w-md py-14">
+                          <div className="text-base font-semibold text-slate-900">
+                            No types found
+                          </div>
+                          <div className="mt-1 text-sm text-slate-500">
+                            Add a type to enable selection during project creation.
+                          </div>
+                        </div>
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </SaasTableShell>
+        </div>
       </div>
 
       {/* Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add New Property Type</ModalHeader>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" motionPreset="slideInBottom">
+        <ModalOverlay bg="blackAlpha.400" backdropFilter="blur(6px)" />
+        <ModalContent className="!m-4 overflow-hidden rounded-2xl border border-slate-200/90 !bg-white shadow-2xl shadow-slate-900/10">
+          <ModalHeader className="!border-b !border-slate-100 !bg-slate-50/80 !px-6 !pb-4 !pt-6">
+            <div className="pr-8">
+              <div className="text-lg font-semibold tracking-tight text-slate-900">Add project type</div>
+              <p className="mt-1 text-sm font-normal text-slate-500">
+                Create a property type for project forms.
+              </p>
+            </div>
+          </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              type="text"
-              placeholder="Name"
-              className="property-input"
-            />
+          <ModalBody className="!px-6 !py-6">
+            <div className="saas-field">
+              <label className="saas-label" htmlFor="property-type-name-input">
+                Name <span className="text-rose-600">*</span>
+              </label>
+              <input
+                id="property-type-name-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                type="text"
+                placeholder="e.g. Apartment"
+                className="saas-input"
+              />
+            </div>
           </ModalBody>
-          <ModalFooter>
-            <Button mr={3} onClick={onClose}>
+          <ModalFooter className="!gap-3 !border-t !border-slate-100 !bg-slate-50/60 !px-6 !py-4">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button variant="ghost" onClick={handleSavePropertyType}>
-              Save
+            <Button className="!bg-rose-600 !text-white hover:!bg-rose-700" onClick={handleSavePropertyType}>
+              Create type
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {/* Table */}
-      <div className="table-box">
-        <TableContainer >
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>Name</Th>
-                <Th>Delete</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {loading ? (
-                <Tr>
-                  <Td colSpan={2} textAlign="center">
-                    <Spinner size="xl" />
-                  </Td>
-                </Tr>
-              ) : (
-                propertyTypes.map((type) => (
-                  <Tr key={type._id}>
-                    <Td>{type.name}</Td>
-                    <Td>
-                      <Delete
-                        handleFunction={() =>
-                          handleDeletePropertyType(type._id)
-                        }
-                      />
-                    </Td>
-                  </Tr>
-                ))
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </div>
-    </div>
+    </>
   );
 }
 

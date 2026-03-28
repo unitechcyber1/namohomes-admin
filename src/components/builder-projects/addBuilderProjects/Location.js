@@ -7,6 +7,146 @@ import {
 } from "../../../services/projectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
+import { projectFormSelectStyles } from "./projectFormSelectStyles";
+
+const LOCATION_PROXIMITY_SECTIONS = [
+  {
+    title: "Metro",
+    detailKey: "metro_detail",
+    toggleName: "is_near_metro",
+    checkboxId: "metro_near_checkbox",
+    toggleLabel: "Near metro",
+    nameInputId: "metro_name_input",
+    distanceInputId: "metro_distance_input",
+    namePlaceholder: "Nearest metro",
+    nameLabel: "Nearest metro",
+    distanceLabel: "Distance (km)",
+  },
+  {
+    title: "School",
+    detailKey: "school_detail",
+    toggleName: "is_near_school",
+    checkboxId: "school_near_checkbox",
+    toggleLabel: "Near school",
+    nameInputId: "school_name_input",
+    distanceInputId: "school_distance_input",
+    namePlaceholder: "School name",
+    nameLabel: "School name",
+    distanceLabel: "Distance (km)",
+  },
+  {
+    title: "College",
+    detailKey: "college_detail",
+    toggleName: "is_near_college",
+    checkboxId: "college_near_checkbox",
+    toggleLabel: "Near college",
+    nameInputId: "college_name_input",
+    distanceInputId: "college_distance_input",
+    namePlaceholder: "College name",
+    nameLabel: "College name",
+    distanceLabel: "Distance (km)",
+  },
+  {
+    title: "Market",
+    detailKey: "market_detail",
+    toggleName: "is_near_market",
+    checkboxId: "market_near_checkbox",
+    toggleLabel: "Near market",
+    nameInputId: "market_name_input",
+    distanceInputId: "market_distance_input",
+    namePlaceholder: "Market name",
+    nameLabel: "Market name",
+    distanceLabel: "Distance (km)",
+  },
+  {
+    title: "Hospital",
+    detailKey: "hospital_detail",
+    toggleName: "is_near_hospital",
+    checkboxId: "hospital_near_checkbox",
+    toggleLabel: "Near hospital",
+    nameInputId: "hospital_name_input",
+    distanceInputId: "hospital_distance_input",
+    namePlaceholder: "Hospital name",
+    nameLabel: "Hospital name",
+    distanceLabel: "Distance (km)",
+  },
+];
+
+function ProximityBlock({ section, projects, handleInputChange }) {
+  const detail = projects?.location?.[section.detailKey] || {};
+  const checked = !!detail[section.toggleName];
+
+  return (
+    <div className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm">
+      <div className="mb-3 text-sm font-semibold text-slate-800">
+        {section.title}
+      </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+        <label
+          htmlFor={section.checkboxId}
+          className="flex cursor-pointer items-center gap-3 rounded-lg py-0.5 lg:min-w-[11rem] lg:shrink-0"
+        >
+          <input
+            id={section.checkboxId}
+            name={section.toggleName}
+            type="checkbox"
+            checked={checked}
+            onChange={(e) =>
+              handleInputChange(e, "location", section.detailKey)
+            }
+            className="h-4 w-4 shrink-0 rounded border-slate-300 text-rose-600 focus:ring-2 focus:ring-rose-500/35"
+          />
+          <span className="text-sm font-medium text-slate-800">
+            {section.toggleLabel}
+          </span>
+        </label>
+        {checked && (
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="form-floating border_field">
+              <input
+                type="text"
+                className="form-control"
+                id={section.nameInputId}
+                placeholder={section.namePlaceholder}
+                name="name"
+                value={detail.name || ""}
+                onChange={(e) =>
+                  handleInputChange(e, "location", section.detailKey)
+                }
+              />
+              <label className="custompadd" htmlFor={section.nameInputId}>
+                {section.nameLabel}
+              </label>
+            </div>
+            <div className="form-floating border_field">
+              <input
+                type="number"
+                min={0}
+                step="0.1"
+                className="form-control"
+                id={section.distanceInputId}
+                placeholder={section.distanceLabel}
+                name="distance"
+                value={
+                  detail.distance === "" || detail.distance == null
+                    ? ""
+                    : detail.distance
+                }
+                onChange={(e) =>
+                  handleInputChange(e, "location", section.detailKey)
+                }
+              />
+              <label className="custompadd" htmlFor={section.distanceInputId}>
+                {section.distanceLabel}
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const Location = () => {
   const {
     selectedMicroLocation,
@@ -167,24 +307,70 @@ const Location = () => {
     }
   }, [country]);
   useEffect(() => {
+    if (!stateOptions?.length) return;
+
     const initialState = stateOptions.find(
       (option) => option.value === editProject?.location?.state
     );
-    if (initialState && isEditable) {
+
+    if (isEditable && initialState) {
       setSelectedState(initialState);
-    } else {
-      setSelectedState(null);
+      return;
     }
+
+    if (!isEditable) {
+      const haryana = stateOptions.find(
+        (o) => o.label?.trim().toLowerCase() === "haryana"
+      );
+      if (haryana) {
+        setSelectedState(haryana);
+        handleFetchCity(haryana.value);
+        setProjects((prev) => ({
+          ...prev,
+          location: {
+            ...(prev.location || {}),
+            state: haryana.value,
+          },
+        }));
+        return;
+      }
+    }
+
+    setSelectedState(initialState || null);
   }, [states]);
+
   useEffect(() => {
+    if (!cityOptions?.length) return;
+
     const initialCity = cityOptions.find(
       (option) => option.value === editProject?.location?.city
     );
-    if (initialCity && isEditable) {
+
+    if (isEditable && initialCity) {
       setSelectedCity(initialCity);
-    } else {
-      setSelectedCity(null);
+      return;
     }
+
+    if (!isEditable) {
+      const gurugram = cityOptions.find((o) => {
+        const l = o.label?.trim().toLowerCase();
+        return l === "gurugram" || l === "gurgaon";
+      });
+      if (gurugram) {
+        setSelectedCity(gurugram);
+        handleFetchMicrolocation(gurugram.value);
+        setProjects((prev) => ({
+          ...prev,
+          location: {
+            ...(prev.location || {}),
+            city: gurugram.value,
+          },
+        }));
+        return;
+      }
+    }
+
+    setSelectedCity(initialCity || null);
   }, [cities]);
 
   useEffect(() => {
@@ -202,470 +388,161 @@ const Location = () => {
     }
   }, [microlocations]);
   return (
-    <>
-      <div className="project-card">
-        <div className="row top-margin">
-          <h4 className="property_form_h4">Location</h4>
+    <div className="saas-card add-project-form-shell">
+      <div className="saas-card-header">
+        <div>
+          <div className="saas-card-title">Location</div>
+          <div className="saas-card-subtitle">
+            Country, state, city, micro-locations, address, and coordinates.
+          </div>
         </div>
-        <div className="row mt-4">
-          <div className="col-md-4">
-            <div>
-              <Select
-                placeholder="Country*"
-                value={selectedCountry}
-                options={countryOptions}
-                onChange={(selectedOption) =>
-                  onChangeOptionHandler(selectedOption, "country")
-                }
-                isSearchable
-                required
-              />
-            </div>
+      </div>
+      <div className="saas-card-body space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="location-country-select">
+              Country
+            </label>
+            <Select
+              inputId="location-country-select"
+              placeholder="Country*"
+              value={selectedCountry}
+              options={countryOptions}
+              onChange={(selectedOption) =>
+                onChangeOptionHandler(selectedOption, "country")
+              }
+              isSearchable
+              required
+              styles={projectFormSelectStyles}
+            />
           </div>
-          <div className="col-md-4">
-            <div>
-              <Select
-                placeholder="State*"
-                value={selectedState}
-                options={stateOptions}
-                onChange={(selectedOption) =>
-                  onChangeOptionHandler(selectedOption, "state")
-                }
-                onMenuOpen={handleFetchCity}
-                isSearchable
-                required
-              />
-            </div>
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="location-state-select">
+              State
+            </label>
+            <Select
+              inputId="location-state-select"
+              placeholder="State*"
+              value={selectedState}
+              options={stateOptions}
+              onChange={(selectedOption) =>
+                onChangeOptionHandler(selectedOption, "state")
+              }
+              onMenuOpen={handleFetchCity}
+              isSearchable
+              required
+              styles={projectFormSelectStyles}
+            />
           </div>
-          <div className="col-md-4">
-            <div>
-              <Select
-                placeholder="City*"
-                value={selectedCity}
-                options={cityOptions}
-                onChange={(selectedOption) =>
-                  onChangeOptionHandler(selectedOption, "city")
-                }
-                isSearchable
-                required
-              />
-            </div>
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="location-city-select">
+              City
+            </label>
+            <Select
+              inputId="location-city-select"
+              placeholder="City*"
+              value={selectedCity}
+              options={cityOptions}
+              onChange={(selectedOption) =>
+                onChangeOptionHandler(selectedOption, "city")
+              }
+              isSearchable
+              required
+              styles={projectFormSelectStyles}
+            />
           </div>
-
         </div>
-        <div className="row mt-4">
-          <div className="col-md-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-floating border_field">
+            <input
+              type="text"
+              className="form-control"
+              id="location-address-input"
+              placeholder="Address"
+              name="address"
+              value={projects?.location?.address || ""}
+              onChange={(e) => handleInputChange(e, "location")}
+            />
+            <label className="custompadd" htmlFor="location-address-input">
+              Address
+            </label>
+          </div>
+          <div className="project-field-block">
+            <label className="saas-label" htmlFor="location-micro-select">
+              Micro-locations
+            </label>
+            <Select
+              inputId="location-micro-select"
+              classNamePrefix="react-select"
+              placeholder="Search micro-locations…"
+              value={selectedMicroLocation}
+              options={microLocationOptions}
+              onChange={(selectedOption) =>
+                onChangeOptionHandler(selectedOption, "microLocation")
+              }
+              isMulti
+              isSearchable
+              required
+              styles={projectFormSelectStyles}
+            />
+          </div>
+        </div>
+        <div className="rounded-xl border border-slate-100 bg-slate-50/40 p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Primary coordinates
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="form-floating border_field">
               <input
                 type="text"
-                className="form-control uniform-select  "
-                id="floatingInputAddress"
-                placeholder="Address"
-                name="address"
-                value={projects?.location?.address || ""}
-                onChange={(e) => handleInputChange(e, 'location')}
+                className="form-control"
+                id="floatingInputLatti"
+                placeholder="Latitude"
+                name="latitude"
+                value={projects?.location?.latitude || ""}
+                onChange={(e) => handleInputChange(e, "location")}
               />
-              <label className="custompadd" htmlFor="floatingInputAddress">Address</label>
+              <label className="custompadd" htmlFor="floatingInputLatti">
+                Latitude
+              </label>
             </div>
-          </div>
-          <div className="col-md-6">
-            <div>
-              <Select
-                className="react-select-container"
-                classNamePrefix="react-select"
-                placeholder="Location*"
-                value={selectedMicroLocation}
-                options={microLocationOptions}
-                onChange={(selectedOption) =>
-                  onChangeOptionHandler(selectedOption, "microLocation")
-                }
-                isMulti
-                isSearchable
-                required
-              />
-            </div>
-          </div>
-        </div>
-        <div className="row mt-4 mb-4">
-          <div className="row align-items-center">
-            <div className="col-auto">
-              <h5 className="property_form_h5 mb-0">Primary</h5>
-            </div>
-
-
-            <div className="col">
-              <div className="form-floating">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputLatti"
-                  placeholder="Latitude"
-                  name="latitude"
-                  value={projects?.location?.latitude || ""}
-                  onChange={(e) => handleInputChange(e, 'location')}
-                />
-                <label className="custompadd" htmlFor="floatingInputLatti">Latitude</label>
-              </div>
-            </div>
-
-
-            <div className="col">
-              <div className="form-floating">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputLongi"
-                  placeholder="Longitude"
-                  name="longitude"
-                  value={projects?.location?.longitude || ""}
-                  onChange={(e) => handleInputChange(e, 'location')}
-                />
-                <label className="custompadd" htmlFor="floatingInputLongi">Longitude</label>
-              </div>
-            </div>
-          </div>
-
-          <div className="row align-items-center mb-3">
-            {/* Label */}
-            <div className="col-auto">
-              <h4 className="property_form_h4 mb-0">Secondary</h4>
-            </div>
-
-            {/* Latitude input */}
-            <div className="col">
-              <div className="form-floating border_field">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputLatti2"
-                  placeholder="Latitude"
-                  name="latitude2"
-                  value={projects?.location?.latitude2 || ""}
-                  onChange={(e) => handleInputChange(e, 'location')}
-                />
-                <label className="custompadd" htmlFor="floatingInputLatti2">Latitude</label>
-              </div>
-            </div>
-
-            {/* Longitude input */}
-            <div className="col">
-              <div className="form-floating border_field">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="floatingInputLongi2"
-                  placeholder="Longitude"
-                  name="longitude2"
-                  value={projects?.location?.longitude2 || ""}
-                  onChange={(e) => handleInputChange(e, 'location')}
-                />
-                <label className="custompadd" htmlFor="floatingInputLongi2">Longitude</label>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div className="row mt-4">
-          <div className="col-md-12">
-            <h4 className="property_form_h4">Metro details</h4>
-          </div>
-          <div className="col-md-4">
-            <div className="form-check">
+            <div className="form-floating border_field">
               <input
-                className="form-check-input"
-                type="checkbox"
-                id="metro_near_checkbox"
-                name="is_near_metro"
-                checked={!!projects?.location?.metro_detail?.is_near_metro}
-                onChange={(e) => handleInputChange(e, "location", "metro_detail")}
+                type="text"
+                className="form-control"
+                id="floatingInputLongi"
+                placeholder="Longitude"
+                name="longitude"
+                value={projects?.location?.longitude || ""}
+                onChange={(e) => handleInputChange(e, "location")}
               />
-              <label className="form-check-label" htmlFor="metro_near_checkbox">
-                Near metro
+              <label className="custompadd" htmlFor="floatingInputLongi">
+                Longitude
               </label>
             </div>
           </div>
-          {projects?.location?.metro_detail?.is_near_metro && (
-            <>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="metro_name_input"
-                    placeholder="Nearest metro"
-                    name="name"
-                    value={projects?.location?.metro_detail?.name || ""}
-                    onChange={(e) => handleInputChange(e, "location", "metro_detail")}
-                  />
-                  <label htmlFor="metro_name_input">Nearest metro</label>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    className="form-control"
-                    id="metro_distance_input"
-                    placeholder="Distance (km)"
-                    name="distance"
-                    value={
-                      projects?.location?.metro_detail?.distance === "" ||
-                      projects?.location?.metro_detail?.distance == null
-                        ? ""
-                        : projects?.location?.metro_detail?.distance
-                    }
-                    onChange={(e) => handleInputChange(e, "location", "metro_detail")}
-                  />
-                  <label htmlFor="metro_distance_input">Distance (km)</label>
-                </div>
-              </div>
-            </>
-          )}
         </div>
-
-        {/* School */}
-        <div className="row mt-4">
-          <div className="col-md-12">
-            <h4 className="property_form_h4">School</h4>
+        <div className="rounded-xl border border-slate-200/90 bg-slate-50/40 p-4">
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Nearby places
           </div>
-          <div className="col-md-4">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="school_near_checkbox"
-                name="is_near_school"
-                checked={!!projects?.location?.school_detail?.is_near_school}
-                onChange={(e) => handleInputChange(e, "location", "school_detail")}
+          <p className="mb-4 text-sm text-slate-600">
+            Toggle each category, then add the place name and distance in
+            kilometers.
+          </p>
+          <div className="space-y-3">
+            {LOCATION_PROXIMITY_SECTIONS.map((section) => (
+              <ProximityBlock
+                key={section.detailKey}
+                section={section}
+                projects={projects}
+                handleInputChange={handleInputChange}
               />
-              <label className="form-check-label" htmlFor="school_near_checkbox">
-                Near school
-              </label>
-            </div>
+            ))}
           </div>
-          {projects?.location?.school_detail?.is_near_school && (
-            <>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="school_name_input"
-                    placeholder="School name"
-                    name="name"
-                    value={projects?.location?.school_detail?.name || ""}
-                    onChange={(e) => handleInputChange(e, "location", "school_detail")}
-                  />
-                  <label htmlFor="school_name_input">School name</label>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    className="form-control"
-                    id="school_distance_input"
-                    name="distance"
-                    value={
-                      projects?.location?.school_detail?.distance === "" ||
-                      projects?.location?.school_detail?.distance == null
-                        ? ""
-                        : projects?.location?.school_detail?.distance
-                    }
-                    onChange={(e) => handleInputChange(e, "location", "school_detail")}
-                  />
-                  <label htmlFor="school_distance_input">Distance (km)</label>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* College */}
-        <div className="row mt-4">
-          <div className="col-md-12">
-            <h4 className="property_form_h4">College</h4>
-          </div>
-          <div className="col-md-4">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="college_near_checkbox"
-                name="is_near_college"
-                checked={!!projects?.location?.college_detail?.is_near_college}
-                onChange={(e) => handleInputChange(e, "location", "college_detail")}
-              />
-              <label className="form-check-label" htmlFor="college_near_checkbox">
-                Near college
-              </label>
-            </div>
-          </div>
-          {projects?.location?.college_detail?.is_near_college && (
-            <>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="college_name_input"
-                    placeholder="College name"
-                    name="name"
-                    value={projects?.location?.college_detail?.name || ""}
-                    onChange={(e) => handleInputChange(e, "location", "college_detail")}
-                  />
-                  <label htmlFor="college_name_input">College name</label>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    className="form-control"
-                    id="college_distance_input"
-                    name="distance"
-                    value={
-                      projects?.location?.college_detail?.distance === "" ||
-                      projects?.location?.college_detail?.distance == null
-                        ? ""
-                        : projects?.location?.college_detail?.distance
-                    }
-                    onChange={(e) => handleInputChange(e, "location", "college_detail")}
-                  />
-                  <label htmlFor="college_distance_input">Distance (km)</label>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Market */}
-        <div className="row mt-4">
-          <div className="col-md-12">
-            <h4 className="property_form_h4">Market</h4>
-          </div>
-          <div className="col-md-4">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="market_near_checkbox"
-                name="is_near_market"
-                checked={!!projects?.location?.market_detail?.is_near_market}
-                onChange={(e) => handleInputChange(e, "location", "market_detail")}
-              />
-              <label className="form-check-label" htmlFor="market_near_checkbox">
-                Near market
-              </label>
-            </div>
-          </div>
-          {projects?.location?.market_detail?.is_near_market && (
-            <>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="market_name_input"
-                    placeholder="Market name"
-                    name="name"
-                    value={projects?.location?.market_detail?.name || ""}
-                    onChange={(e) => handleInputChange(e, "location", "market_detail")}
-                  />
-                  <label htmlFor="market_name_input">Market name</label>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    className="form-control"
-                    id="market_distance_input"
-                    name="distance"
-                    value={
-                      projects?.location?.market_detail?.distance === "" ||
-                      projects?.location?.market_detail?.distance == null
-                        ? ""
-                        : projects?.location?.market_detail?.distance
-                    }
-                    onChange={(e) => handleInputChange(e, "location", "market_detail")}
-                  />
-                  <label htmlFor="market_distance_input">Distance (km)</label>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Hospital */}
-        <div className="row mt-4 mb-4">
-          <div className="col-md-12">
-            <h4 className="property_form_h4">Hospital</h4>
-          </div>
-          <div className="col-md-4">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="hospital_near_checkbox"
-                name="is_near_hospital"
-                checked={!!projects?.location?.hospital_detail?.is_near_hospital}
-                onChange={(e) => handleInputChange(e, "location", "hospital_detail")}
-              />
-              <label className="form-check-label" htmlFor="hospital_near_checkbox">
-                Near hospital
-              </label>
-            </div>
-          </div>
-          {projects?.location?.hospital_detail?.is_near_hospital && (
-            <>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="hospital_name_input"
-                    placeholder="Hospital name"
-                    name="name"
-                    value={projects?.location?.hospital_detail?.name || ""}
-                    onChange={(e) => handleInputChange(e, "location", "hospital_detail")}
-                  />
-                  <label htmlFor="hospital_name_input">Hospital name</label>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="form-floating border_field">
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    className="form-control"
-                    id="hospital_distance_input"
-                    name="distance"
-                    value={
-                      projects?.location?.hospital_detail?.distance === "" ||
-                      projects?.location?.hospital_detail?.distance == null
-                        ? ""
-                        : projects?.location?.hospital_detail?.distance
-                    }
-                    onChange={(e) => handleInputChange(e, "location", "hospital_detail")}
-                  />
-                  <label htmlFor="hospital_distance_input">Distance (km)</label>
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -18,8 +18,16 @@ const AppProvider = ({ children }) => {
   const [selectedCity, setSelectedCity] = useState(null);
   const [isEditable, setIsEditable] = useState(false);
   const login = (userData, authToken) => {
-    Cookies.set("token", authToken);
-    Cookies.set("userInfo", JSON.stringify(userData));
+    // Ensure cookies are available across all routes/tabs.
+    // Without an explicit path, cookies can default to the current route (e.g. /login),
+    // which breaks auth when opening deep links in a new tab.
+    const cookieOptions = {
+      path: "/",
+      sameSite: "lax",
+      secure: window.location.protocol === "https:",
+    };
+    Cookies.set("token", authToken, cookieOptions);
+    Cookies.set("userInfo", JSON.stringify(userData), cookieOptions);
     setUserInfo(userData);
     setToken(authToken);
   };
@@ -27,8 +35,11 @@ const AppProvider = ({ children }) => {
   const logout = () => {
     setUserInfo(null);
     setToken(null);
-    Cookies.remove("userInfo");
-    Cookies.remove("token");
+    const cookieOptions = {
+      path: "/",
+    };
+    Cookies.remove("userInfo", cookieOptions);
+    Cookies.remove("token", cookieOptions);
   };
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
