@@ -49,6 +49,70 @@ const normalizeAllAmenitiesFromApi = (raw) => {
   };
 };
 
+const isNonEmptyString = (v) =>
+  v != null && String(v).trim() !== "";
+
+const hasStartingPrice = (v) => {
+  if (v === "" || v == null) return false;
+  if (typeof v === "number") return Number.isFinite(v);
+  return String(v).trim() !== "";
+};
+
+/**
+ * Mirrors `required` / * markers on Project details, Location, and Floor plans.
+ */
+const collectRequiredFieldIssues = (p) => {
+  const issues = [];
+  if (!p) {
+    issues.push("Project data is missing.");
+    return issues;
+  }
+
+  if (!isNonEmptyString(p.name)) issues.push("Project name is required.");
+  if (!isNonEmptyString(p.slug)) issues.push("Slug is required.");
+  if (!hasStartingPrice(p.starting_price)) {
+    issues.push("Starting price is required.");
+  }
+  if (!isNonEmptyString(p.configuration)) {
+    issues.push("Configuration is required.");
+  }
+  if (!isNonEmptyString(p.project_status)) {
+    issues.push("Project status is required.");
+  }
+
+  const loc = p.location || {};
+  if (!isNonEmptyString(loc.country)) issues.push("Country is required.");
+  if (!isNonEmptyString(loc.state)) issues.push("State is required.");
+  if (!isNonEmptyString(loc.city)) issues.push("City is required.");
+  const micro = loc.micro_location;
+  if (!Array.isArray(micro) || micro.length === 0) {
+    issues.push("At least one micro-location is required.");
+  }
+
+  const plans = Array.isArray(p.plans) ? p.plans : [];
+  plans.forEach((row, idx) => {
+    const n = idx + 1;
+    if (!isNonEmptyString(row.category)) {
+      issues.push(`Plan ${n}: category is required.`);
+    }
+    if (!isNonEmptyString(row.price)) {
+      issues.push(`Plan ${n}: price is required.`);
+    }
+    const fps = Array.isArray(row.floor_plans) ? row.floor_plans : [];
+    fps.forEach((fp, j) => {
+      const fn = j + 1;
+      if (!isNonEmptyString(fp.rent_price)) {
+        issues.push(`Plan ${n}, unit ${fn}: rent price is required.`);
+      }
+      if (!isNonEmptyString(fp.sale_price)) {
+        issues.push(`Plan ${n}, unit ${fn}: sale price is required.`);
+      }
+    });
+  });
+
+  return issues;
+};
+
 function AddBuilderprojects() {
   const [isUploaded, setIsUploaded] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -238,17 +302,25 @@ function AddBuilderprojects() {
     e.preventDefault();
     setSubmitAttempted(true);
 
-    // Basic validation
-    if (!projects || !projects.name || !projects.slug) {
+    const validationIssues = collectRequiredFieldIssues(projects);
+    if (validationIssues.length > 0) {
       setFormErrors({
-        name: !projects?.name ? "Project name is required." : "",
-        slug: !projects?.slug ? "Slug is required." : "",
+        name: !isNonEmptyString(projects?.name)
+          ? "Project name is required."
+          : "",
+        slug: !isNonEmptyString(projects?.slug) ? "Slug is required." : "",
       });
+      const maxLines = 12;
+      const shown = validationIssues.slice(0, maxLines);
+      const more =
+        validationIssues.length > maxLines
+          ? ` (+${validationIssues.length - maxLines} more)`
+          : "";
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields (Name and Slug).",
+        title: "Please complete required fields",
+        description: `${shown.join(" • ")}${more}`,
         status: "warning",
-        duration: 5000,
+        duration: 9000,
         isClosable: true,
         position: "bottom",
       });

@@ -130,8 +130,13 @@ const ProjectDetails = ({ showValidation = false, errors = {} }) => {
       setSelectedBuilder(null);
     }
   }, [builders]);
-  const nameInvalid = showValidation && !projects?.name;
-  const slugInvalid = showValidation && !projects?.slug;
+  const nameInvalid =
+    showValidation && !String(projects?.name ?? "").trim();
+  const slugInvalid =
+    showValidation && !String(projects?.slug ?? "").trim();
+
+  const inputErrorClass =
+    "border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-rose-500/25";
 
   return (
     <div className="saas-card add-project-form-shell">
@@ -146,9 +151,7 @@ const ProjectDetails = ({ showValidation = false, errors = {} }) => {
 
       <div className="saas-card-body space-y-6">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div
-            className={`project-field-block lg:col-span-2 ${nameInvalid ? "rounded-xl ring-2 ring-rose-200 ring-offset-2" : ""}`}
-          >
+          <div className="project-field-block lg:col-span-2">
             <label className="saas-label" htmlFor="project-name-input">
               Name of project <span className="text-rose-600">*</span>
             </label>
@@ -159,20 +162,25 @@ const ProjectDetails = ({ showValidation = false, errors = {} }) => {
               value={projects.name ?? ""}
               onChange={handleInputChange}
               placeholder="e.g. Skyline Residences"
-              className="saas-input"
+              className={[
+                "saas-input",
+                nameInvalid ? inputErrorClass : "",
+              ].join(" ")}
               required
               aria-invalid={nameInvalid ? "true" : "false"}
+              aria-describedby={nameInvalid ? "project-name-error" : undefined}
             />
             {nameInvalid && (
-              <span className="mt-1 block text-xs font-medium text-rose-600">
-                {errors?.name || "Required"}
+              <span
+                id="project-name-error"
+                className="mt-1 block text-xs font-medium text-rose-600"
+              >
+                {errors?.name || "Project name is required."}
               </span>
             )}
           </div>
 
-          <div
-            className={`project-field-block ${slugInvalid ? "rounded-xl ring-2 ring-rose-200 ring-offset-2" : ""}`}
-          >
+          <div className="project-field-block">
             <label className="saas-label" htmlFor="project-slug-input">
               Slug <span className="text-rose-600">*</span>
             </label>
@@ -183,13 +191,20 @@ const ProjectDetails = ({ showValidation = false, errors = {} }) => {
               value={projects.slug ?? ""}
               onChange={handleInputChange}
               placeholder="url-friendly-name"
-              className="saas-input font-mono text-[13px]"
+              className={[
+                "saas-input font-mono text-[13px]",
+                slugInvalid ? inputErrorClass : "",
+              ].join(" ")}
               required
               aria-invalid={slugInvalid ? "true" : "false"}
+              aria-describedby={slugInvalid ? "project-slug-error" : undefined}
             />
             {slugInvalid && (
-              <span className="mt-1 block text-xs font-medium text-rose-600">
-                {errors?.slug || "Required"}
+              <span
+                id="project-slug-error"
+                className="mt-1 block text-xs font-medium text-rose-600"
+              >
+                {errors?.slug || "Slug is required."}
               </span>
             )}
           </div>
