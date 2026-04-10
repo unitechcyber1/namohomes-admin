@@ -139,17 +139,63 @@ const ProjectImage = () => {
       images: [...updatedOrderPayload]
     }))
   };
-  const handleDelete = async (imageId, order, name, id) => {
-    const data = { projectId: projects?._id, imageId, name, id }
-    try {
-      await deleteImage(data)
-      setProjects((prevProjects) => ({
-        ...prevProjects,
-        images: prevProjects.images.filter((image) => image.order !== order),
-      }));
-    } catch (error) {
-      // Error handled by deleteImage service function
+  const handleDelete = async (img, rowIndex) => {
+    const projectId = projects?._id;
+    const mediaFileId =
+      img?.image && typeof img.image === "object"
+        ? img.image._id
+        : typeof img.image === "string"
+          ? img.image
+          : undefined;
+
+    if (projectId && (mediaFileId || img._id)) {
+      try {
+        await deleteImage({
+          projectId,
+          imageId: img._id,
+          name: img?.image?.name ?? img?.name,
+          id: mediaFileId ?? img._id,
+        });
+        toast({
+          title: "Image removed",
+          description: "File removed from project and storage.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } catch (error) {
+        const msg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Could not delete file on server.";
+        toast({
+          title: "Server delete failed",
+          description: `${msg} Removing from this draft anyway.`,
+          status: "warning",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+    } else {
+      toast({
+        title: "Image removed",
+        description:
+          projectId == null
+            ? "Removed from project (save project to persist other changes)."
+            : "Removed from this project.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
     }
+
+    setProjects((prevProjects) => ({
+      ...prevProjects,
+      images: prevProjects.images.filter((_, i) => i !== rowIndex),
+    }));
   };
   return (
     <>
@@ -224,8 +270,12 @@ const ProjectImage = () => {
                           >
                             {projects.images.map((img, index) => (
                               <Draggable
-                                key={index}
-                                draggableId={index.toString()}
+                                key={
+                                  img._id ||
+                                  img.image?._id ||
+                                  `img-${img.order}-${index}`
+                                }
+                                draggableId={`row-${index}`}
                                 index={index}
                               >
                                 {(provided) => (
@@ -273,8 +323,9 @@ const ProjectImage = () => {
                                     </Td>
                                     <Td>
                                       <Delete
+                                        id={`project-image-del-${index}`}
                                         handleFunction={() =>
-                                          handleDelete(img._id, img.order, img?.image?.name, img.image?._id)
+                                          handleDelete(img, index)
                                         }
                                       />
                                     </Td>
